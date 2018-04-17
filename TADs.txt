@@ -1,0 +1,100 @@
+tipo abstrato Arquivo
+  "Serve para guardar e como interface de um arquivo aberto, podendo ser de leitura ou escrita."
+
+  função abrir_arquivo(path: string, modo: string): Arquivo
+    pré-condição: 'path' deve ser um caminho valido. Modo deve ser um dos seguintes: "w" para escrita, "a" para alteração, "r" para leitura.
+    pós-condição: Retorna o arquivo aberto em path, válido para a operação escolhida.
+
+  função ler_proxima_linha(a: Arquivo): string
+    pré-condição: 'a' deve ter sido aberto como modo leitura.
+    pós-condição: retorna a proxima linha do arquivo 'a'.
+
+  função escrever_linha(a: Arquivo, entrada: string): void
+    pré-condição: 'a' deve ter sido aberto como modo escrita ou alteracao.
+    pós-condição: escreve 'entrada' no arquivo 'a'.
+
+  função numero_linha_atual(a: Arquivo): int
+    pós-condição: retorna a linha atual do arquivo 'a'. Também é a próxima linha a ser lida/escrita.
+
+  função fechar_arquivo(a: Arquivo: void)
+    pré-condição: 'a' deve ter sido aberto.
+    pós-condição: fecha o arquivo 'a'.
+    
+
+fim tipo
+
+tipo abstrato Comando
+  "Tipo abstrato para guardar informações de um comando recebido do arquivo inicial."
+
+  função cria_comando(entrada: string): Comando
+    pré-condição: 'entrada' deve ser uma string válida, do formato "[comando] [argumentos...]". Por exemplo "w 1 bom dia uel$".
+    pós-condição: retorna um comando.
+
+  função get_numero_parametros(c: Comando): int
+    pré-condição: O comando deve ter sido iniciado
+    pós-condição: Retorna o número de parametros que o comando possui.
+
+  função get_parametros(c: Comando): string[]
+    pré-condição: O comando deve ter sido iniciado
+    pós-condição: Retorna um vetor de string que contém os parametros que o comando possui.
+
+  função get_tipo(c: Comando): int
+    pré-condição: O comando deve ter sido iniciado
+    pós-condição: Retorna um inteiro que indica um tipo. Definido por um enum.
+
+
+fim tipo
+
+tipo abstrato SVG
+  "Tipo abstrato para guardar informações de um arquivo SVG a ser criado."
+
+  função cria_SVG(x_max: float, y_max: float): SVG
+    pré-condição: x_max, y_max > 0
+    pós-condição: Retorna um arquivo SVG nulo, sem nada.
+
+  função desenha_figura(s: SVG, f: Figura): void
+    pré-condição: A figura 'f' deve ter sido inicializada e com os parâmetros definidos.
+    pós-condição: Desenha a figura 'f', segundo as suas especificações, no svg 's'.
+
+  função escreve_texto(s: SVG, texto: string, x: float, y: float, tamanho: float, cor: string, cor_borda: string): void
+    pré-condição: x <= x_max; y <= y_max; cor e cor_borda são cores válidas de svg
+    pós-condição: Escreve o texto 'texto', na posicão ('x', 'y'), com tamanho 'tamanho' e cores 'cor' e 'cor_borda' no SVG 's'.
+
+  função salva_SVG(path: string): void
+    pré-condição: 'path' é um caminho válido para um arquivo.
+    pós-condição: Salva o SVG no path especificado.
+
+fim tipo
+
+tipo abstrato Figura
+
+  função intercepta_figura(f: Figura, f2: Figura): boolean
+    pré-condição: 'f' e 'f2' devem ser figuras válidas ("Circulo ou Retangulo")
+    pós-condição: Retorna true caso as duas figuras se interceptam. False caso contrário.
+
+  função cria_retangulo(x: float, y: float, w: float, h: float, cor: string, cor_borda: string): Figura
+    pré-condição: x < x_max; y < y_max; 'cor' e 'cor_borda' devem ser cores válidas de SVG
+    pós-condição: Retorna uma Figura do tipo Retângulo com as especificações dadas.
+
+  função cria_circulo(x: float, y: float, r: float, cor: string): Figura
+    pré-condição: x < x_max; y < y_max; 'cor' e 'cor_borda' devem ser cores válidas de SVG
+    pós-condição: Retorna uma Figura do tipo Circulo com as especificações dadas.
+
+fim tipo
+
+tipo abstrato Controlador
+  "Controla o programa em si. Guarda informações necessárias para o funcionamento do programa e executa as funções necessárias."
+
+  função cria_controlador(): Controlador
+    pós-condição: Retorna um controlador vazio
+
+  função lidar_parametros(c: Controlador, argc: int, argv: string[]): void
+    pós-condição: Lê e interpreta os argumentos do programa e salva os dados necessários no Controlador 'c'.
+
+  função executar_comando(c: Controlador, com: Comando): boolean
+    pré-condição: Controlador 'c' deve ter os dados necessários para a execução do comando 'com'.
+    pós-condição: Executa o comando 'com' seguindo os dados do controlador 'c'. Retorna true se foi possível executar o comando, falso caso contrário.
+
+fim tipo
+
+  
