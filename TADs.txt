@@ -68,10 +68,6 @@ fim tipo
 
 tipo abstrato Figura
 
-  função intercepta_figura(f: Figura, f2: Figura): boolean
-    pré-condição: 'f' e 'f2' devem ser figuras válidas ("Circulo ou Retangulo")
-    pós-condição: Retorna true caso as duas figuras se interceptam. False caso contrário.
-
   função cria_retangulo(x: float, y: float, w: float, h: float, cor: string, cor_borda: string): Figura
     pré-condição: x < x_max; y < y_max; 'cor' e 'cor_borda' devem ser cores válidas de SVG
     pós-condição: Retorna uma Figura do tipo Retângulo com as especificações dadas.
@@ -79,6 +75,10 @@ tipo abstrato Figura
   função cria_circulo(x: float, y: float, r: float, cor: string): Figura
     pré-condição: x < x_max; y < y_max; 'cor' e 'cor_borda' devem ser cores válidas de SVG
     pós-condição: Retorna uma Figura do tipo Circulo com as especificações dadas.
+
+  função intercepta_figura(f: Figura, f2: Figura): boolean
+    pré-condição: 'f' e 'f2' devem ser figuras válidas ("Circulo ou Retangulo")
+    pós-condição: Retorna true caso as duas figuras se interceptam. False caso contrário.
 
 fim tipo
 
@@ -94,6 +94,10 @@ tipo abstrato Controlador
   função executar_comando(c: Controlador, com: Comando): boolean
     pré-condição: Controlador 'c' deve ter os dados necessários para a execução do comando 'com'.
     pós-condição: Executa o comando 'com' seguindo os dados do controlador 'c'. Retorna true se foi possível executar o comando, falso caso contrário.
+
+  função set_arquivo_entrada(c: Controlador, a: Arquivo): void
+    pré-condição: Arquivo 'a' deve ser de modo leitura.
+    pós-condição: Define o arquivo 'a' como arquivo de entrada dos comandos do Controlador 'c'.
 
 fim tipo
 
