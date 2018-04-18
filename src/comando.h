@@ -1,15 +1,15 @@
-#ifndef _COMANDO_H_
-#define _COMANDO_H_
+#ifndef __COMANDO_H__
+#define __COMANDO_H__
 
-typedef struct Comando* Comando;
-typedef enum TipoComando TipoComando;
+typedef void *Comando;
+typedef int TipoComando;
 
-Comando cria_comando(char* entrada);
+Comando cria_comando(char *entrada);
 
 int get_numero_parametros(Comando c);
 
-char** get_parametros(Comando c);
+char **get_parametros(Comando c);
 
 TipoComando get_tipo(Comando c);
 
-#endif // _COMANDO_H_
+#endif  // __COMANDO_H__

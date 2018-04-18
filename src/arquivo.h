@@ -1,18 +1,17 @@
-#ifndef _ARQUIVO_H_
-#define _ARQUIVO_H_
+#ifndef __ARQUIVO_H__
+#define __ARQUIVO_H__
 
-typedef struct Arquivo* Arquivo;
+typedef void *Arquivo;
+typedef int TipoArquivo;
 
-typedef enum TipoArquivo TipoArquivo;
+Arquivo abrir_arquivo(char *path, TipoArquivo modo);
 
-Arquivo abrir_arquivo(char* path, TipoArquivo modo);
+char *ler_proxima_linha(Arquivo a);
 
-char* ler_proxima_linha(Arquivo a);
-
-char* escrever_linha(Arquivo a, char* entrada);
+char *escrever_linha(Arquivo a, char *entrada);
 
 int numero_linha_atual(Arquivo a);
 
 void fechar_arquivo(Arquivo a);
 
-#endif // _ARQUIVO_H_
+#endif  // __ARQUIVO_H__
