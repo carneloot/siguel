@@ -1,16 +1,17 @@
-#ifndef _SVG_H_
-#define _SVG_H_
+#ifndef __SVG_H__
+#define __SVG_H__
 
 #include "figura.h"
 
-typedef struct SVG* SVG;
+typedef void* SVG;
 
 SVG cria_SVG();
 
 void desenha_figura(SVG s, Figura f);
 
-void escreve_texto(SVG s, char* texto, float x, float y, float tamanho, char* cor, char* cor_borda);
+void escreve_texto(SVG s, char* texto, float x, float y, float tamanho,
+                   char* cor, char* cor_borda);
 
 void salva_SVG(char* path);
 
-#endif // _SVG_H_
+#endif  // __SVG_H__

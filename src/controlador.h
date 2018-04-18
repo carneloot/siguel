@@ -1,10 +1,10 @@
-#ifndef _CONTROLADOR_H_
-#define _CONTROLADOR_H_
+#ifndef __CONTROLADOR_H__
+#define __CONTROLADOR_H__
 
-#include "comando.h"
 #include "arquivo.h"
+#include "comando.h"
 
-typedef struct Controlador* Controlador;
+typedef void* Controlador;
 
 Controlador cria_controlador();
 
@@ -14,4 +14,4 @@ int executar_comando(Controlador c, Comando com);
 
 void set_arquivo_entrada(Controlador c, Arquivo a);
 
-#endif // _CONTROLADOR_H_
+#endif  // __CONTROLADOR_H__

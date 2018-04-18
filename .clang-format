@@ -1,0 +1,15 @@
+﻿---
+BasedOnStyle: Google
+AccessModifierOffset: '0'
+AlignConsecutiveAssignments: 'true'
+AllowAllParametersOfDeclarationOnNextLine: 'true'
+AllowShortBlocksOnASingleLine: 'true'
+AllowShortCaseLabelsOnASingleLine: 'true'
+DerivePointerAlignment: 'true'
+IndentWidth: '2'
+SortIncludes: 'true'
+SpaceAfterCStyleCast: 'true'
+TabWidth: '2'
+UseTab: Never
+
+...
