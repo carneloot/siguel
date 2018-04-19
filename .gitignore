@@ -89,3 +89,5 @@ lib/*
 # Ignore the Executables
 bin/*
 
+# Ignorar PDFs
+*.pdf
