@@ -19,7 +19,15 @@ tipo abstrato Arquivo
   função fechar_arquivo(a: Arquivo): void
     pré-condição: 'a' deve ter sido aberto.
     pós-condição: fecha o arquivo 'a'.
-    
+
+  função get_nome(a: Arquivo): string
+    pós-condição: Retorna o nome do arquivo.
+  
+  função get_diretorio(a: Arquivo): string
+    pós-condição: Retorna o diretorio do arquivo.
+
+  função get_extensao(a: Arquivo): string
+    pós-condição: Retorna a extensao do arquivo.
 
 fim tipo
 
@@ -41,7 +49,6 @@ tipo abstrato Comando
   função get_tipo(c: Comando): int
     pré-condição: O comando deve ter sido iniciado
     pós-condição: Retorna um inteiro que indica um tipo. Definido por um enum.
-
 
 fim tipo
 
@@ -84,7 +91,6 @@ tipo abstrato Figura
   função contem_ponto(f: Figura, x: double, y: double): boolean
     pré-condição: 'f' e 'f2' devem ser figuras válidas ("Circulo ou Retangulo").
     pós-condição: Retorna true caso o ponto (x, y) está dentro da figura 'f'.
-  
 
 fim tipo
 
