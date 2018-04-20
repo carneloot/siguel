@@ -16,11 +16,11 @@ TARGET   = siguel
 
 CC       = gcc
 # compiling flags here
-CFLAGS   = -std=c99 -Wall -I.
+CFLAGS   = -std=c99 -Wall -I. -g
 
 LINKER   = gcc
 # linking flags here
-LFLAGS   = -Wall -I. -lm
+LFLAGS   = -Wall -I. -lm -g
 
 # change these to proper directories where each file should be
 SRCDIR   = src
