@@ -21,4 +21,6 @@ int intercepta_figura(Figura f, Figura f2);
 
 int contem_ponto(Figura f, double x, double y);
 
+void print_figura(Figura f);
+
 #endif  // __FIGURA_H__
