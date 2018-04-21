@@ -23,4 +23,6 @@ int contem_ponto(Figura f, double x, double y);
 
 void print_figura(Figura f);
 
+void destruir_figura(Figura f);
+
 #endif  // __FIGURA_H__

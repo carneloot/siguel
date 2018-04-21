@@ -13,10 +13,16 @@ struct Comando {
 const struct {
   char *id;
   enum TipoComando tipo;
-} comandos[] = {{"nx", MUDAR_NUM_FIGURAS}, {"c", DESENHA_CIRCULO},
-                {"r", DESENHA_RETANGULO},  {"o", CHECA_SOBREPOSICAO},
-                {"i", CHECA_PONTO},        {"d", DISTANCIA_FIGURAS},
-                {"a", CRIAR_SVG},          {"#", FIM_DO_ARQUIVO}};
+} comandos[] = {{"nx", MUDAR_NUM_FIGURAS},
+                {"c", DESENHA_CIRCULO},
+                {"r", DESENHA_RETANGULO},
+                {"o", CHECA_SOBREPOSICAO},
+                {"i", CHECA_PONTO},
+                {"d", DISTANCIA_FIGURAS},
+                {"a", CRIAR_SVG},
+                {"#", FIM_DO_ARQUIVO}};
+
+int conta_params(char *entrada);
 
 Comando cria_comando(char *entrada) {
   int h;
@@ -25,18 +31,9 @@ Comando cria_comando(char *entrada) {
   struct Comando *this = (struct Comando *) malloc(sizeof(struct Comando));
 
   this->tipo      = NONE;
-  this->num_param = 0;
+  this->num_param = conta_params(entrada);
 
   linha = (char *) malloc((strlen(entrada) + 1) * sizeof(char));
-  strcpy(linha, entrada);
-
-  // Conta o numero de parametros tem no comando
-  item = strtok(linha, " ");
-  while (item) {
-    this->num_param++;
-    item = strtok(NULL, " ");
-  }
-  this->num_param--;
 
   // Coloca os parametros no vetor de strings this->params
   this->params = (char **) malloc(this->num_param * sizeof(char *));
@@ -69,6 +66,8 @@ Comando cria_comando(char *entrada) {
     item = strtok(NULL, " ");
   }
 
+  free(linha);
+
   return (void *) this;
 }
 
@@ -82,4 +81,40 @@ char **get_parametros(Comando c) {
 
 enum TipoComando get_tipo(Comando c) {
   return ((struct Comando *) c)->tipo;
+}
+
+void destruir_comando(Comando c) {
+  struct Comando *this = (struct Comando *) c;
+
+  for (int i = 0; i < this->num_param; i++) {
+    free(this->params[i]);
+  }
+
+  free(this->params);
+
+  free(c);
+
+}
+
+// --------- FUNCOES PRIVADAS -------------
+
+int conta_params(char *entrada) {
+  char *linha, *item;
+  int num_params = 0;
+
+  linha = (char *) malloc((strlen(entrada) + 1) * sizeof(char));
+  strcpy(linha, entrada);
+
+  // Conta o numero de parametros tem no comando
+  item = strtok(linha, " ");
+  while (item) {
+    num_params++;
+    item = strtok(NULL, " ");
+  }
+
+  num_params--;
+
+  free(linha);
+
+  return num_params;
 }

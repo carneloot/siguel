@@ -31,7 +31,7 @@ Arquivo abrir_arquivo(char *path, enum TipoArquivo modo) {
 
   this->linha_atual = 1;
   this->modo        = modo;
-  this->path        = (char *) malloc(strlen(path) * sizeof(char));
+  this->path        = (char *) malloc((strlen(path) + 1) * sizeof(char));
 
   strcpy(this->path, path);
 
@@ -50,6 +50,7 @@ char *ler_proxima_linha(Arquivo a) {
   if (tam <= 0)
     return NULL;
 
+  // TODO: Lembrar de dar free nessa linha;
   char *linha = (char *) malloc(tam * sizeof(char));
 
   // Le a linha até antes do \n
@@ -76,9 +77,7 @@ void escrever_linha(Arquivo a, char *entrada) {
 }
 
 int numero_linha_atual(Arquivo a) {
-  struct Arquivo *this = (struct Arquivo *) a;
-
-  return this->linha_atual;
+  return ((struct Arquivo *) a)->linha_atual;
 }
 
 void fechar_arquivo(Arquivo a) {

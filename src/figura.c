@@ -110,6 +110,8 @@ int contem_ponto(Figura f, double x, double y) {
     return !(x < this->x || x > this->x + this->dados_rect.w || y < this->y ||
              y > this->y + this->dados_rect.h);
   }
+
+  return 0;
 }
 
 void print_figura(Figura f) {
@@ -131,4 +133,13 @@ void print_figura(Figura f) {
              this->dados_circ.r);
       break;
   }
+}
+
+void destruir_figura(Figura f) {
+  struct Figura *this = (struct Figura *) f;
+
+  free(this->cor);
+  free(this->cor_borda);
+
+  free(f);
 }
