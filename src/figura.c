@@ -114,27 +114,6 @@ int contem_ponto(Figura f, double x, double y) {
   return 0;
 }
 
-void print_figura(Figura f) {
-  struct Figura *this = (struct Figura *) f;
-
-  switch (this->tipo) {
-    case RETANGULO:
-      printf("Ret: (%.0f, %.0f) -> h: %.0f, w: %.0f\n",
-             this->x,
-             this->y,
-             this->dados_rect.h,
-             this->dados_rect.w);
-      break;
-
-    case CIRCULO:
-      printf("Cir: (%.0f, %.0f) -> r: %.0f\n",
-             this->x,
-             this->y,
-             this->dados_circ.r);
-      break;
-  }
-}
-
 void destruir_figura(Figura f) {
   struct Figura *this = (struct Figura *) f;
 

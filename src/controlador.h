@@ -12,6 +12,8 @@ void lidar_parametros(Controlador c, int argc, char *argv[]);
 
 int executar_comando(Controlador c, Comando com);
 
-void set_arquivo_entrada(Controlador c, Arquivo a);
+void abrir_arquivo_entrada(Controlador c);
+
+void destruir_controlador(Controlador c);
 
 #endif  // __CONTROLADOR_H__

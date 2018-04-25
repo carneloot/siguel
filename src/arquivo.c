@@ -29,6 +29,11 @@ Arquivo abrir_arquivo(char *path, enum TipoArquivo modo) {
     case ALTERACAO: this->arq = fopen(path, "a"); break;
   }
 
+  if (!this->arq) {
+    free(this);
+    return NULL;
+  }
+
   this->linha_atual = 1;
   this->modo        = modo;
   this->path        = (char *) malloc((strlen(path) + 1) * sizeof(char));

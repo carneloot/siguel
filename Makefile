@@ -44,8 +44,7 @@ $(OBJECTS): $(OBJDIR)/%.o : $(SRCDIR)/%.c
 
 .PHONY: clean
 clean:
-	@# $(rm) $(OBJECTS)
-	@$(rm) $(OBJDIR)/*
+	@$(rm) $(OBJECTS)
 	@echo "Cleanup complete!"
 
 .PHONY: remove
