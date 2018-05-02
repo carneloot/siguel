@@ -7,13 +7,14 @@
  */
 typedef void *Figura;
 
+enum TipoFigura { CIRCULO, RETANGULO };
+
 /**
  * 'cor' e 'cor_borda' devem ser cores válidas de SVG.
  * Retorna uma Figura do tipo Retângulo com as especificações dadas.
  */
-Figura cria_retangulo(float x, float y, float w, float h, char *cor,
-                      char *cor_borda);
-
+Figura cria_retangulo(
+    float x, float y, float w, float h, char *cor, char *cor_borda);
 
 Figura cria_circulo(float x, float y, float r, char *cor, char *cor_borda);
 
@@ -22,5 +23,23 @@ int intercepta_figura(Figura f, Figura f2);
 int contem_ponto(Figura f, double x, double y);
 
 void destruir_figura(Figura f);
+
+/** Getters */
+
+float get_x(Figura f);
+
+float get_y(Figura f);
+
+float get_r(Figura f);
+
+float get_w(Figura f);
+
+float get_h(Figura f);
+
+char *get_cor(Figura f);
+
+char *get_cor_borda(Figura f);
+
+enum TipoFigura get_tipo_figura(Figura f);
 
 #endif  // __FIGURA_H__

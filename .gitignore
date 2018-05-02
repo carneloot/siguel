@@ -94,3 +94,5 @@ bin/*
 
 # Nao enviar o link para o git
 .clang-format
+
+*.svg

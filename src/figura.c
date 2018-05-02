@@ -6,14 +6,13 @@
 #include <string.h>
 #include "utils.h"
 
-enum TipoFigura { CIRCULO, RETANGULO };
-
 struct Figura {
   float x, y;
   char *cor, *cor_borda;
 
   enum TipoFigura tipo;
 
+  /** DADOS DE CADA TIPO */
   union {
     /** DADOS CIRCULO */
     struct {
@@ -57,6 +56,9 @@ Figura cria_circulo(float x, float y, float r, char *cor, char *cor_borda) {
 
   strcpy(this->cor, cor);
   strcpy(this->cor_borda, cor_borda);
+
+  trim(&this->cor);
+  trim(&this->cor_borda);
 
   return (void *) this;
 }
@@ -121,4 +123,53 @@ void destruir_figura(Figura f) {
   free(this->cor_borda);
 
   free(f);
+}
+
+/** Getters */
+
+float get_x(Figura f) {
+  return ((struct Figura *) f)->x;
+}
+
+float get_y(Figura f) {
+  return ((struct Figura *) f)->y;
+}
+
+float get_r(Figura f) {
+  struct Figura *this = (struct Figura *) f;
+
+  if (this->tipo != CIRCULO)
+    return -1;
+
+  return this->dados_circ.r;
+}
+
+float get_w(Figura f) {
+  struct Figura *this = (struct Figura *) f;
+
+  if (this->tipo != RETANGULO)
+    return -1;
+
+  return this->dados_rect.w;
+}
+
+float get_h(Figura f) {
+  struct Figura *this = (struct Figura *) f;
+
+  if (this->tipo != RETANGULO)
+    return -1;
+
+  return this->dados_rect.h;
+}
+
+char *get_cor(Figura f) {
+  return ((struct Figura *) f)->cor;
+}
+
+char *get_cor_borda(Figura f) {
+  return ((struct Figura *) f)->cor_borda;
+}
+
+enum TipoFigura get_tipo_figura(Figura f) {
+  return ((struct Figura *) f)->tipo;
 }

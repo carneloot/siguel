@@ -4,6 +4,8 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include "utils.h"
+
 struct Arquivo {
   FILE *arq;
   int linha_atual;
@@ -56,13 +58,17 @@ char *ler_proxima_linha(Arquivo a) {
     return NULL;
 
   // TODO: Lembrar de dar free nessa linha;
-  char *linha = (char *) malloc(tam * sizeof(char));
+  char *linha = (char *) malloc((tam + 1) * sizeof(char));
 
   // Le a linha até antes do \n
   fgets(linha, tam, this->arq);
 
   // Pula o \n que ele nao leu
-  fseek(this->arq, 1, SEEK_CUR);
+  char c;
+
+  while ((c = fgetc(this->arq)) != '\n' && c != '\r') {}
+
+  trim(&linha);
 
   this->linha_atual++;
 
@@ -113,7 +119,7 @@ int tamanho_linha(FILE *arq) {
   int tam = 0;
   char c;
 
-  while ((c = fgetc(arq)) != '\n' && !feof(arq)) {
+  while ((c = fgetc(arq)) != '\n' && c != '\r' && !feof(arq)) {
     tam++;
   }
 
@@ -122,5 +128,5 @@ int tamanho_linha(FILE *arq) {
 
   fseek(arq, -(tam + 1), SEEK_CUR);
 
-  return tam;
+  return tam + 1;
 }

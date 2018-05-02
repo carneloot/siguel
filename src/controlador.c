@@ -35,7 +35,37 @@ Controlador cria_controlador() {
   return (void *) this;
 }
 
-void lidar_parametros(Controlador c, int argc, char *argv[]);
+void lidar_parametros(Controlador c, int argc, const char *argv[]) {
+  struct Controlador *this = (struct Controlador *) c;
+
+  int i = 1;
+
+  while (i < argc) {
+    // Pega o file name out
+    if (!strcmp(argv[i], "-f")) {
+      i++;
+      this->nome_arquivo_entrada =
+          (char *) malloc((strlen(argv[i]) + 1) * sizeof(char));
+      strcpy(this->nome_arquivo_entrada, argv[i]);
+    }
+
+    // Pega o default directory
+    else if (!strcmp(argv[i], "-o")) {
+      i++;
+      this->dir_saida = (char *) malloc((strlen(argv[i]) + 1) * sizeof(char));
+      strcpy(this->dir_saida, argv[i]);
+    }
+
+    else if (!strcmp(argv[i], "-e")) {
+      i++;
+      free(this->dir_entrada);
+      this->dir_entrada = (char *) malloc((strlen(argv[i]) + 1) * sizeof(char));
+      strcpy(this->dir_entrada, argv[i]);
+    }
+
+    i++;
+  }
+}
 
 int executar_comando(Controlador c, Comando com);
 
@@ -81,4 +111,8 @@ void destruir_controlador(Controlador c) {
     free(this->dir_entrada);
 
   free(c);
+}
+
+Arquivo get_arquivo_entrada(Controlador c) {
+  return ((struct Controlador *) c)->arquivo_entrada;
 }

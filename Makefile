@@ -16,7 +16,7 @@ TARGET   = siguel
 
 CC       = gcc
 # compiling flags here
-CFLAGS   = -std=c99 -Wall -I. -g
+CFLAGS   = -std=c11 -Wall -I. -g
 
 LINKER   = gcc
 # linking flags here
