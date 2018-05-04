@@ -238,11 +238,11 @@ int executar_comando(Controlador c, Comando com) {
         sufixo = (char *) calloc(1, sizeof(char));
 
       length = strlen(this->nome_base) + strlen(this->dir_saida) +
-               strlen(sufixo) + 5;
+               strlen(sufixo) + 6;
 
       saida = (char *) malloc(length * sizeof(char));
 
-      sprintf(saida, "%s%s%s.svg", this->dir_saida, this->nome_base, sufixo);
+      sprintf(saida, "%s%s-%s.svg", this->dir_saida, this->nome_base, sufixo);
 
       s = cria_SVG(saida);
 
