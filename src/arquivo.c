@@ -101,18 +101,6 @@ void fechar_arquivo(Arquivo a) {
   free(a);
 }
 
-char *get_nome(Arquivo a) {
-  return "";
-}
-
-char *get_diretorio(Arquivo a) {
-  return "";
-}
-
-char *get_extensao(Arquivo a) {
-  return "";
-}
-
 // ----------------- DEFINIÇÔES MÉTODOS PRIVADOS -------------------
 
 int tamanho_linha(FILE *arq) {

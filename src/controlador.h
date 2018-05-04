@@ -12,10 +12,12 @@ void lidar_parametros(Controlador c, int argc, const char *argv[]);
 
 int executar_comando(Controlador c, Comando com);
 
-void abrir_arquivo_entrada(Controlador c);
+void abrir_arquivos(Controlador c);
 
 void destruir_controlador(Controlador c);
 
 Arquivo get_arquivo_entrada(Controlador c);
+
+char *get_nome_base(Controlador c);
 
 #endif  // __CONTROLADOR_H__

@@ -9,6 +9,8 @@ SVG cria_SVG(char *path);
 
 void desenha_figura(SVG s, Figura f);
 
+void desenha_dashed_rect(SVG s, Figura f);
+
 void escreve_texto(
     SVG s, char *texto, float x, float y, float tamanho, char *cor);
 

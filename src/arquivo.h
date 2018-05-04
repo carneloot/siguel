@@ -37,19 +37,4 @@ int numero_linha_atual(Arquivo a);
  */
 void fechar_arquivo(Arquivo a);
 
-/**
- * Retorna o nome do arquivo
- */
-char *get_nome(Arquivo a);
-
-/**
- * Retorna o diretorio do arquivo
- */
-char *get_diretorio(Arquivo a);
-
-/**
- * Retorna a extensao do arquivo
- */
-char *get_extensao(Arquivo a);
-
 #endif  // __ARQUIVO_H__

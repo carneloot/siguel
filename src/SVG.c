@@ -6,9 +6,6 @@
 #include "arquivo.h"
 #include "utils.h"
 
-#define MAX_WIDTH 500
-#define MAX_HEIGHT 500
-
 struct SVG {
   Arquivo saida;
 };
@@ -18,20 +15,7 @@ SVG cria_SVG(char *path) {
 
   this->saida = abrir_arquivo(path, ESCRITA);
 
-  // Codigo para colocar o MAX_WIDTH e o MAX_HEIGHT no inicio do SVG
-  size_t length;
-  char *linha;
-
-  length = 25;
-  length += num_digits(MAX_HEIGHT) - 2;
-  length += num_digits(MAX_WIDTH) - 2;
-
-  linha = (char *) malloc(length * sizeof(char));
-  sprintf(linha, "<svg width=\"%d\" height=\"%d\">", MAX_WIDTH, MAX_HEIGHT);
-
-  escrever_linha(this->saida, linha);
-
-  free(linha);
+  escrever_linha(this->saida, "<svg xmlns=\"http://www.w3.org/2000/svg\">");
 
   return (void *) this;
 }
@@ -54,7 +38,7 @@ void desenha_figura(SVG s, Figura f) {
 
   switch (get_tipo_figura(f)) {
     case CIRCULO:
-      length += 65;
+      length += 77;
 
       r = get_r(f);
       length += num_digits(r);
@@ -63,7 +47,7 @@ void desenha_figura(SVG s, Figura f) {
 
       sprintf(linha,
               "<circle cx=\"%.1f\" cy=\"%.1f\" r=\"%.1f\" "
-              "style=\"fill:%s;stroke-width:4;stroke:%s\" />",
+              "style=\"fill:%s;stroke-width:2;stroke:%s;opacity:0.4\" />",
               x,
               y,
               r,
@@ -74,7 +58,7 @@ void desenha_figura(SVG s, Figura f) {
       break;
 
     case RETANGULO:
-      length += 75;
+      length += 87;
 
       h = get_h(f);
       w = get_w(f);
@@ -86,7 +70,7 @@ void desenha_figura(SVG s, Figura f) {
 
       sprintf(linha,
               "<rect x=\"%.1f\" y=\"%.1f\" width=\"%.1f\" height=\"%.1f\" "
-              "style=\"fill:%s;stroke-width:4;stroke:%s\" />",
+              "style=\"fill:%s;stroke-width:2;stroke:%s;opacity:0.4\" />",
               x,
               y,
               w,
@@ -97,6 +81,42 @@ void desenha_figura(SVG s, Figura f) {
       escrever_linha(this->saida, linha);
       break;
   }
+
+  free(linha);
+}
+
+void desenha_dashed_rect(SVG s, Figura f) {
+  if (get_tipo_figura(f) != RETANGULO)
+    return;
+
+  struct SVG *this = (struct SVG *) s;
+
+  float x, y, h, w;
+  char *linha;
+  size_t length;
+
+  x = get_x(f);
+  y = get_y(f);
+  h = get_h(f);
+  w = get_w(f);
+
+  length = 115;
+  length += num_digits(x);
+  length += num_digits(y);
+  length += num_digits(h);
+  length += num_digits(w);
+
+  linha = (char *) malloc(length * sizeof(char));
+
+  sprintf(linha,
+          "<rect width=\"%.1f\" height=\"%.1f\" x=\"%.1f\" y=\"%.1f\" stroke-dasharray=\"3, "
+          "3\" style=\"fill:transparent;stroke-width:2;stroke:purple\"/>",
+          w,
+          h,
+          x,
+          y);
+
+  escrever_linha(this->saida, linha);
 
   free(linha);
 }
@@ -156,7 +176,7 @@ void desenha_linha(SVG s, float x1, float y1, float x2, float y2, char *cor) {
 
   sprintf(linha,
           "<line x1=\"%.1f\" y1=\"%.1f\" x2=\"%.1f\" y2=\"%.1f\" "
-          "style=\"stroke:%s;stroke-width:3\" />",
+          "style=\"stroke:%s;stroke-width:1\" />",
           x1,
           y1,
           x2,

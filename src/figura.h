@@ -22,6 +22,12 @@ int intercepta_figura(Figura f, Figura f2);
 
 int contem_ponto(Figura f, double x, double y);
 
+void get_centro_massa(Figura f, float *x, float *y);
+
+Figura get_rect_sobreposicao(Figura f1, Figura f2);
+
+float distancia_figuras(Figura f, Figura f2);
+
 void destruir_figura(Figura f);
 
 /** Getters */
