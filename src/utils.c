@@ -4,14 +4,12 @@
 #include <stdlib.h>
 #include <string.h>
 
-float round_digits(float num, int n) {
-  float newNum;
+float fmaxf(float a, float b) {
+  return (a > b) ? a : b;
+}
 
-  newNum = num * pow(10, n);
-  newNum = (float) round(newNum);
-  newNum = newNum / pow(10, n);
-
-  return newNum;
+float fminf(float a, float b) {
+  return (a < b) ? a : b;
 }
 
 void trim(char **p) {
@@ -31,8 +29,8 @@ void trim(char **p) {
 
   saida = (char *) malloc((tam + 1) * sizeof(char));
 
-  // Copia os 'tam' primeiros caracteres de entrada para saida
-  // strncpy deu problema no valgrind (????)
+  /* Copia os 'tam' primeiros caracteres de entrada para saida */
+  /* strncpy deu problema no valgrind (????) */
   for (i = 0; i < tam; i++)
     saida[i] = entrada[i];
   saida[i] = 0;
@@ -42,10 +40,10 @@ void trim(char **p) {
 }
 
 int num_digits(float num) {
+  int a, count;
+
   if (num == 0)
     return 3;
-
-  int a, count;
 
   a     = (int) num;
   count = 0;
@@ -133,13 +131,14 @@ char *get_extensao(char *path) {
 
 char *evaluate_dir(char *dir) {
   int tam;
+  char *newDir;
 
   tam = strlen(dir);
 
   if (dir[tam - 1] == '/')
     return dir;
 
-  char *newDir = (char *) calloc(tam + 2, sizeof(char));
+  newDir = (char *) calloc(tam + 2, sizeof(char));
 
   strcat(newDir, dir);
   strcat(newDir, "/");

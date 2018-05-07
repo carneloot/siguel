@@ -9,7 +9,7 @@ struct Comando {
   char **params;
 };
 
-// Comandos definidos numa constante para procurar automaticamente
+/* Comandos definidos numa constante para procurar automaticamente */
 const struct {
   char *id;
   enum TipoComando tipo;
@@ -25,17 +25,18 @@ const struct {
 int conta_params(char *entrada);
 
 Comando cria_comando(char *entrada) {
-  int h;
+  int h, i;
   char *linha, *item;
 
-  struct Comando *this = (struct Comando *) malloc(sizeof(struct Comando));
+  struct Comando *this;
+  this = (struct Comando *) malloc(sizeof(struct Comando));
 
   this->tipo      = NONE;
   this->num_param = conta_params(entrada);
 
   linha = (char *) malloc((strlen(entrada) + 1) * sizeof(char));
 
-  // Coloca os parametros no vetor de strings this->params
+  /* Coloca os parametros no vetor de strings this->params */
   this->params = (char **) malloc(this->num_param * sizeof(char *));
   strcpy(linha, entrada);
 
@@ -43,11 +44,11 @@ Comando cria_comando(char *entrada) {
 
   item = strtok(linha, " ");
   while (item) {
-    // Tipo
+    /* Tipo */
     if (this->tipo == NONE) {
       int total_comandos = sizeof(comandos) / sizeof(comandos[0]);
 
-      for (int i = 0; i < total_comandos; i++) {
+      for (i = 0; i < total_comandos; i++) {
         if (!strcmp(item, comandos[i].id)) {
           this->tipo = comandos[i].tipo;
           break;
@@ -55,7 +56,7 @@ Comando cria_comando(char *entrada) {
       }
     }
 
-    // Parametros
+    /* Parametros */
     else {
       this->params[h] = (char *) malloc((strlen(item) + 1) * sizeof(char));
       strcpy(this->params[h], item);
@@ -84,19 +85,21 @@ enum TipoComando get_tipo(Comando c) {
 }
 
 void destruir_comando(Comando c) {
-  struct Comando *this = (struct Comando *) c;
+  struct Comando *this;
+  int i;
 
-  for (int i = 0; i < this->num_param; i++) {
+  this = (struct Comando *) c;
+
+  for (i = 0; i < this->num_param; i++) {
     free(this->params[i]);
   }
 
   free(this->params);
 
   free(c);
-
 }
 
-// --------- FUNCOES PRIVADAS -------------
+/* --------- FUNCOES PRIVADAS ------------- */
 
 int conta_params(char *entrada) {
   char *linha, *item;
@@ -105,7 +108,7 @@ int conta_params(char *entrada) {
   linha = (char *) malloc((strlen(entrada) + 1) * sizeof(char));
   strcpy(linha, entrada);
 
-  // Conta o numero de parametros tem no comando
+  /* Conta o numero de parametros tem no comando */
   item = strtok(linha, " ");
   while (item) {
     num_params++;

@@ -20,4 +20,4 @@ void salva_SVG(SVG s);
 
 void destruir_SVG(SVG s);
 
-#endif  // __SVG_H__
+#endif /* __SVG_H__ */

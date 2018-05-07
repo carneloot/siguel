@@ -48,4 +48,4 @@ char *get_cor_borda(Figura f);
 
 enum TipoFigura get_tipo_figura(Figura f);
 
-#endif  // __FIGURA_H__
+#endif /* __FIGURA_H__ */

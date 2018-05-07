@@ -1,6 +1,10 @@
 #ifndef __UTILS_H__
 #define __UTILS_H__
 
+float fmaxf(float, float);
+
+float fminf(float, float);
+
 float round_digits(float num, int n);
 
 void trim(char **);
@@ -19,4 +23,4 @@ char *get_extensao(char *path);
 
 char *evaluate_dir(char *dir);
 
-#endif  // __UTILS_H__
+#endif /* __UTILS_H__ */

@@ -13,17 +13,18 @@ struct Arquivo {
   char *path;
 };
 
-// ----------------- DECLARAÇÕES MÉTODOS PRIVADOS -------------------
+/* ----------------- DECLARAÇÕES MÉTODOS PRIVADOS ------------------- */
 
 /**
  * Retorna o tamanho da proxima linha do arquivo
  */
 int tamanho_linha(FILE *arq);
 
-// ----------------- DECLARAÇÕES MÉTODOS PUBLICOS -------------------
+/* ----------------- DECLARAÇÕES MÉTODOS PUBLICOS ------------------- */
 
 Arquivo abrir_arquivo(char *path, enum TipoArquivo modo) {
-  struct Arquivo *this = (struct Arquivo *) malloc(sizeof(struct Arquivo));
+  struct Arquivo *this;
+	this = (struct Arquivo *) malloc(sizeof(struct Arquivo));
 
   switch (modo) {
     case LEITURA: this->arq = fopen(path, "r"); break;
@@ -46,25 +47,28 @@ Arquivo abrir_arquivo(char *path, enum TipoArquivo modo) {
 }
 
 char *ler_proxima_linha(Arquivo a) {
-  struct Arquivo *this = (struct Arquivo *) a;
+  struct Arquivo *this;
+  int tam;
+  char *linha, c;
+  
+	this = (struct Arquivo *) a;
 
   if (this->modo != LEITURA)
     return NULL;
 
-  int tam = tamanho_linha(this->arq);
+  tam = tamanho_linha(this->arq);
 
-  // Se estiver no final do arquivo
+  /* Se estiver no final do arquivo */
   if (tam <= 0)
     return NULL;
 
-  // TODO: Lembrar de dar free nessa linha;
-  char *linha = (char *) malloc((tam + 1) * sizeof(char));
+  /* TODO: Lembrar de dar free nessa linha; */
+  linha = (char *) malloc((tam + 1) * sizeof(char));
 
-  // Le a linha até antes do \n
+  /* Le a linha até antes do \n */
   fgets(linha, tam, this->arq);
 
-  // Pula o \n que ele nao leu
-  char c;
+  /* Pula o \n que ele nao leu */
 
   while ((c = fgetc(this->arq)) != '\n' && c != '\r') {}
 
@@ -76,7 +80,8 @@ char *ler_proxima_linha(Arquivo a) {
 }
 
 void escrever_linha(Arquivo a, char *entrada) {
-  struct Arquivo *this = (struct Arquivo *) a;
+  struct Arquivo *this;
+	this = (struct Arquivo *) a;
 
   if (this->modo == LEITURA)
     return;
@@ -92,7 +97,8 @@ int numero_linha_atual(Arquivo a) {
 }
 
 void fechar_arquivo(Arquivo a) {
-  struct Arquivo *this = (struct Arquivo *) a;
+  struct Arquivo *this;
+	this = (struct Arquivo *) a;
 
   fclose(this->arq);
 
@@ -101,7 +107,7 @@ void fechar_arquivo(Arquivo a) {
   free(a);
 }
 
-// ----------------- DEFINIÇÔES MÉTODOS PRIVADOS -------------------
+/* ----------------- DEFINIÇÔES MÉTODOS PRIVADOS ------------------- */
 
 int tamanho_linha(FILE *arq) {
   int tam = 0;

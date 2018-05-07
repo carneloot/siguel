@@ -37,4 +37,4 @@ int numero_linha_atual(Arquivo a);
  */
 void fechar_arquivo(Arquivo a);
 
-#endif  // __ARQUIVO_H__
+#endif /* __ARQUIVO_H__ */
