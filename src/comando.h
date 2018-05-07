@@ -25,4 +25,4 @@ enum TipoComando get_tipo(Comando c);
 
 void destruir_comando(Comando c);
 
-#endif  // __COMANDO_H__
+#endif /* __COMANDO_H__ */

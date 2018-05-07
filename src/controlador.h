@@ -20,4 +20,4 @@ Arquivo get_arquivo_entrada(Controlador c);
 
 char *get_nome_base(Controlador c);
 
-#endif  // __CONTROLADOR_H__
+#endif /* __CONTROLADOR_H__ */

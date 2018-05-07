@@ -14,9 +14,11 @@
 # project name (generate executable with this name)
 TARGET   = siguel
 
+PFLAGS   = -pedantic -ansi
+
 CC       = gcc
 # compiling flags here
-CFLAGS   = -std=c11 -Wall -I. -g
+CFLAGS   = -lm -Wall -I. -g $(PFLAGS)
 
 LINKER   = gcc
 # linking flags here

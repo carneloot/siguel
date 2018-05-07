@@ -52,9 +52,10 @@ Controlador cria_controlador() {
 }
 
 void lidar_parametros(Controlador c, int argc, const char *argv[]) {
-  struct Controlador *this = (struct Controlador *) c;
-
+  struct Controlador *this;
   int i = 1, j, length;
+
+  this = (struct Controlador *) c;
 
   while (i < argc) {
     if (!strcmp(argv[i], "-f")) {
@@ -67,7 +68,7 @@ void lidar_parametros(Controlador c, int argc, const char *argv[]) {
       this->nome_base[j] = 0;
     }
 
-    // Pega o default directory
+    /* Pega o default directory */
     else if (!strcmp(argv[i], "-o")) {
       i++;
       this->dir_saida = (char *) malloc((strlen(argv[i]) + 1) * sizeof(char));
@@ -88,20 +89,23 @@ void lidar_parametros(Controlador c, int argc, const char *argv[]) {
 }
 
 int executar_comando(Controlador c, Comando com) {
-  struct Controlador *this = (struct Controlador *) c;
+  struct Controlador *this;
+  enum TipoComando tipo;
+  char **params;
+  int result;
 
-  int result = 0;
-
-  enum TipoComando tipo = get_tipo(com);
-  char **params         = get_parametros(com);
-
-  // Parametros especificos
+  /* Parametros especificos */
   char *cor, *cor_borda, *saida, *sufixo;
   int id, id2, i, count;
   float x, y, x2, y2, r, h, w, distancia;
   size_t length;
   Figura figAtual;
   SVG s;
+
+  this   = (struct Controlador *) c;
+  tipo   = get_tipo(com);
+  params = get_parametros(com);
+  result = 0;
 
   switch (tipo) {
     case MUDAR_NUM_FIGURAS:
@@ -164,7 +168,7 @@ int executar_comando(Controlador c, Comando com) {
 
       if (intercepta_figura(this->figuras[id], this->figuras[id2])) {
         sprintf(saida, "o %d %d\nSIM", id + 1, id2 + 1);
-        // Desenhar retangulo no lugar da sobreposicao
+        /* Desenhar retangulo no lugar da sobreposicao */
         this->sobrepos[this->total_sobrepos] = (int *) malloc(2 * sizeof(int));
 
         this->sobrepos[this->total_sobrepos][0] = id;
@@ -233,7 +237,7 @@ int executar_comando(Controlador c, Comando com) {
     case CRIAR_SVG:
       id = atoi(params[0]) - 1;
 
-      // Cria o sufixo padrao caso nao tenha sido especificado
+      /* Cria o sufixo padrao caso nao tenha sido especificado */
       if (get_numero_parametros(com) > 1)
         sufixo = params[1];
       else
@@ -326,15 +330,16 @@ int executar_comando(Controlador c, Comando com) {
 }
 
 void abrir_arquivos(Controlador c) {
-  struct Controlador *this = (struct Controlador *) c;
-
-  // Nome nao foi setado ainda
-  if (!this->nome_base)
-    return;
-
+  struct Controlador *this;
   size_t tamanho_total;
   char *full_path;
   Arquivo arq;
+
+  this = (struct Controlador *) c;
+
+  /* Nome nao foi setado ainda */
+  if (!this->nome_base)
+    return;
 
   tamanho_total = strlen(this->dir_entrada) + strlen(this->nome_base) + 1 + 4;
   full_path     = (char *) malloc(tamanho_total * sizeof(char));
@@ -366,7 +371,10 @@ void abrir_arquivos(Controlador c) {
 }
 
 void destruir_controlador(Controlador c) {
-  struct Controlador *this = (struct Controlador *) c;
+  struct Controlador *this;
+  int i;
+
+  this = (struct Controlador *) c;
 
   if (this->arquivo_entrada)
     fechar_arquivo(this->arquivo_entrada);
@@ -374,7 +382,7 @@ void destruir_controlador(Controlador c) {
   if (this->arquivo_saida)
     fechar_arquivo(this->arquivo_saida);
 
-  int i = 0;
+  i = 0;
   while (this->total_figuras) {
     if (this->figuras[i]) {
       destruir_figura(this->figuras[i]);
@@ -410,13 +418,14 @@ char *get_nome_base(Controlador c) {
 /** METODOS PRIVADOS */
 
 void desenhar_todas_figuras(Controlador c, SVG s) {
-  struct Controlador *this = (struct Controlador *) c;
+  struct Controlador *this;
 
   int i, count;
   Figura figAtual;
   char *saida;
   float x, y;
 
+  this  = (struct Controlador *) c;
   i     = 0;
   count = 0;
 
@@ -426,18 +435,13 @@ void desenhar_todas_figuras(Controlador c, SVG s) {
     if (figAtual) {
       desenha_figura(s, figAtual);
 
-      // Escrever numero
+      /* Escrever numero */
       saida = (char *) malloc((num_digits((float) i) - 2 + 1) * sizeof(char));
       sprintf(saida, "%d", i + 1);
       get_centro_massa(figAtual, &x, &y);
       x -= 2;
       y += 2;
-      escreve_texto(s,
-                    saida,
-                    x,
-                    y,
-                    7,
-                    get_cor_borda(figAtual));
+      escreve_texto(s, saida, x, y, 7, get_cor_borda(figAtual));
 
       free(saida);
 
@@ -449,15 +453,16 @@ void desenhar_todas_figuras(Controlador c, SVG s) {
 }
 
 void desenhar_sobreposicoes(Controlador c, SVG s) {
-  struct Controlador *this = (struct Controlador *) c;
+  struct Controlador *this;
+  Figura figDash, fig1, fig2;
+  int i;
+
+  this = (struct Controlador *) c;
 
   if (!this->total_sobrepos)
     return;
 
-  int i;
-  Figura figDash, fig1, fig2;
-
-  // Calcular retangulo das sobreposicoes
+  /* Calcular retangulo das sobreposicoes */
   for (i = 0; i < this->total_sobrepos; i++) {
     fig1    = this->figuras[this->sobrepos[i][0]];
     fig2    = this->figuras[this->sobrepos[i][1]];

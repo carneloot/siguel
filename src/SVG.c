@@ -11,7 +11,8 @@ struct SVG {
 };
 
 SVG cria_SVG(char *path) {
-  struct SVG *this = (struct SVG *) malloc(sizeof(struct SVG));
+  struct SVG *this;
+  this = (struct SVG *) malloc(sizeof(struct SVG));
 
   this->saida = abrir_arquivo(path, ESCRITA);
 
@@ -21,11 +22,13 @@ SVG cria_SVG(char *path) {
 }
 
 void desenha_figura(SVG s, Figura f) {
-  struct SVG *this = (struct SVG *) s;
+  struct SVG *this;
 
   float x, y, r, h, w;
   char *cor, *cor_borda, *linha;
   size_t length;
+
+  this = (struct SVG *) s;
 
   x         = get_x(f);
   y         = get_y(f);
@@ -86,14 +89,16 @@ void desenha_figura(SVG s, Figura f) {
 }
 
 void desenha_dashed_rect(SVG s, Figura f) {
-  if (get_tipo_figura(f) != RETANGULO)
-    return;
-
-  struct SVG *this = (struct SVG *) s;
+  struct SVG *this;
 
   float x, y, h, w;
   char *linha;
   size_t length;
+
+  if (get_tipo_figura(f) != RETANGULO)
+    return;
+
+  this = (struct SVG *) s;
 
   x = get_x(f);
   y = get_y(f);
@@ -109,7 +114,8 @@ void desenha_dashed_rect(SVG s, Figura f) {
   linha = (char *) malloc(length * sizeof(char));
 
   sprintf(linha,
-          "<rect width=\"%.1f\" height=\"%.1f\" x=\"%.1f\" y=\"%.1f\" stroke-dasharray=\"3, "
+          "<rect width=\"%.1f\" height=\"%.1f\" x=\"%.1f\" y=\"%.1f\" "
+          "stroke-dasharray=\"3, "
           "3\" style=\"fill:transparent;stroke-width:2;stroke:purple\"/>",
           w,
           h,
@@ -123,10 +129,12 @@ void desenha_dashed_rect(SVG s, Figura f) {
 
 void escreve_texto(
     SVG s, char *texto, float x, float y, float tamanho, char *cor) {
-  struct SVG *this = (struct SVG *) s;
+  struct SVG *this;
 
   size_t length;
   char *linha;
+
+  this = (struct SVG *) s;
 
   length = 74;
   length += num_digits(x);
@@ -152,13 +160,16 @@ void escreve_texto(
 }
 
 void desenha_linha(SVG s, float x1, float y1, float x2, float y2, char *cor) {
-  struct SVG *this = (struct SVG *) s;
+  struct SVG *this;
 
-  int padrao = 0;
+  int padrao;
   size_t length;
   char *linha;
 
-  // Cor padrão
+  this   = (struct SVG *) s;
+  padrao = 0;
+
+  /* Cor padrão */
   if (!cor) {
     cor = (char *) malloc(6 * sizeof(char));
     strcpy(cor, "black");
@@ -191,7 +202,8 @@ void desenha_linha(SVG s, float x1, float y1, float x2, float y2, char *cor) {
 }
 
 void salva_SVG(SVG s) {
-  struct SVG *this = (struct SVG *) s;
+  struct SVG *this;
+  this = (struct SVG *) s;
   escrever_linha(this->saida, "</svg>");
 
   fechar_arquivo(this->saida);
