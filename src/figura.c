@@ -70,7 +70,7 @@ int intercepta_figura(Figura f, Figura f2) {
   struct Figura *other = (struct Figura *) f2;
 
   if (this->tipo == CIRCULO && other->tipo == CIRCULO) {
-    return (dist_squared(this->x, this->y, other->x, other->y) <
+    return (dist_squared(this->x, this->y, other->x, other->y) <=
             pow(this->dados_circ.r + other->dados_circ.r, 2));
   }
 
@@ -95,7 +95,7 @@ int intercepta_figura(Figura f, Figura f2) {
   x_perto = fmaxf(rect->x, fminf(circ->x, rect->x + rect->dados_rect.w));
   y_perto = fmaxf(rect->y, fminf(circ->y, rect->y + rect->dados_rect.h));
 
-  return (dist_squared(circ->x, circ->y, x_perto, y_perto) <
+  return (dist_squared(circ->x, circ->y, x_perto, y_perto) <=
           pow(circ->dados_circ.r, 2));
 }
 
@@ -107,8 +107,8 @@ int contem_ponto(Figura f, double x, double y) {
   }
 
   if (this->tipo == RETANGULO) {
-    return !(x < this->x || x > this->x + this->dados_rect.w || y < this->y ||
-             y > this->y + this->dados_rect.h);
+    return !(x < this->x || x >= this->x + this->dados_rect.w || y < this->y ||
+             y >= this->y + this->dados_rect.h);
   }
 
   return 0;

@@ -72,6 +72,7 @@ void lidar_parametros(Controlador c, int argc, const char *argv[]) {
       i++;
       this->dir_saida = (char *) malloc((strlen(argv[i]) + 1) * sizeof(char));
       strcpy(this->dir_saida, argv[i]);
+      this->dir_saida = evaluate_dir(this->dir_saida);
     }
 
     else if (!strcmp(argv[i], "-e")) {
@@ -79,6 +80,7 @@ void lidar_parametros(Controlador c, int argc, const char *argv[]) {
       free(this->dir_entrada);
       this->dir_entrada = (char *) malloc((strlen(argv[i]) + 1) * sizeof(char));
       strcpy(this->dir_entrada, argv[i]);
+      this->dir_entrada = evaluate_dir(this->dir_entrada);
     }
 
     i++;

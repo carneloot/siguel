@@ -17,4 +17,6 @@ char *get_diretorio(char *path);
 
 char *get_extensao(char *path);
 
+char *evaluate_dir(char *dir);
+
 #endif  // __UTILS_H__

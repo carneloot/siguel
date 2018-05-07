@@ -130,3 +130,22 @@ char *get_extensao(char *path) {
 
   return ext;
 }
+
+char *evaluate_dir(char *dir) {
+  int tam;
+
+  tam = strlen(dir);
+
+  if (dir[tam - 1] == '/')
+    return dir;
+
+  char *newDir = (char *) calloc(tam + 2, sizeof(char));
+
+  strcat(newDir, dir);
+  strcat(newDir, "/");
+
+  if (dir)
+    free(dir);
+
+  return newDir;
+}
