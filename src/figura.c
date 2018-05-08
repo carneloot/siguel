@@ -105,12 +105,12 @@ int contem_ponto(Figura f, double x, double y) {
   this = (struct Figura *) f;
 
   if (this->tipo == CIRCULO) {
-    return (dist_squared(this->x, this->y, x, y) <= pow(this->data.circ.r, 2));
+    return (dist_squared(this->x, this->y, x, y) < pow(this->data.circ.r, 2));
   }
 
   if (this->tipo == RETANGULO) {
-    return !(x < this->x || x >= this->x + this->data.rect.w || y < this->y ||
-             y >= this->y + this->data.rect.h);
+    return !(x < this->x || x > this->x + this->data.rect.w || y < this->y ||
+             y > this->y + this->data.rect.h);
   }
 
   return 0;
