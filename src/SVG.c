@@ -35,21 +35,19 @@ void desenha_figura(SVG s, Figura f) {
   cor       = get_cor(f);
   cor_borda = get_cor_borda(f);
 
-  length = strlen(cor) + strlen(cor_borda);
-  length += num_digits(x);
-  length += num_digits(y);
+  length = strlen(cor) + strlen(cor_borda) + 12;
 
   switch (get_tipo_figura(f)) {
     case CIRCULO:
       length += 77;
 
       r = get_r(f);
-      length += num_digits(r);
+      length += 6;
 
       linha = (char *) malloc(length * sizeof(char));
 
       sprintf(linha,
-              "<circle cx=\"%.1f\" cy=\"%.1f\" r=\"%.1f\" "
+              "<circle cx=\"%4.1f\" cy=\"%4.1f\" r=\"%4.1f\" "
               "style=\"fill:%s;stroke-width:2;stroke:%s;opacity:0.4\" />",
               x,
               y,
@@ -66,13 +64,12 @@ void desenha_figura(SVG s, Figura f) {
       h = get_h(f);
       w = get_w(f);
 
-      length += num_digits(h);
-      length += num_digits(w);
+      length += 12;
 
       linha = (char *) malloc(length * sizeof(char));
 
       sprintf(linha,
-              "<rect x=\"%.1f\" y=\"%.1f\" width=\"%.1f\" height=\"%.1f\" "
+              "<rect x=\"%4.1f\" y=\"%4.1f\" width=\"%4.1f\" height=\"%4.1f\" "
               "style=\"fill:%s;stroke-width:2;stroke:%s;opacity:0.4\" />",
               x,
               y,
@@ -105,16 +102,12 @@ void desenha_dashed_rect(SVG s, Figura f) {
   h = get_h(f);
   w = get_w(f);
 
-  length = 115;
-  length += num_digits(x);
-  length += num_digits(y);
-  length += num_digits(h);
-  length += num_digits(w);
+  length = 115 + 24;
 
   linha = (char *) malloc(length * sizeof(char));
 
   sprintf(linha,
-          "<rect width=\"%.1f\" height=\"%.1f\" x=\"%.1f\" y=\"%.1f\" "
+          "<rect width=\"%4.1f\" height=\"%4.1f\" x=\"%4.1f\" y=\"%4.1f\" "
           "stroke-dasharray=\"3, "
           "3\" style=\"fill:transparent;stroke-width:2;stroke:purple\"/>",
           w,
@@ -136,18 +129,15 @@ void escreve_texto(
 
   this = (struct SVG *) s;
 
-  length = 74;
-  length += num_digits(x);
-  length += num_digits(y);
-  length += num_digits(tamanho);
+  length = 74 + 18;
   length += strlen(texto);
   length += strlen(cor);
 
   linha = (char *) malloc(length * sizeof(char));
 
   sprintf(linha,
-          "<text x=\"%.1f\" y=\"%.1f\" "
-          "style=\"fill:%s;font-size:%.1fpx;font-family:sans-serif\">%s</text>",
+          "<text x=\"%4.1f\" y=\"%4.1f\" "
+          "style=\"fill:%s;font-size:%4.1fpx;font-family:sans-serif\">%s</text>",
           x,
           y,
           cor,
@@ -176,17 +166,13 @@ void desenha_linha(SVG s, float x1, float y1, float x2, float y2, char *cor) {
     padrao = 1;
   }
 
-  length = 64;
-  length += num_digits(x1);
-  length += num_digits(y1);
-  length += num_digits(x2);
-  length += num_digits(y2);
+  length = 64 + 24;
   length += strlen(cor);
 
   linha = (char *) malloc(length * sizeof(char));
 
   sprintf(linha,
-          "<line x1=\"%.1f\" y1=\"%.1f\" x2=\"%.1f\" y2=\"%.1f\" "
+          "<line x1=\"%4.1f\" y1=\"%4.1f\" x2=\"%4.1f\" y2=\"%4.1f\" "
           "style=\"stroke:%s;stroke-width:1\" />",
           x1,
           y1,

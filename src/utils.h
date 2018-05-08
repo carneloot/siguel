@@ -7,8 +7,6 @@ float fminf(float, float);
 
 char *trim(char *);
 
-int num_digits(float);
-
 float dist_squared(float x1, float y1, float x2, float y2);
 
 float dist(float x1, float y1, float x2, float y2);

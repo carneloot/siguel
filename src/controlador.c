@@ -160,14 +160,12 @@ int executar_comando(Controlador c, Comando com) {
       id  = atoi(params[0]) - 1;
       id2 = atoi(params[1]) - 1;
 
-      length = 8;
-      length += num_digits((float) id) - 2;
-      length += num_digits((float) id2) - 2;
+      length = 16;
 
       saida = (char *) malloc(length * sizeof(char));
 
       if (intercepta_figura(this->figuras[id], this->figuras[id2])) {
-        sprintf(saida, "o %d %d\nSIM", id + 1, id2 + 1);
+        sprintf(saida, "o %4d %4d\nSIM", id + 1, id2 + 1);
         /* Desenhar retangulo no lugar da sobreposicao */
         this->sobrepos[this->total_sobrepos] = (int *) malloc(2 * sizeof(int));
 
@@ -176,7 +174,7 @@ int executar_comando(Controlador c, Comando com) {
 
         this->total_sobrepos++;
       } else
-        sprintf(saida, "o %d %d\nNAO", id + 1, id2 + 1);
+        sprintf(saida, "o %4d %4d\nNAO", id + 1, id2 + 1);
 
       inserir_lista(this->saida, (Item) saida);
 
@@ -189,17 +187,14 @@ int executar_comando(Controlador c, Comando com) {
       x  = atof(params[1]);
       y  = atof(params[2]);
 
-      length = 9;
-      length += num_digits((float) id) - 2;
-      length += num_digits(x);
-      length += num_digits(y);
+      length = 25;
 
       saida = (char *) malloc(length * sizeof(char));
 
       if (contem_ponto(this->figuras[id], x, y))
-        sprintf(saida, "i %d %.1f %.1f\nSIM", id + 1, x, y);
+        sprintf(saida, "i %4d %4.1f %4.1f\nSIM", id + 1, x, y);
       else
-        sprintf(saida, "i %d %.1f %.1f\nNAO", id + 1, x, y);
+        sprintf(saida, "i %4d %4.1f %4.1f\nNAO", id + 1, x, y);
 
       inserir_lista(this->saida, (Item) saida);
 
@@ -213,14 +208,11 @@ int executar_comando(Controlador c, Comando com) {
 
       distancia = distancia_figuras(this->figuras[id], this->figuras[id2]);
 
-      length = 5;
-      length += num_digits((float) id) - 2;
-      length += num_digits((float) id2) - 2;
-      length += num_digits(distancia);
+      length = 19;
 
       saida = (char *) malloc(length * sizeof(char));
 
-      sprintf(saida, "d %d %d\n%.1f", id + 1, id2 + 1, distancia);
+      sprintf(saida, "d %4d %4d\n%4.1f", id + 1, id2 + 1, distancia);
 
       inserir_lista(this->saida, (Item) saida);
 
@@ -271,11 +263,11 @@ int executar_comando(Controlador c, Comando com) {
 
           desenha_linha(s, x, y, x2, y2, cor);
 
-          length = num_digits(distancia) + 1;
+          length = 9;
 
           saida = calloc(length, sizeof(char));
 
-          sprintf(saida, "%.1f", distancia);
+          sprintf(saida, "%6.1f", distancia);
 
           escreve_texto(s, saida, (x + x2) / 2 + 10, (y + y2) / 2, 15, cor);
 
@@ -416,8 +408,8 @@ void desenhar_todas_figuras(Controlador c, SVG s) {
       desenha_figura(s, figAtual);
 
       /* Escrever numero */
-      saida = (char *) malloc((num_digits((float) i) - 2 + 1) * sizeof(char));
-      sprintf(saida, "%d", i + 1);
+      saida = (char *) malloc(5 * sizeof(char));
+      sprintf(saida, "%4d", i + 1);
       get_centro_massa(figAtual, &x, &y);
       x -= 2;
       y += 2;

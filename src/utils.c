@@ -38,24 +38,6 @@ char *trim(char *entrada) {
   return saida;
 }
 
-int num_digits(float num) {
-  int a, count;
-
-  if (num == 0)
-    return 3;
-
-  a     = (int) num;
-  count = 0;
-
-  while (a >= 10) {
-    a = a / 10;
-    count++;
-  }
-  count++;
-
-  return count + 2;
-}
-
 float dist_squared(float x1, float y1, float x2, float y2) {
   return pow(x1 - x2, 2) + pow(y1 - y2, 2);
 }
