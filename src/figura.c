@@ -31,15 +31,15 @@ struct Figura {
 Figura cria_retangulo(
     float x, float y, float w, float h, char *cor, char *cor_borda) {
   struct Figura *this;
-	this = (struct Figura *) malloc(sizeof(struct Figura));
+  this = (struct Figura *) malloc(sizeof(struct Figura));
 
-  this->tipo         = RETANGULO;
-  this->x            = x;
-  this->y            = y;
+  this->tipo        = RETANGULO;
+  this->x           = x;
+  this->y           = y;
   this->data.rect.w = w;
   this->data.rect.h = h;
-  this->cor          = (char *) malloc((strlen(cor) + 1) * sizeof(char));
-  this->cor_borda    = (char *) malloc((strlen(cor_borda) + 1) * sizeof(char));
+  this->cor         = (char *) malloc((strlen(cor) + 1) * sizeof(char));
+  this->cor_borda   = (char *) malloc((strlen(cor_borda) + 1) * sizeof(char));
 
   strcpy(this->cor, cor);
   strcpy(this->cor_borda, cor_borda);
@@ -49,14 +49,14 @@ Figura cria_retangulo(
 
 Figura cria_circulo(float x, float y, float r, char *cor, char *cor_borda) {
   struct Figura *this;
-	this = (struct Figura *) malloc(sizeof(struct Figura));
+  this = (struct Figura *) malloc(sizeof(struct Figura));
 
-  this->tipo         = CIRCULO;
-  this->x            = x;
-  this->y            = y;
+  this->tipo        = CIRCULO;
+  this->x           = x;
+  this->y           = y;
   this->data.circ.r = r;
-  this->cor          = (char *) malloc((strlen(cor) + 1) * sizeof(char));
-  this->cor_borda    = (char *) malloc((strlen(cor_borda) + 1) * sizeof(char));
+  this->cor         = (char *) malloc((strlen(cor) + 1) * sizeof(char));
+  this->cor_borda   = (char *) malloc((strlen(cor_borda) + 1) * sizeof(char));
 
   strcpy(this->cor, cor);
   strcpy(this->cor_borda, cor_borda);
@@ -102,7 +102,7 @@ int intercepta_figura(Figura f, Figura f2) {
 
 int contem_ponto(Figura f, double x, double y) {
   struct Figura *this;
-	this = (struct Figura *) f;
+  this = (struct Figura *) f;
 
   if (this->tipo == CIRCULO) {
     return (dist_squared(this->x, this->y, x, y) <= pow(this->data.circ.r, 2));
@@ -118,7 +118,7 @@ int contem_ponto(Figura f, double x, double y) {
 
 void get_centro_massa(Figura f, float *x, float *y) {
   struct Figura *this;
-	this = (struct Figura *) f;
+  this = (struct Figura *) f;
 
   *x = this->x;
   *y = this->y;
@@ -193,7 +193,7 @@ float distancia_figuras(Figura f, Figura f2) {
 
 void destruir_figura(Figura f) {
   struct Figura *this;
-	this = (struct Figura *) f;
+  this = (struct Figura *) f;
 
   free(this->cor);
   free(this->cor_borda);
@@ -213,7 +213,7 @@ float get_y(Figura f) {
 
 float get_r(Figura f) {
   struct Figura *this;
-	this = (struct Figura *) f;
+  this = (struct Figura *) f;
 
   if (this->tipo != CIRCULO)
     return -1;
@@ -223,7 +223,7 @@ float get_r(Figura f) {
 
 float get_w(Figura f) {
   struct Figura *this;
-	this = (struct Figura *) f;
+  this = (struct Figura *) f;
 
   if (this->tipo != RETANGULO)
     return -1;
@@ -233,7 +233,7 @@ float get_w(Figura f) {
 
 float get_h(Figura f) {
   struct Figura *this;
-	this = (struct Figura *) f;
+  this = (struct Figura *) f;
 
   if (this->tipo != RETANGULO)
     return -1;
