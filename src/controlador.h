@@ -3,6 +3,7 @@
 
 #include "arquivo.h"
 #include "comando.h"
+#include "lista.h"
 
 typedef void *Controlador;
 
@@ -12,11 +13,9 @@ void lidar_parametros(Controlador c, int argc, const char *argv[]);
 
 int executar_comando(Controlador c, Comando com);
 
-void abrir_arquivos(Controlador c);
+Lista get_linhas_entrada(Controlador c);
 
 void destruir_controlador(Controlador c);
-
-Arquivo get_arquivo_entrada(Controlador c);
 
 char *get_nome_base(Controlador c);
 

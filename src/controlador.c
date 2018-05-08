@@ -10,8 +10,7 @@
 #define TOTAL_FIGURAS_DEFAULT 1000
 
 struct Controlador {
-  Arquivo arquivo_entrada;
-  Arquivo arquivo_saida;
+  Lista saida;
   char *nome_base;
   char *dir_saida;
   char *dir_entrada;
@@ -28,17 +27,18 @@ void desenhar_todas_figuras(Controlador c, SVG s);
 
 void desenhar_sobreposicoes(Controlador c, SVG s);
 
+void escrever_txt_final(Controlador c);
+
 /** METODOS PUBLICOS */
 
 Controlador cria_controlador() {
   struct Controlador *this =
       (struct Controlador *) malloc(sizeof(struct Controlador));
 
-  this->arquivo_entrada = NULL;
-  this->arquivo_saida   = NULL;
-  this->nome_base       = NULL;
-  this->dir_saida       = NULL;
-  this->dir_entrada     = (char *) malloc(3 * sizeof(char));
+  this->saida       = cria_lista();
+  this->nome_base   = NULL;
+  this->dir_saida   = NULL;
+  this->dir_entrada = (char *) malloc(3 * sizeof(char));
   strcpy(this->dir_entrada, "./");
 
   this->max_figuras   = TOTAL_FIGURAS_DEFAULT;
@@ -178,9 +178,7 @@ int executar_comando(Controlador c, Comando com) {
       } else
         sprintf(saida, "o %d %d\nNAO", id + 1, id2 + 1);
 
-      escrever_linha(this->arquivo_saida, saida);
-
-      free(saida);
+      inserir_lista(this->saida, (Item) saida);
 
       result = 1;
 
@@ -203,9 +201,7 @@ int executar_comando(Controlador c, Comando com) {
       else
         sprintf(saida, "i %d %.1f %.1f\nNAO", id + 1, x, y);
 
-      escrever_linha(this->arquivo_saida, saida);
-
-      free(saida);
+      inserir_lista(this->saida, (Item) saida);
 
       result = 1;
 
@@ -226,9 +222,7 @@ int executar_comando(Controlador c, Comando com) {
 
       sprintf(saida, "d %d %d\n%.1f", id + 1, id2 + 1, distancia);
 
-      escrever_linha(this->arquivo_saida, saida);
-
-      free(saida);
+      inserir_lista(this->saida, (Item) saida);
 
       result = 1;
 
@@ -304,6 +298,7 @@ int executar_comando(Controlador c, Comando com) {
       break;
 
     case FIM_DO_ARQUIVO:
+      /* Escrever SVG final */
       length = strlen(this->nome_base) + strlen(this->dir_saida) + 5;
 
       saida = (char *) malloc(length * sizeof(char));
@@ -321,6 +316,8 @@ int executar_comando(Controlador c, Comando com) {
       destruir_SVG(s);
       free(saida);
 
+      escrever_txt_final(c);
+
       result = 1;
       break;
     case NONE: result = 0; break;
@@ -329,17 +326,17 @@ int executar_comando(Controlador c, Comando com) {
   return result;
 }
 
-void abrir_arquivos(Controlador c) {
+Lista get_linhas_entrada(Controlador c) {
   struct Controlador *this;
   size_t tamanho_total;
-  char *full_path;
+  char *full_path, *linha_atual;
   Arquivo arq;
+  Lista lista;
 
   this = (struct Controlador *) c;
 
-  /* Nome nao foi setado ainda */
   if (!this->nome_base)
-    return;
+    return NULL;
 
   tamanho_total = strlen(this->dir_entrada) + strlen(this->nome_base) + 1 + 4;
   full_path     = (char *) malloc(tamanho_total * sizeof(char));
@@ -348,26 +345,17 @@ void abrir_arquivos(Controlador c) {
 
   arq = abrir_arquivo(full_path, LEITURA);
 
-  if (!arq)
-    return;
-
-  this->arquivo_entrada = arq;
-
   free(full_path);
 
-  tamanho_total = strlen(this->dir_saida) + strlen(this->nome_base) + 1 + 4;
-  full_path     = (char *) malloc(tamanho_total * sizeof(char));
+  lista = cria_lista();
 
-  sprintf(full_path, "%s%s.txt", this->dir_saida, this->nome_base);
+  while ((linha_atual = ler_proxima_linha(arq))) {
+    inserir_lista(lista, (Item) linha_atual);
+  }
 
-  arq = abrir_arquivo(full_path, ESCRITA);
+  fechar_arquivo(arq);
 
-  if (!arq)
-    return;
-
-  this->arquivo_saida = arq;
-
-  free(full_path);
+  return lista;
 }
 
 void destruir_controlador(Controlador c) {
@@ -376,11 +364,7 @@ void destruir_controlador(Controlador c) {
 
   this = (struct Controlador *) c;
 
-  if (this->arquivo_entrada)
-    fechar_arquivo(this->arquivo_entrada);
-
-  if (this->arquivo_saida)
-    fechar_arquivo(this->arquivo_saida);
+  destruir_lista(this->saida);
 
   i = 0;
   while (this->total_figuras) {
@@ -405,10 +389,6 @@ void destruir_controlador(Controlador c) {
     free(this->dir_entrada);
 
   free(c);
-}
-
-Arquivo get_arquivo_entrada(Controlador c) {
-  return ((struct Controlador *) c)->arquivo_entrada;
 }
 
 char *get_nome_base(Controlador c) {
@@ -474,4 +454,34 @@ void desenhar_sobreposicoes(Controlador c, SVG s) {
 
     destruir_figura(figDash);
   }
+}
+
+void escrever_txt_final(Controlador c) {
+  struct Controlador *this;
+  size_t tamanho_total;
+  char *full_path;
+  Arquivo arq;
+  Node node;
+
+  this = (struct Controlador *) c;
+
+  if (!this->nome_base)
+    return;
+
+  tamanho_total = strlen(this->dir_saida) + strlen(this->nome_base) + 1 + 4;
+  full_path     = (char *) malloc(tamanho_total * sizeof(char));
+
+  sprintf(full_path, "%s%s.txt", this->dir_saida, this->nome_base);
+
+  arq = abrir_arquivo(full_path, ESCRITA);
+
+  free(full_path);
+
+  node = get_start_lista(this->saida);
+
+  while (tem_proximo_node(node)) {
+    escrever_linha(arq, (char *) get_proximo_node(&node));
+  }
+
+  fechar_arquivo(arq);
 }
