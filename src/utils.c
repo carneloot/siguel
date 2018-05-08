@@ -12,12 +12,11 @@ float fminf(float a, float b) {
   return (a < b) ? a : b;
 }
 
-void trim(char **p) {
+char *trim(char *entrada) {
   int tam, i;
-  char *entrada, *saida;
+  char *saida;
 
-  entrada = *p;
-  tam     = strlen(entrada);
+  tam = strlen(entrada);
 
   i = tam - 1;
   while ((entrada[i] == '\n' || entrada[i] == '\r' || entrada[i] == '\t' ||
@@ -36,7 +35,7 @@ void trim(char **p) {
   saida[i] = 0;
 
   free(entrada);
-  *p = saida;
+  return saida;
 }
 
 int num_digits(float num) {

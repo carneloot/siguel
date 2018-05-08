@@ -61,8 +61,8 @@ Figura cria_circulo(float x, float y, float r, char *cor, char *cor_borda) {
   strcpy(this->cor, cor);
   strcpy(this->cor_borda, cor_borda);
 
-  trim(&this->cor);
-  trim(&this->cor_borda);
+  this->cor       = trim(this->cor);
+  this->cor_borda = trim(this->cor_borda);
 
   return (void *) this;
 }

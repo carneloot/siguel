@@ -5,9 +5,7 @@ float fmaxf(float, float);
 
 float fminf(float, float);
 
-float round_digits(float num, int n);
-
-void trim(char **);
+char *trim(char *);
 
 int num_digits(float);
 

@@ -24,7 +24,7 @@ int tamanho_linha(FILE *arq);
 
 Arquivo abrir_arquivo(char *path, enum TipoArquivo modo) {
   struct Arquivo *this;
-	this = (struct Arquivo *) malloc(sizeof(struct Arquivo));
+  this = (struct Arquivo *) malloc(sizeof(struct Arquivo));
 
   switch (modo) {
     case LEITURA: this->arq = fopen(path, "r"); break;
@@ -50,8 +50,8 @@ char *ler_proxima_linha(Arquivo a) {
   struct Arquivo *this;
   int tam;
   char *linha, c;
-  
-	this = (struct Arquivo *) a;
+
+  this = (struct Arquivo *) a;
 
   if (this->modo != LEITURA)
     return NULL;
@@ -72,7 +72,7 @@ char *ler_proxima_linha(Arquivo a) {
 
   while ((c = fgetc(this->arq)) != '\n' && c != '\r') {}
 
-  trim(&linha);
+  linha = trim(linha);
 
   this->linha_atual++;
 
@@ -81,7 +81,7 @@ char *ler_proxima_linha(Arquivo a) {
 
 void escrever_linha(Arquivo a, char *entrada) {
   struct Arquivo *this;
-	this = (struct Arquivo *) a;
+  this = (struct Arquivo *) a;
 
   if (this->modo == LEITURA)
     return;
@@ -98,7 +98,7 @@ int numero_linha_atual(Arquivo a) {
 
 void fechar_arquivo(Arquivo a) {
   struct Arquivo *this;
-	this = (struct Arquivo *) a;
+  this = (struct Arquivo *) a;
 
   fclose(this->arq);
 
