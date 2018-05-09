@@ -240,7 +240,7 @@ int executar_comando(Controlador c, Comando com) {
 
       distancia = distancia_figuras(this->figuras[id], this->figuras[id2]);
 
-      length = 11 + +strlen(params[0]) + strlen(params[1]);
+      length = 11 + strlen(params[0]) + strlen(params[1]);
 
       saida = (char *) malloc(length * sizeof(char));
 
