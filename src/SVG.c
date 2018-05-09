@@ -10,15 +10,30 @@ struct SVG {
   Arquivo saida;
 };
 
-SVG cria_SVG(char *path) {
+SVG cria_SVG(char *path, float max_width, float max_height) {
   struct SVG *this;
+  char *saida;
+  size_t length;
+
   this = (struct SVG *) malloc(sizeof(struct SVG));
+
+  length = 12 + 60;
+
+  saida = (char *) calloc(length, sizeof(char));
 
   this->saida = abrir_arquivo(path, ESCRITA);
 
-  escrever_linha(this->saida, "<svg xmlns=\"http://www.w3.org/2000/svg\">");
+  sprintf(saida,
+          "<svg width=\"%4.1f\" height=\"%4.1f\" "
+          "xmlns=\"http://www.w3.org/2000/svg\">",
+          max_width,
+          max_height);
 
-  return (void *) this;
+  escrever_linha(this->saida, saida);
+
+  free(saida);
+
+  return (SVG) this;
 }
 
 void desenha_figura(SVG s, Figura f) {
@@ -135,14 +150,15 @@ void escreve_texto(
 
   linha = (char *) malloc(length * sizeof(char));
 
-  sprintf(linha,
-          "<text x=\"%4.1f\" y=\"%4.1f\" "
-          "style=\"fill:%s;font-size:%4.1fpx;font-family:sans-serif\">%s</text>",
-          x,
-          y,
-          cor,
-          tamanho,
-          texto);
+  sprintf(
+      linha,
+      "<text x=\"%4.1f\" y=\"%4.1f\" "
+      "style=\"fill:%s;font-size:%4.1fpx;font-family:sans-serif\">%s</text>",
+      x,
+      y,
+      cor,
+      tamanho,
+      texto);
 
   escrever_linha(this->saida, linha);
 

@@ -149,7 +149,9 @@ Figura get_rect_sobreposicao(Figura f1, Figura f2) {
 
     w = fmaxf(this->x + this->data.rect.w, other->x + other->data.rect.w);
     h = fmaxf(this->y + this->data.rect.h, other->y + other->data.rect.h);
-  } else {
+  }
+  
+  else {
     struct Figura *circ, *rect;
 
     if (this->tipo == CIRCULO) {
@@ -216,7 +218,7 @@ float get_r(Figura f) {
   this = (struct Figura *) f;
 
   if (this->tipo != CIRCULO)
-    return -1;
+    return 0;
 
   return this->data.circ.r;
 }
@@ -226,7 +228,7 @@ float get_w(Figura f) {
   this = (struct Figura *) f;
 
   if (this->tipo != RETANGULO)
-    return -1;
+    return 0;
 
   return this->data.rect.w;
 }
@@ -236,7 +238,7 @@ float get_h(Figura f) {
   this = (struct Figura *) f;
 
   if (this->tipo != RETANGULO)
-    return -1;
+    return 0;
 
   return this->data.rect.h;
 }

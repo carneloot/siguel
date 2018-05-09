@@ -53,3 +53,8 @@ clean:
 remove: clean
 	@$(rm) $(BINDIR)/$(TARGET)
 	@echo "Executable removed!"
+
+.PHONY: clean-test
+clean-test:
+	@$(rm) test/*.svg test/*.txt
+	@echo "Tests removed!"

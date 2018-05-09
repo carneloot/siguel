@@ -5,7 +5,7 @@
 
 typedef void *SVG;
 
-SVG cria_SVG(char *path);
+SVG cria_SVG(char *path, float, float);
 
 void desenha_figura(SVG s, Figura f);
 

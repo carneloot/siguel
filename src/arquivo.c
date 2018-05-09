@@ -33,8 +33,9 @@ Arquivo abrir_arquivo(char *path, enum TipoArquivo modo) {
   }
 
   if (!this->arq) {
+    printf("Nao foi possível abrir o arquivo \"%s\"\n", path);
     free(this);
-    return NULL;
+    exit(EXIT_FAILURE);
   }
 
   this->linha_atual = 1;

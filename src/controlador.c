@@ -1,5 +1,6 @@
 #include "controlador.h"
 
+#include <math.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -28,6 +29,8 @@ void desenhar_todas_figuras(Controlador c, SVG s);
 void desenhar_sobreposicoes(Controlador c, SVG s);
 
 void escrever_txt_final(Controlador c);
+
+void get_max_width_height(Controlador c, float *width, float *heigth);
 
 /** METODOS PUBLICOS */
 
@@ -236,7 +239,9 @@ int executar_comando(Controlador c, Comando com) {
 
       sprintf(saida, "%s%s-%s.svg", this->dir_saida, this->nome_base, sufixo);
 
-      s = cria_SVG(saida);
+      get_max_width_height(c, &x, &y);
+
+      s = cria_SVG(saida, x, y);
 
       free(saida);
 
@@ -297,7 +302,9 @@ int executar_comando(Controlador c, Comando com) {
 
       sprintf(saida, "%s%s.svg", this->dir_saida, this->nome_base);
 
-      s = cria_SVG(saida);
+      get_max_width_height(c, &x, &y);
+
+      s = cria_SVG(saida, x, y);
 
       desenhar_todas_figuras(c, s);
 
@@ -394,8 +401,6 @@ void desenhar_todas_figuras(Controlador c, SVG s) {
 
   int i, count;
   Figura figAtual;
-  char *saida;
-  float x, y;
 
   this  = (struct Controlador *) c;
   i     = 0;
@@ -406,16 +411,6 @@ void desenhar_todas_figuras(Controlador c, SVG s) {
 
     if (figAtual) {
       desenha_figura(s, figAtual);
-
-      /* Escrever numero */
-      saida = (char *) malloc(5 * sizeof(char));
-      sprintf(saida, "%4d", i + 1);
-      get_centro_massa(figAtual, &x, &y);
-      x -= 2;
-      y += 2;
-      escreve_texto(s, saida, x, y, 7, get_cor_borda(figAtual));
-
-      free(saida);
 
       count++;
     }
@@ -476,4 +471,39 @@ void escrever_txt_final(Controlador c) {
   }
 
   fechar_arquivo(arq);
+}
+
+void get_max_width_height(Controlador c, float *w, float *h) {
+  struct Controlador *this;
+  Figura figAtual;
+  float maxw, maxh, watual, hatual;
+  int i, count;
+
+  this = (struct Controlador *) c;
+  maxw = maxh = 0;
+  i = count = 0;
+
+  while (count < this->total_figuras) {
+    figAtual = this->figuras[i];
+
+    if (!figAtual) {
+      i++;
+      continue;
+    }
+
+    watual = get_x(figAtual) + get_w(figAtual) + get_r(figAtual);
+    hatual = get_y(figAtual) + get_h(figAtual) + get_r(figAtual);
+
+    if (watual > maxw)
+      maxw = watual;
+
+    if (hatual > maxh)
+      maxh = hatual;
+
+    count++;
+    i++;
+  }
+
+  *w = maxw + 4;
+  *h = maxh + 4;
 }
