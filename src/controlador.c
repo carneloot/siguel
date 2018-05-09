@@ -22,6 +22,9 @@ struct Controlador {
 
   int **sobrepos;
   int total_sobrepos;
+
+  float max_width;
+  float max_height;
 };
 
 void desenhar_todas_figuras(Controlador c, SVG s);
@@ -29,8 +32,6 @@ void desenhar_todas_figuras(Controlador c, SVG s);
 void desenhar_sobreposicoes(Controlador c, SVG s);
 
 void escrever_txt_final(Controlador c);
-
-void get_max_width_height(Controlador c, float *width, float *heigth);
 
 /** METODOS PUBLICOS */
 
@@ -50,6 +51,9 @@ Controlador cria_controlador() {
 
   this->total_sobrepos = 0;
   this->sobrepos       = (int **) malloc(this->max_figuras * sizeof(int *));
+
+  this->max_width  = 0;
+  this->max_height = 0;
 
   return (void *) this;
 }
@@ -162,6 +166,15 @@ int executar_comando(Controlador c, Comando com) {
 
       this->figuras[id] = cria_circulo(x, y, r, cor, cor_borda);
 
+      w = get_x(this->figuras[id]) + get_r(this->figuras[id]);
+      h = get_y(this->figuras[id]) + get_r(this->figuras[id]);
+
+      if (w > this->max_width)
+        this->max_width = w;
+
+      if (h > this->max_height)
+        this->max_height= h;
+
       this->total_figuras++;
 
       result = 1;
@@ -182,6 +195,15 @@ int executar_comando(Controlador c, Comando com) {
       }
 
       this->figuras[id] = cria_retangulo(x, y, w, h, cor, cor_borda);
+
+      w = get_x(this->figuras[id]) + get_w(this->figuras[id]);
+      h = get_y(this->figuras[id]) + get_h(this->figuras[id]);
+
+      if (w > this->max_width)
+        this->max_width = w;
+
+      if (h > this->max_height)
+        this->max_height= h;
 
       this->total_figuras++;
 
@@ -268,9 +290,7 @@ int executar_comando(Controlador c, Comando com) {
 
       sprintf(saida, "%s%s-%s.svg", this->dir_saida, this->nome_base, sufixo);
 
-      get_max_width_height(c, &x, &y);
-
-      s = cria_SVG(saida, x, y);
+      s = cria_SVG(saida, this->max_width, this->max_height);
 
       free(saida);
 
@@ -331,9 +351,7 @@ int executar_comando(Controlador c, Comando com) {
 
       sprintf(saida, "%s%s.svg", this->dir_saida, this->nome_base);
 
-      get_max_width_height(c, &x, &y);
-
-      s = cria_SVG(saida, x, y);
+      s = cria_SVG(saida, this->max_width, this->max_height);
 
       desenhar_todas_figuras(c, s);
 
@@ -534,39 +552,4 @@ void escrever_txt_final(Controlador c) {
   }
 
   fechar_arquivo(arq);
-}
-
-void get_max_width_height(Controlador c, float *w, float *h) {
-  struct Controlador *this;
-  Figura figAtual;
-  float maxw, maxh, watual, hatual;
-  int i, count;
-
-  this = (struct Controlador *) c;
-  maxw = maxh = 0;
-  i = count = 0;
-
-  while (count < this->total_figuras) {
-    figAtual = this->figuras[i];
-
-    if (!figAtual) {
-      i++;
-      continue;
-    }
-
-    watual = get_x(figAtual) + get_w(figAtual) + get_r(figAtual);
-    hatual = get_y(figAtual) + get_h(figAtual) + get_r(figAtual);
-
-    if (watual > maxw)
-      maxw = watual;
-
-    if (hatual > maxh)
-      maxh = hatual;
-
-    count++;
-    i++;
-  }
-
-  *w = maxw + 4;
-  *h = maxh + 4;
 }
