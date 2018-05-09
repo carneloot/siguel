@@ -58,3 +58,6 @@ remove: clean
 clean-test:
 	@$(rm) test/*.svg test/*.txt
 	@echo "Tests removed!"
+
+remake: remove $(BINDIR)/$(TARGET)
+		@echo "Remaked!"
