@@ -90,7 +90,15 @@ void lidar_parametros(Controlador c, int argc, const char *argv[]) {
     i++;
   }
 
-  /* TODO: Colocar erro caso nao tenha passo o -o e o -f */
+  if (!this->nome_base) {
+    printf("Nao foi inserido um nome de arquivo.\nFechando programa.\n");
+    exit(EXIT_FAILURE);
+  }
+
+  if (!this->dir_saida) {
+    printf("Nao foi inserido um diretorio de saida.\nFechando programa.\n");
+    exit(EXIT_FAILURE);
+  }
 }
 
 int executar_comando(Controlador c, Comando com) {
@@ -104,7 +112,7 @@ int executar_comando(Controlador c, Comando com) {
   int id, id2, i, count;
   float x, y, x2, y2, r, h, w, distancia;
   size_t length;
-  Figura figAtual;
+  Figura figAtual, *newFiguras;
   SVG s;
 
   this   = (struct Controlador *) c;
@@ -115,8 +123,27 @@ int executar_comando(Controlador c, Comando com) {
   switch (tipo) {
     case MUDAR_NUM_FIGURAS:
       this->max_figuras = atoi(params[0]);
-      this->figuras =
-        (Figura *) realloc(this->figuras, this->max_figuras * sizeof(Figura));
+
+      newFiguras = (Figura *) calloc(this->max_figuras, sizeof(Figura));
+
+      i     = 0;
+      count = 0;
+
+      while (count < this->total_figuras) {
+        figAtual = this->figuras[i];
+        if (!figAtual) {
+          i++;
+          continue;
+        }
+        newFiguras[i] = this->figuras[i];
+        count++;
+        i++;
+      }
+
+      free(this->figuras);
+
+      this->figuras = newFiguras;
+
       result = 1;
       break;
 
@@ -213,7 +240,7 @@ int executar_comando(Controlador c, Comando com) {
 
       distancia = distancia_figuras(this->figuras[id], this->figuras[id2]);
 
-      length = 11 + + strlen(params[0]) + strlen(params[1]);
+      length = 11 + +strlen(params[0]) + strlen(params[1]);
 
       saida = (char *) malloc(length * sizeof(char));
 

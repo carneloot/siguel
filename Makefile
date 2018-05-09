@@ -14,7 +14,7 @@
 # project name (generate executable with this name)
 TARGET   = siguel
 
-PFLAGS   = -pedantic -ansi
+PFLAGS   = -pedantic -ansi # -D DEBUG
 
 CC       = gcc
 # compiling flags here
