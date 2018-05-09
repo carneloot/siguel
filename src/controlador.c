@@ -36,7 +36,7 @@ void get_max_width_height(Controlador c, float *width, float *heigth);
 
 Controlador cria_controlador() {
   struct Controlador *this =
-      (struct Controlador *) malloc(sizeof(struct Controlador));
+    (struct Controlador *) malloc(sizeof(struct Controlador));
 
   this->saida       = cria_lista();
   this->nome_base   = NULL;
@@ -89,6 +89,8 @@ void lidar_parametros(Controlador c, int argc, const char *argv[]) {
 
     i++;
   }
+
+  /* TODO: Colocar erro caso nao tenha passo o -o e o -f */
 }
 
 int executar_comando(Controlador c, Comando com) {
@@ -114,7 +116,7 @@ int executar_comando(Controlador c, Comando com) {
     case MUDAR_NUM_FIGURAS:
       this->max_figuras = atoi(params[0]);
       this->figuras =
-          (Figura *) realloc(this->figuras, this->max_figuras * sizeof(Figura));
+        (Figura *) realloc(this->figuras, this->max_figuras * sizeof(Figura));
       result = 1;
       break;
 
@@ -232,8 +234,8 @@ int executar_comando(Controlador c, Comando com) {
       else
         sufixo = (char *) calloc(1, sizeof(char));
 
-      length = strlen(this->nome_base) + strlen(this->dir_saida) +
-               strlen(sufixo) + 6;
+      length =
+        strlen(this->nome_base) + strlen(this->dir_saida) + strlen(sufixo) + 6;
 
       saida = (char *) malloc(length * sizeof(char));
 
@@ -402,6 +404,12 @@ void desenhar_todas_figuras(Controlador c, SVG s) {
   int i, count;
   Figura figAtual;
 
+  #ifdef DEBUG
+  char *saida;
+  float x, y;
+  size_t length;
+  #endif
+
   this  = (struct Controlador *) c;
   i     = 0;
   count = 0;
@@ -417,6 +425,34 @@ void desenhar_todas_figuras(Controlador c, SVG s) {
 
     i++;
   }
+
+  /* Printa os ids */
+  #ifdef DEBUG
+
+  i = count = 0;
+
+  while (count < this->total_figuras) {
+    figAtual = this->figuras[i];
+
+    if (figAtual) {
+      /* Escrever numero */
+      length = floor(log10(i + 1)) + 1 + 1;
+
+      saida = (char *) malloc(length * sizeof(char));
+      sprintf(saida, "%d", i + 1);
+      get_centro_massa(figAtual, &x, &y);
+      x -= 2;
+      y += 2;
+      escreve_texto(s, saida, x, y, 7, get_cor_borda(figAtual));
+
+      free(saida);
+    }
+
+    count++;
+    i++;
+  }
+
+  #endif
 }
 
 void desenhar_sobreposicoes(Controlador c, SVG s) {
@@ -437,7 +473,7 @@ void desenhar_sobreposicoes(Controlador c, SVG s) {
 
     desenha_dashed_rect(s, figDash);
     escreve_texto(
-        s, "sobrepoe", get_x(figDash), get_y(figDash) - 5, 15, "purple");
+      s, "sobrepoe", get_x(figDash), get_y(figDash) - 5, 15, "purple");
 
     destruir_figura(figDash);
   }

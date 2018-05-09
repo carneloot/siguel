@@ -23,11 +23,12 @@ SVG cria_SVG(char *path, float max_width, float max_height) {
 
   this->saida = abrir_arquivo(path, ESCRITA);
 
-  sprintf(saida,
-          "<svg width=\"%4.1f\" height=\"%4.1f\" "
-          "xmlns=\"http://www.w3.org/2000/svg\">",
-          max_width,
-          max_height);
+  sprintf(
+    saida,
+    "<svg width=\"%4.1f\" height=\"%4.1f\" "
+    "xmlns=\"http://www.w3.org/2000/svg\">",
+    max_width,
+    max_height);
 
   escrever_linha(this->saida, saida);
 
@@ -61,14 +62,15 @@ void desenha_figura(SVG s, Figura f) {
 
       linha = (char *) malloc(length * sizeof(char));
 
-      sprintf(linha,
-              "<circle cx=\"%4.1f\" cy=\"%4.1f\" r=\"%4.1f\" "
-              "style=\"fill:%s;stroke-width:2;stroke:%s;opacity:0.4\" />",
-              x,
-              y,
-              r,
-              cor,
-              cor_borda);
+      sprintf(
+        linha,
+        "<circle cx=\"%4.1f\" cy=\"%4.1f\" r=\"%4.1f\" "
+        "style=\"fill:%s;stroke-width:2;stroke:%s;opacity:0.4\" />",
+        x,
+        y,
+        r,
+        cor,
+        cor_borda);
 
       escrever_linha(this->saida, linha);
       break;
@@ -83,15 +85,16 @@ void desenha_figura(SVG s, Figura f) {
 
       linha = (char *) malloc(length * sizeof(char));
 
-      sprintf(linha,
-              "<rect x=\"%4.1f\" y=\"%4.1f\" width=\"%4.1f\" height=\"%4.1f\" "
-              "style=\"fill:%s;stroke-width:2;stroke:%s;opacity:0.4\" />",
-              x,
-              y,
-              w,
-              h,
-              cor,
-              cor_borda);
+      sprintf(
+        linha,
+        "<rect x=\"%4.1f\" y=\"%4.1f\" width=\"%4.1f\" height=\"%4.1f\" "
+        "style=\"fill:%s;stroke-width:2;stroke:%s;opacity:0.4\" />",
+        x,
+        y,
+        w,
+        h,
+        cor,
+        cor_borda);
 
       escrever_linha(this->saida, linha);
       break;
@@ -121,14 +124,15 @@ void desenha_dashed_rect(SVG s, Figura f) {
 
   linha = (char *) malloc(length * sizeof(char));
 
-  sprintf(linha,
-          "<rect width=\"%4.1f\" height=\"%4.1f\" x=\"%4.1f\" y=\"%4.1f\" "
-          "stroke-dasharray=\"3, "
-          "3\" style=\"fill:transparent;stroke-width:2;stroke:purple\"/>",
-          w,
-          h,
-          x,
-          y);
+  sprintf(
+    linha,
+    "<rect width=\"%4.1f\" height=\"%4.1f\" x=\"%4.1f\" y=\"%4.1f\" "
+    "stroke-dasharray=\"3, "
+    "3\" style=\"fill:transparent;stroke-width:2;stroke:purple\"/>",
+    w,
+    h,
+    x,
+    y);
 
   escrever_linha(this->saida, linha);
 
@@ -136,7 +140,7 @@ void desenha_dashed_rect(SVG s, Figura f) {
 }
 
 void escreve_texto(
-    SVG s, char *texto, float x, float y, float tamanho, char *cor) {
+  SVG s, char *texto, float x, float y, float tamanho, char *cor) {
   struct SVG *this;
 
   size_t length;
@@ -151,14 +155,14 @@ void escreve_texto(
   linha = (char *) malloc(length * sizeof(char));
 
   sprintf(
-      linha,
-      "<text x=\"%4.1f\" y=\"%4.1f\" "
-      "style=\"fill:%s;font-size:%4.1fpx;font-family:sans-serif\">%s</text>",
-      x,
-      y,
-      cor,
-      tamanho,
-      texto);
+    linha,
+    "<text x=\"%4.1f\" y=\"%4.1f\" "
+    "style=\"fill:%s;font-size:%4.1fpx;font-family:sans-serif\">%s</text>",
+    x,
+    y,
+    cor,
+    tamanho,
+    texto);
 
   escrever_linha(this->saida, linha);
 
@@ -187,14 +191,15 @@ void desenha_linha(SVG s, float x1, float y1, float x2, float y2, char *cor) {
 
   linha = (char *) malloc(length * sizeof(char));
 
-  sprintf(linha,
-          "<line x1=\"%4.1f\" y1=\"%4.1f\" x2=\"%4.1f\" y2=\"%4.1f\" "
-          "style=\"stroke:%s;stroke-width:1\" />",
-          x1,
-          y1,
-          x2,
-          y2,
-          cor);
+  sprintf(
+    linha,
+    "<line x1=\"%4.1f\" y1=\"%4.1f\" x2=\"%4.1f\" y2=\"%4.1f\" "
+    "style=\"stroke:%s;stroke-width:1\" />",
+    x1,
+    y1,
+    x2,
+    y2,
+    cor);
 
   escrever_linha(this->saida, linha);
 
