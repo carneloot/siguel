@@ -165,12 +165,12 @@ int executar_comando(Controlador c, Comando com) {
       id  = atoi(params[0]) - 1;
       id2 = atoi(params[1]) - 1;
 
-      length = 16;
+      length = 8 + strlen(params[0]) + strlen(params[1]);
 
       saida = (char *) malloc(length * sizeof(char));
 
       if (intercepta_figura(this->figuras[id], this->figuras[id2])) {
-        sprintf(saida, "o %4d %4d\nSIM", id + 1, id2 + 1);
+        sprintf(saida, "o %s %s\nSIM", params[0], params[1]);
         /* Desenhar retangulo no lugar da sobreposicao */
         this->sobrepos[this->total_sobrepos] = (int *) malloc(2 * sizeof(int));
 
@@ -179,7 +179,7 @@ int executar_comando(Controlador c, Comando com) {
 
         this->total_sobrepos++;
       } else
-        sprintf(saida, "o %4d %4d\nNAO", id + 1, id2 + 1);
+        sprintf(saida, "o %s %s\nNAO", params[0], params[1]);
 
       inserir_lista(this->saida, (Item) saida);
 
@@ -192,14 +192,14 @@ int executar_comando(Controlador c, Comando com) {
       x  = atof(params[1]);
       y  = atof(params[2]);
 
-      length = 25;
+      length = 9 + strlen(params[0]) + strlen(params[1]) + strlen(params[2]);
 
       saida = (char *) malloc(length * sizeof(char));
 
       if (contem_ponto(this->figuras[id], x, y))
-        sprintf(saida, "i %4d %4.1f %4.1f\nSIM", id + 1, x, y);
+        sprintf(saida, "i %s %s %s\nSIM", params[0], params[1], params[2]);
       else
-        sprintf(saida, "i %4d %4.1f %4.1f\nNAO", id + 1, x, y);
+        sprintf(saida, "i %s %s %s\nNAO", params[0], params[1], params[2]);
 
       inserir_lista(this->saida, (Item) saida);
 
@@ -213,11 +213,11 @@ int executar_comando(Controlador c, Comando com) {
 
       distancia = distancia_figuras(this->figuras[id], this->figuras[id2]);
 
-      length = 19;
+      length = 11 + + strlen(params[0]) + strlen(params[1]);
 
       saida = (char *) malloc(length * sizeof(char));
 
-      sprintf(saida, "d %4d %4d\n%4.1f", id + 1, id2 + 1, distancia);
+      sprintf(saida, "d %s %s\n%4.1f", params[0], params[1], distancia);
 
       inserir_lista(this->saida, (Item) saida);
 

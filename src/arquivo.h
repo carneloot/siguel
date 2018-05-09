@@ -25,7 +25,7 @@ char *ler_proxima_linha(Arquivo a);
  * 'a' deve ser do modo escrita ou alteracao
  * Escreve em 'a' a string 'entrada'
  */
-void escrever_linha(Arquivo a, char *entrada);
+void escrever_linha(Arquivo a, const char *entrada, ...);
 
 /**
  * Retorna a linha atual do arquivo 'a'

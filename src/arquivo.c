@@ -3,6 +3,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <stdarg.h>
 
 #include "utils.h"
 
@@ -80,15 +81,20 @@ char *ler_proxima_linha(Arquivo a) {
   return linha;
 }
 
-void escrever_linha(Arquivo a, char *entrada) {
+void escrever_linha(Arquivo a, const char *entrada, ...) {
   struct Arquivo *this;
+  va_list args;
+
   this = (struct Arquivo *) a;
 
   if (this->modo == LEITURA)
     return;
 
-  fputs(entrada, this->arq);
-  fputc('\n', this->arq);
+  va_start(args, entrada);
+
+  vfprintf(this->arq, entrada, args);
+
+  va_end(args);
 
   this->linha_atual++;
 }
