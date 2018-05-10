@@ -1,5 +1,4 @@
 #include <stdio.h>
-#include <stdlib.h>
 
 #include "arquivo.h"
 #include "comando.h"
@@ -23,6 +22,10 @@ int main(int argc, const char *argv[]) {
   /* Main loop */
   while (tem_proximo_node(linha_atual_node)) {
     linha_atual = (char *) get_proximo_node(&linha_atual_node);
+
+    #ifdef DEBUG
+    printf("DEBUG: %s\n", linha_atual);
+    #endif
 
     comando = cria_comando(linha_atual);
     executar_comando(controlador, comando);

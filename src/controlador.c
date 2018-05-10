@@ -27,11 +27,11 @@ struct Controlador {
   float max_height;
 };
 
-void desenhar_todas_figuras(Controlador c, SVG s);
+static void desenhar_todas_figuras(Controlador c, SVG s);
 
-void desenhar_sobreposicoes(Controlador c, SVG s);
+static void desenhar_sobreposicoes(Controlador c, SVG s);
 
-void escrever_txt_final(Controlador c);
+static void escrever_txt_final(Controlador c);
 
 /** METODOS PUBLICOS */
 
@@ -173,7 +173,7 @@ int executar_comando(Controlador c, Comando com) {
         this->max_width = w + 4;
 
       if (h > this->max_height)
-        this->max_height= h + 4;
+        this->max_height = h + 4;
 
       this->total_figuras++;
 
@@ -203,7 +203,7 @@ int executar_comando(Controlador c, Comando com) {
         this->max_width = w + 4;
 
       if (h > this->max_height)
-        this->max_height= h + 4;
+        this->max_height = h + 4;
 
       this->total_figuras++;
 

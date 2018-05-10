@@ -22,7 +22,7 @@ const struct {
                 {"a", CRIAR_SVG},
                 {"#", FIM_DO_ARQUIVO}};
 
-int conta_params(char *entrada);
+static int conta_params(char *entrada);
 
 Comando cria_comando(char *entrada) {
   int h, i;

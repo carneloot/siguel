@@ -19,7 +19,7 @@ struct Arquivo {
 /**
  * Retorna o tamanho da proxima linha do arquivo
  */
-int tamanho_linha(FILE *arq);
+static int tamanho_linha(FILE *arq);
 
 /* ----------------- DECLARAÇÕES MÉTODOS PUBLICOS ------------------- */
 
@@ -51,7 +51,7 @@ Arquivo abrir_arquivo(char *path, enum TipoArquivo modo) {
 char *ler_proxima_linha(Arquivo a) {
   struct Arquivo *this;
   int tam;
-  char *linha, c;
+  char *linha, *linha_trimmed, c;
 
   this = (struct Arquivo *) a;
 
@@ -74,11 +74,13 @@ char *ler_proxima_linha(Arquivo a) {
 
   while ((c = fgetc(this->arq)) != '\n' && c != '\r') {}
 
-  linha = trim(linha);
+  linha_trimmed = trim(linha);
 
   this->linha_atual++;
 
-  return linha;
+  free(linha);
+
+  return linha_trimmed;
 }
 
 void escrever_linha(Arquivo a, const char *entrada, ...) {

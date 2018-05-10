@@ -28,6 +28,7 @@ LFLAGS   = -Wall -I. -lm -g
 SRCDIR   = src
 OBJDIR   = build
 BINDIR   = bin
+OUTDIR   = out
 
 SOURCES  := $(wildcard $(SRCDIR)/*.c $(SRCDIR)/**/*.c)
 INCLUDES := $(wildcard $(SRCDIR)/*.h $(SRCDIR)/**/*.h)
@@ -56,7 +57,7 @@ remove: clean
 
 .PHONY: clean-test
 clean-test:
-	@$(rm) test/*.svg test/*.txt
+	@$(rm) $(OUTDIR)/*.svg $(OUTDIR)/*.txt
 	@echo "Tests removed!"
 
 remake: remove $(BINDIR)/$(TARGET)

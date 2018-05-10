@@ -38,33 +38,27 @@ Figura cria_retangulo(
   this->y           = y;
   this->data.rect.w = w;
   this->data.rect.h = h;
-  this->cor         = (char *) malloc((strlen(cor) + 1) * sizeof(char));
-  this->cor_borda   = (char *) malloc((strlen(cor_borda) + 1) * sizeof(char));
 
-  strcpy(this->cor, cor);
-  strcpy(this->cor_borda, cor_borda);
+  this->cor       = trim(cor);
+  this->cor_borda = trim(cor_borda);
 
-  return (void *) this;
+  return (Figura) this;
 }
 
 Figura cria_circulo(float x, float y, float r, char *cor, char *cor_borda) {
   struct Figura *this;
+
   this = (struct Figura *) malloc(sizeof(struct Figura));
 
   this->tipo        = CIRCULO;
   this->x           = x;
   this->y           = y;
   this->data.circ.r = r;
-  this->cor         = (char *) malloc((strlen(cor) + 1) * sizeof(char));
-  this->cor_borda   = (char *) malloc((strlen(cor_borda) + 1) * sizeof(char));
 
-  strcpy(this->cor, cor);
-  strcpy(this->cor_borda, cor_borda);
+  this->cor       = trim(cor);
+  this->cor_borda = trim(cor_borda);
 
-  this->cor       = trim(this->cor);
-  this->cor_borda = trim(this->cor_borda);
-
-  return (void *) this;
+  return (Figura) this;
 }
 
 int intercepta_figura(Figura f, Figura f2) {
@@ -95,8 +89,8 @@ int intercepta_figura(Figura f, Figura f2) {
     rect = this;
   }
 
-  x_perto = fmaxf(rect->x, fminf(circ->x, rect->x + rect->data.rect.w));
-  y_perto = fmaxf(rect->y, fminf(circ->y, rect->y + rect->data.rect.h));
+  x_perto = max(rect->x, min(circ->x, rect->x + rect->data.rect.w));
+  y_perto = max(rect->y, min(circ->y, rect->y + rect->data.rect.h));
 
   return (
     dist_squared(circ->x, circ->y, x_perto, y_perto) <=
@@ -140,19 +134,19 @@ Figura get_rect_sobreposicao(Figura f1, Figura f2) {
   float x, y, h, w;
 
   if (this->tipo == CIRCULO && other->tipo == CIRCULO) {
-    x = fminf(this->x - this->data.circ.r, other->x - other->data.circ.r);
-    y = fminf(this->y - this->data.circ.r, other->y - other->data.circ.r);
+    x = min(this->x - this->data.circ.r, other->x - other->data.circ.r);
+    y = min(this->y - this->data.circ.r, other->y - other->data.circ.r);
 
-    w = fmaxf(this->x + this->data.circ.r, other->x + other->data.circ.r);
-    h = fmaxf(this->y + this->data.circ.r, other->y + other->data.circ.r);
+    w = max(this->x + this->data.circ.r, other->x + other->data.circ.r);
+    h = max(this->y + this->data.circ.r, other->y + other->data.circ.r);
   }
 
   else if (this->tipo == RETANGULO && other->tipo == RETANGULO) {
-    x = fminf(this->x, other->x);
-    y = fminf(this->y, other->y);
+    x = min(this->x, other->x);
+    y = min(this->y, other->y);
 
-    w = fmaxf(this->x + this->data.rect.w, other->x + other->data.rect.w);
-    h = fmaxf(this->y + this->data.rect.h, other->y + other->data.rect.h);
+    w = max(this->x + this->data.rect.w, other->x + other->data.rect.w);
+    h = max(this->y + this->data.rect.h, other->y + other->data.rect.h);
   }
 
   else {
@@ -166,11 +160,11 @@ Figura get_rect_sobreposicao(Figura f1, Figura f2) {
       rect = this;
     }
 
-    x = fminf(rect->x, circ->x - circ->data.circ.r);
-    y = fminf(rect->y, circ->y - circ->data.circ.r);
+    x = min(rect->x, circ->x - circ->data.circ.r);
+    y = min(rect->y, circ->y - circ->data.circ.r);
 
-    w = fmaxf(rect->x + rect->data.rect.w, circ->x + circ->data.circ.r);
-    h = fmaxf(rect->y + rect->data.rect.h, circ->y + circ->data.circ.r);
+    w = max(rect->x + rect->data.rect.w, circ->x + circ->data.circ.r);
+    h = max(rect->y + rect->data.rect.h, circ->y + circ->data.circ.r);
   }
 
   w -= x;

@@ -1,9 +1,9 @@
 #ifndef __UTILS_H__
 #define __UTILS_H__
 
-float fmaxf(float, float);
+#define max(a, b) ((a > b) ? (a) : (b))
 
-float fminf(float, float);
+#define min(a, b) ((a < b) ? (a) : (b))
 
 char *trim(char *);
 

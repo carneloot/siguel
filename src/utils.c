@@ -4,14 +4,6 @@
 #include <stdlib.h>
 #include <string.h>
 
-float fmaxf(float a, float b) {
-  return (a > b) ? a : b;
-}
-
-float fminf(float a, float b) {
-  return (a < b) ? a : b;
-}
-
 char *trim(char *entrada) {
   int tam, i;
   char *saida;
@@ -34,7 +26,6 @@ char *trim(char *entrada) {
     saida[i] = entrada[i];
   saida[i] = 0;
 
-  free(entrada);
   return saida;
 }
 
