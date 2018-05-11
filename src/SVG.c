@@ -89,8 +89,8 @@ void desenha_dashed_rect(SVG s, Figura f) {
   escrever_linha(
     this->saida,
     "<rect width=\"%.1f\" height=\"%.1f\" x=\"%.1f\" y=\"%.1f\" "
-    "stroke-dasharray=\"3, "
-    "3\" style=\"fill:transparent;stroke-width:2;stroke:purple\"/>\n",
+    "stroke-dasharray=\"5, 5\" "
+    "style=\"fill:transparent;stroke-width:2;stroke:purple\"/>\n",
     w,
     h,
     x,
