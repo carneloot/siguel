@@ -19,6 +19,8 @@ void destruir_lista(Lista);
 
 void para_cada_lista(Lista, void (*)(Item));
 
+unsigned get_tamanho_lista(Lista);
+
 Node get_start_lista(Lista);
 
 /** Manupulacao do Nó */

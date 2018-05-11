@@ -20,8 +20,7 @@ struct Controlador {
   int total_figuras;
   int max_figuras;
 
-  int **sobrepos;
-  int total_sobrepos;
+  Lista sobreposicoes;
 
   float max_width;
   float max_height;
@@ -49,8 +48,7 @@ Controlador cria_controlador() {
   this->total_figuras = 0;
   this->figuras       = (Figura *) calloc(this->max_figuras, sizeof(Figura));
 
-  this->total_sobrepos = 0;
-  this->sobrepos       = (int **) malloc(this->max_figuras * sizeof(int *));
+  this->sobreposicoes = cria_lista();
 
   this->max_width  = 0;
   this->max_height = 0;
@@ -214,21 +212,18 @@ int executar_comando(Controlador c, Comando com) {
       id  = atoi(params[0]) - 1;
       id2 = atoi(params[1]) - 1;
 
-      length = 8 + strlen(params[0]) + strlen(params[1]);
+      length = 9 + strlen(params[0]) + strlen(params[1]);
 
       saida = (char *) malloc(length * sizeof(char));
 
       if (intercepta_figura(this->figuras[id], this->figuras[id2])) {
-        sprintf(saida, "o %s %s\nSIM", params[0], params[1]);
+        sprintf(saida, "o %s %s\nSIM\n", params[0], params[1]);
         /* Desenhar retangulo no lugar da sobreposicao */
-        this->sobrepos[this->total_sobrepos] = (int *) malloc(2 * sizeof(int));
-
-        this->sobrepos[this->total_sobrepos][0] = id;
-        this->sobrepos[this->total_sobrepos][1] = id2;
-
-        this->total_sobrepos++;
+        inserir_lista(
+          this->sobreposicoes,
+          get_rect_sobreposicao(this->figuras[id], this->figuras[id2]));
       } else
-        sprintf(saida, "o %s %s\nNAO", params[0], params[1]);
+        sprintf(saida, "o %s %s\nNAO\n", params[0], params[1]);
 
       inserir_lista(this->saida, (Item) saida);
 
@@ -241,14 +236,14 @@ int executar_comando(Controlador c, Comando com) {
       x  = atof(params[1]);
       y  = atof(params[2]);
 
-      length = 9 + strlen(params[0]) + strlen(params[1]) + strlen(params[2]);
+      length = 10 + strlen(params[0]) + strlen(params[1]) + strlen(params[2]);
 
       saida = (char *) malloc(length * sizeof(char));
 
       if (contem_ponto(this->figuras[id], x, y))
-        sprintf(saida, "i %s %s %s\nSIM", params[0], params[1], params[2]);
+        sprintf(saida, "i %s %s %s\nSIM\n", params[0], params[1], params[2]);
       else
-        sprintf(saida, "i %s %s %s\nNAO", params[0], params[1], params[2]);
+        sprintf(saida, "i %s %s %s\nNAO\n", params[0], params[1], params[2]);
 
       inserir_lista(this->saida, (Item) saida);
 
@@ -262,11 +257,11 @@ int executar_comando(Controlador c, Comando com) {
 
       distancia = distancia_figuras(this->figuras[id], this->figuras[id2]);
 
-      length = 11 + strlen(params[0]) + strlen(params[1]);
+      length = 12 + strlen(params[0]) + strlen(params[1]);
 
       saida = (char *) malloc(length * sizeof(char));
 
-      sprintf(saida, "d %s %s\n%4.1f", params[0], params[1], distancia);
+      sprintf(saida, "d %s %s\n%4.1f\n", params[0], params[1], distancia);
 
       inserir_lista(this->saida, (Item) saida);
 
@@ -422,10 +417,10 @@ void destruir_controlador(Controlador c) {
   }
   free(this->figuras);
 
-  i = 0;
-  while (i < this->total_sobrepos)
-    free(this->sobrepos[i++]);
-  free(this->sobrepos);
+  while (!lista_vazia(this->sobreposicoes))
+    destruir_figura(remover_inicio_lista(this->sobreposicoes));
+
+  destruir_lista(this->sobreposicoes);
 
   if (this->nome_base)
     free(this->nome_base);
@@ -502,25 +497,23 @@ void desenhar_todas_figuras(Controlador c, SVG s) {
 
 void desenhar_sobreposicoes(Controlador c, SVG s) {
   struct Controlador *this;
-  Figura figDash, fig1, fig2;
-  int i;
+  Figura figDash;
+  Node no_atual;
 
   this = (struct Controlador *) c;
 
-  if (!this->total_sobrepos)
+  if (lista_vazia(this->sobreposicoes))
     return;
 
   /* Calcular retangulo das sobreposicoes */
-  for (i = 0; i < this->total_sobrepos; i++) {
-    fig1    = this->figuras[this->sobrepos[i][0]];
-    fig2    = this->figuras[this->sobrepos[i][1]];
-    figDash = get_rect_sobreposicao(fig1, fig2);
+  no_atual = get_start_lista(this->sobreposicoes);
+
+  while (tem_proximo_node(no_atual)) {
+    figDash = (Figura) get_proximo_node(&no_atual);
 
     desenha_dashed_rect(s, figDash);
     escreve_texto(
       s, "sobrepoe", get_x(figDash), get_y(figDash) - 5, 15, "purple");
-
-    destruir_figura(figDash);
   }
 }
 

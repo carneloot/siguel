@@ -1,4 +1,5 @@
 from os import listdir, mkdir
+from time import time
 import subprocess
 
 BIN_FOLDER   = "bin"
@@ -17,17 +18,25 @@ if __name__ == "__main__":
     except FileExistsError:
         pass
 
-    for filename in listdir(TESTS_FOLDER):
+    tests = listdir(TESTS_FOLDER)
+    tests.sort()
+
+    for filename in tests:
         if not filename.endswith(".geo"):
             continue
 
         print("Rodando \"{0}\".".format(filename))
+
+        before_time = time()
         output = subprocess.Popen(
             RUN_COMMAND.format(
                 APP_PATH, TESTS_FOLDER, OUT_FOLDER, filename
             ),
             shell=True,
-            stdout=subprocess.PIPE
+            stdout=subprocess.PIPE            
         ).stdout.read()
-        output = str(output, 'utf-8')
-        print(output)
+        after_time = time()
+
+        print("Rodou em {} seg.\n".format(
+            round(after_time - before_time, 2)
+        ))

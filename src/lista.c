@@ -114,6 +114,10 @@ void para_cada_lista(Lista l, void (*f)(Item)) {
   }
 }
 
+unsigned get_tamanho_lista(Lista l) {
+  return ((struct Lista *) l)->tamanho;
+}
+
 Node get_start_lista(Lista l) {
   return (Node)((struct Lista *) l)->start;
 }
