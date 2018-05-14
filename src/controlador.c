@@ -20,6 +20,8 @@ struct Controlador {
   int total_figuras;
   int max_figuras;
 
+  int linha_atual;
+
   Lista sobreposicoes;
 
   float max_width;
@@ -47,6 +49,8 @@ Controlador cria_controlador() {
   this->max_figuras   = TOTAL_FIGURAS_DEFAULT;
   this->total_figuras = 0;
   this->figuras       = (Figura *) calloc(this->max_figuras, sizeof(Figura));
+
+  this->linha_atual = 0;
 
   this->sobreposicoes = cria_lista();
 
@@ -107,7 +111,6 @@ int executar_comando(Controlador c, Comando com) {
   struct Controlador *this;
   enum TipoComando tipo;
   char **params;
-  int result;
 
   /* Parametros especificos */
   char *cor, *cor_borda, *saida, *sufixo;
@@ -120,7 +123,8 @@ int executar_comando(Controlador c, Comando com) {
   this   = (struct Controlador *) c;
   tipo   = get_tipo(com);
   params = get_parametros(com);
-  result = 0;
+
+  this->linha_atual++;
 
   switch (tipo) {
     case MUDAR_NUM_FIGURAS:
@@ -146,7 +150,6 @@ int executar_comando(Controlador c, Comando com) {
 
       this->figuras = newFiguras;
 
-      result = 1;
       break;
 
     case DESENHA_CIRCULO:
@@ -175,7 +178,6 @@ int executar_comando(Controlador c, Comando com) {
 
       this->total_figuras++;
 
-      result = 1;
       break;
 
     case DESENHA_RETANGULO:
@@ -205,12 +207,23 @@ int executar_comando(Controlador c, Comando com) {
 
       this->total_figuras++;
 
-      result = 1;
       break;
 
     case CHECA_SOBREPOSICAO:
       id  = atoi(params[0]) - 1;
       id2 = atoi(params[1]) - 1;
+
+      if (!this->figuras[id]) {
+        printf(
+          "Nao ha figura no id %d! (linha %d)\n", id + 1, this->linha_atual);
+        return 0;
+      }
+
+      if (!this->figuras[id2]) {
+        printf(
+          "Nao ha figura no id %d! (linha %d)\n", id2 + 1, this->linha_atual);
+        return 0;
+      }
 
       length = 9 + strlen(params[0]) + strlen(params[1]);
 
@@ -227,14 +240,18 @@ int executar_comando(Controlador c, Comando com) {
 
       inserir_lista(this->saida, (Item) saida);
 
-      result = 1;
-
       break;
 
     case CHECA_PONTO:
       id = atoi(params[0]) - 1;
       x  = atof(params[1]);
       y  = atof(params[2]);
+
+      if (!this->figuras[id]) {
+        printf(
+          "Nao ha figura no id %d! (linha %d)\n", id + 1, this->linha_atual);
+        return 0;
+      }
 
       length = 10 + strlen(params[0]) + strlen(params[1]) + strlen(params[2]);
 
@@ -247,13 +264,23 @@ int executar_comando(Controlador c, Comando com) {
 
       inserir_lista(this->saida, (Item) saida);
 
-      result = 1;
-
       break;
 
     case DISTANCIA_FIGURAS:
       id  = atoi(params[0]) - 1;
       id2 = atoi(params[1]) - 1;
+
+      if (!this->figuras[id]) {
+        printf(
+          "Nao ha figura no id %d! (linha %d)\n", id + 1, this->linha_atual);
+        return 0;
+      }
+
+      if (!this->figuras[id2]) {
+        printf(
+          "Nao ha figura no id %d! (linha %d)\n", id2 + 1, this->linha_atual);
+        return 0;
+      }
 
       distancia = distancia_figuras(this->figuras[id], this->figuras[id2]);
 
@@ -265,12 +292,16 @@ int executar_comando(Controlador c, Comando com) {
 
       inserir_lista(this->saida, (Item) saida);
 
-      result = 1;
-
       break;
 
     case CRIAR_SVG:
       id = atoi(params[0]) - 1;
+
+      if (!this->figuras[id]) {
+        printf(
+          "Nao ha figura no id %d! (linha %d)\n", id + 1, this->linha_atual);
+        return 0;
+      }
 
       /* Cria o sufixo padrao caso nao tenha sido especificado */
       if (get_numero_parametros(com) > 1)
@@ -335,7 +366,6 @@ int executar_comando(Controlador c, Comando com) {
       if (get_numero_parametros(com) <= 1)
         free(sufixo);
 
-      result = 1;
       break;
 
     case FIM_DO_ARQUIVO:
@@ -359,12 +389,11 @@ int executar_comando(Controlador c, Comando com) {
 
       escrever_txt_final(c);
 
-      result = 1;
       break;
-    case NONE: result = 0; break;
+    case NONE: break;
   }
 
-  return result;
+  return 1;
 }
 
 Lista get_linhas_entrada(Controlador c) {
@@ -385,6 +414,9 @@ Lista get_linhas_entrada(Controlador c) {
   sprintf(full_path, "%s%s.geo", this->dir_entrada, this->nome_base);
 
   arq = abrir_arquivo(full_path, LEITURA);
+
+  if (!arq)
+    return NULL;
 
   free(full_path);
 

@@ -35,6 +35,9 @@ if __name__ == "__main__":
             shell=True,
             stdout=subprocess.PIPE            
         ).stdout.read()
+        output = str(output, 'utf-8')
+        print(output)
+
         after_time = time()
 
         print("Rodou em {} seg.\n".format(

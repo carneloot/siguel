@@ -11,6 +11,7 @@ int main(int argc, const char *argv[]) {
   Lista linhas;
   Node linha_atual_node;
   char *linha_atual;
+  int eh_erro;
 
   /* Setup */
   controlador = cria_controlador();
@@ -19,8 +20,10 @@ int main(int argc, const char *argv[]) {
 
   linha_atual_node = get_start_lista(linhas);
 
+  eh_erro = !linhas;
+
   /* Main loop */
-  while (tem_proximo_node(linha_atual_node)) {
+  while (tem_proximo_node(linha_atual_node) && !eh_erro) {
     linha_atual = (char *) get_proximo_node(&linha_atual_node);
 
     #ifdef DEBUG
@@ -28,12 +31,16 @@ int main(int argc, const char *argv[]) {
     #endif
 
     comando = cria_comando(linha_atual);
-    executar_comando(controlador, comando);
+    eh_erro = !executar_comando(controlador, comando);
 
     destruir_comando(comando);
   }
 
-  printf("Arquivo \"%s.geo\" finalizado.\n", get_nome_base(controlador));
+  if (eh_erro)
+    printf(
+      "Arquivo \"%s.geo\" finalizado com erro.\n", get_nome_base(controlador));
+  else
+    printf("Arquivo \"%s.geo\" finalizado.\n", get_nome_base(controlador));
 
   destruir_lista(linhas);
 
