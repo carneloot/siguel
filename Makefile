@@ -14,21 +14,22 @@
 # project name (generate executable with this name)
 TARGET   = siguel
 
-PFLAGS   = -pedantic -ansi # -D DEBUG
-
-CC       = gcc
-# compiling flags here
-CFLAGS   = -lm -Wall -I. -g $(PFLAGS)
-
-LINKER   = gcc
-# linking flags here
-LFLAGS   = -Wall -I. -lm -g
-
 # change these to proper directories where each file should be
 SRCDIR   = src
 OBJDIR   = build
 BINDIR   = bin
 OUTDIR   = out
+INCDIR   = includes
+
+PFLAGS   = -pedantic -ansi# -D DEBUG
+
+CC       = gcc
+# compiling flags here
+CFLAGS   = -lm -Wall -I $(INCDIR) -g $(PFLAGS)
+
+LINKER   = gcc
+# linking flags here
+LFLAGS   = -Wall -I $(INCDIR) -lm -g
 
 SOURCES  := $(wildcard $(SRCDIR)/*.c $(SRCDIR)/**/*.c)
 INCLUDES := $(wildcard $(SRCDIR)/*.h $(SRCDIR)/**/*.h)
@@ -43,7 +44,7 @@ $(BINDIR)/$(TARGET): $(OBJECTS)
 $(OBJECTS): $(OBJDIR)/%.o : $(SRCDIR)/%.c
 	@mkdir -p $(dir $@)
 	@$(CC) $(CFLAGS) -c $< -o $@
-	@echo "Compiled "$<" successfully!"
+	@echo "Compiled \"$<\" successfully!"
 
 .PHONY: clean
 clean:
