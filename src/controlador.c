@@ -42,7 +42,7 @@ Controlador cria_controlador() {
   struct Controlador *this =
     (struct Controlador *) malloc(sizeof(struct Controlador));
 
-  this->saida       = cria_lista();
+  this->saida       = create_lista();
   this->nome_base   = NULL;
   this->dir_saida   = NULL;
   this->dir_entrada = (char *) malloc(3 * sizeof(char));
@@ -54,12 +54,12 @@ Controlador cria_controlador() {
 
   this->linha_atual = 0;
 
-  this->sobreposicoes = cria_lista();
+  this->sobreposicoes = create_lista();
 
   this->max_width  = 0;
   this->max_height = 0;
 
-  this->fila_execucao = cria_lista();
+  this->fila_execucao = create_lista();
 
   return (void *) this;
 }
@@ -117,7 +117,10 @@ int executar_comando(Controlador c) {
   enum TipoComando tipo;
   char **params;
 
-  com = (Comando) remover_inicio_lista(this->fila_execucao);
+  Posic inicio_lista = get_first_lista(this->fila_execucao);
+
+  com = (Comando) get_lista(this->fila_execucao, inicio_lista);
+  remove_lista(this->fila_execucao, inicio_lista);
 
   /* Parametros especificos */
   char *cor, *cor_borda, *saida, *sufixo;
@@ -238,13 +241,13 @@ int executar_comando(Controlador c) {
       if (intercepta_figura(this->figuras[id], this->figuras[id2])) {
         sprintf(saida, "o %s %s\nSIM\n", params[0], params[1]);
         /* Desenhar retangulo no lugar da sobreposicao */
-        inserir_lista(
+        insert_lista(
           this->sobreposicoes,
-          get_rect_sobreposicao(this->figuras[id], this->figuras[id2]));
+          (Item) get_rect_sobreposicao(this->figuras[id], this->figuras[id2]));
       } else
         sprintf(saida, "o %s %s\nNAO\n", params[0], params[1]);
 
-      inserir_lista(this->saida, (Item) saida);
+      insert_lista(this->saida, (Item) saida);
 
       break;
 
@@ -268,7 +271,7 @@ int executar_comando(Controlador c) {
       else
         sprintf(saida, "i %s %s %s\nNAO\n", params[0], params[1], params[2]);
 
-      inserir_lista(this->saida, (Item) saida);
+      insert_lista(this->saida, (Item) saida);
 
       break;
 
@@ -296,7 +299,7 @@ int executar_comando(Controlador c) {
 
       sprintf(saida, "d %s %s\n%4.1f\n", params[0], params[1], distancia);
 
-      inserir_lista(this->saida, (Item) saida);
+      insert_lista(this->saida, (Item) saida);
 
       break;
 
@@ -407,7 +410,7 @@ int executar_comando(Controlador c) {
 int ha_comandos(Controlador c) {
   struct Controlador *this = (struct Controlador *) c;
 
-  return !lista_vazia(this->fila_execucao);
+  return !!length_lista(this->fila_execucao);
 }
 
 void gerar_fila_execucao(Controlador c) {
@@ -426,7 +429,7 @@ void gerar_fila_execucao(Controlador c) {
   arq = abrir_arquivo(path, LEITURA);
 
   while ((linha = ler_proxima_linha(arq))) {
-    inserir_lista(this->fila_execucao, (Item) cria_comando(linha));
+    insert_lista(this->fila_execucao, (Item) cria_comando(linha));
 
     free(linha);
   }
@@ -456,8 +459,12 @@ void destruir_controlador(Controlador c) {
   }
   free(this->figuras);
 
-  while (!lista_vazia(this->sobreposicoes))
-    destruir_figura(remover_inicio_lista(this->sobreposicoes));
+  Posic iterator = get_first_lista(this->sobreposicoes);
+
+  while (get_next_lista(this->sobreposicoes, iterator)) {
+    destruir_figura(get_lista(this->sobreposicoes, iterator));
+    iterator = get_next_lista(this->sobreposicoes, iterator);
+  }
 
   destruir_lista(this->sobreposicoes);
 
@@ -539,22 +546,23 @@ void desenhar_todas_figuras(Controlador c, SVG s) {
 void desenhar_sobreposicoes(Controlador c, SVG s) {
   struct Controlador *this;
   Figura figDash;
-  Node no_atual;
 
   this = (struct Controlador *) c;
 
-  if (lista_vazia(this->sobreposicoes))
+  if (!length_lista(this->sobreposicoes))
     return;
 
   /* Calcular retangulo das sobreposicoes */
-  no_atual = get_start_lista(this->sobreposicoes);
+  Posic iterator = get_first_lista(this->sobreposicoes);
 
-  while (tem_proximo_node(no_atual)) {
-    figDash = (Figura) get_proximo_node(&no_atual);
+  while (get_next_lista(this->sobreposicoes, iterator)) {
+    figDash = (Figura) get_lista(this->sobreposicoes, iterator);
 
     desenha_dashed_rect(s, figDash);
     escreve_texto(
       s, "sobrepoe", get_x(figDash), get_y(figDash) - 5, 15, "purple");
+
+    iterator = get_next_lista(this->sobreposicoes, iterator);
   }
 }
 
@@ -563,7 +571,6 @@ void escrever_txt_final(Controlador c) {
   size_t tamanho_total;
   char *full_path;
   Arquivo arq;
-  Node node;
 
   this = (struct Controlador *) c;
 
@@ -579,10 +586,11 @@ void escrever_txt_final(Controlador c) {
 
   free(full_path);
 
-  node = get_start_lista(this->saida);
+  Posic iterator = get_first_lista(this->saida);
 
-  while (tem_proximo_node(node)) {
-    escrever_linha(arq, (char *) get_proximo_node(&node));
+  while (get_next_lista(this->saida, iterator)) {
+    escrever_linha(arq, (char *) get_lista(this->saida, iterator));
+    iterator = get_next_lista(this->saida, iterator);
   }
 
   fechar_arquivo(arq);

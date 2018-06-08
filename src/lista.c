@@ -2,141 +2,180 @@
 
 #include <stdlib.h>
 
-struct Node {
+struct Posic {
   Item value;
-  struct Node *next;
-  struct Node *prev;
+  struct Posic *next;
+  struct Posic *prev;
 };
 
 struct Lista {
-  struct Node *start;
-  struct Node *end;
-  int tamanho;
+  struct Posic *start;
+  struct Posic *end;
+  int size;
 };
 
-Lista cria_lista() {
-  struct Lista *this;
+Lista create_lista() {
+  struct Lista *this = (struct Lista *) malloc(sizeof(struct Lista));
 
-  this = (struct Lista *) malloc(sizeof(struct Lista));
+  this->start = NULL;
+  this->end   = NULL;
+  this->size  = 0;
 
-  this->start   = NULL;
-  this->end     = NULL;
-  this->tamanho = 0;
-
-  return (void *) this;
+  return (Lista) this;
 }
 
-int lista_vazia(Lista l) {
-  return (!((struct Lista *) l)->tamanho);
+int length_lista(Lista lista) {
+  struct Lista *this = (struct Lista *) lista;
+  return this->size;
 }
 
-void inserir_lista(Lista l, Item item) {
-  struct Lista *this;
-  struct Node *node;
+Posic insert_lista(Lista lista, Item info) {
+  struct Lista *this = (struct Lista *) lista;
+  struct Posic *posic;
 
-  this = (struct Lista *) l;
-  node = (struct Node *) malloc(sizeof(struct Node));
+  posic = (struct Posic *) malloc(sizeof(struct Posic));
 
-  node->value = item;
-  node->next  = NULL;
-  node->prev  = NULL;
+  posic->next  = NULL;
+  posic->prev  = NULL;
+  posic->value = info;
 
-  this->tamanho++;
+  // Se a lista estiver vazia
+  if (length_lista(lista) == 0) {
+    this->start = posic;
+    this->end   = posic;
+    this->size++;
 
-  if (!this->start) {
-    this->start = node;
-    this->end   = node;
+    return posic;
+  }
+
+  posic->prev     = this->end;
+  this->end->next = posic;
+  this->end       = posic;
+
+  this->size++;
+
+  return posic;
+}
+
+void remove_lista(Lista lista, Posic posicao) {
+  struct Lista *this  = (struct Lista *) lista;
+  struct Posic *posic = (struct Posic *) posicao;
+
+  if (!posicao)
     return;
+
+  if (this->start == posic)
+    this->start = posic->next;
+
+  if (this->end == posic)
+    this->end = posic->prev;
+
+  if (posic->prev)
+    posic->prev->next = posic->next;
+
+  if (posic->next)
+    posic->next->prev = posic->prev;
+
+  free(posic);
+
+  this->size--;
+}
+
+Item get_lista(Lista lista, Posic posicao) {
+  struct Posic *posic = (struct Posic *) posicao;
+
+  if (!posicao)
+    return NULL;
+
+  return posic->value;
+}
+
+Posic insert_before_lista(Lista lista, Posic posicao, Item info) {
+  struct Lista *this     = (struct Lista *) lista;
+  struct Posic *posic    = (struct Posic *) posicao;
+  struct Posic *newPosic = (struct Posic *) malloc(sizeof(struct Posic));
+
+  if (!posicao)
+    return NULL;
+
+  newPosic->prev  = NULL;
+  newPosic->next  = posic;
+  newPosic->value = info;
+
+  if (this->start == posic) {
+    this->start->prev = newPosic;
+    this->start       = newPosic;
+
+    this->size++;
+    return newPosic;
   }
 
-  node->prev      = this->end;
-  this->end->next = node;
-  this->end       = node;
+  posic->prev->next = newPosic;
+  newPosic->prev    = posic->prev;
+  posic->prev       = newPosic;
+
+  this->size++;
+
+  return (Posic) newPosic;
 }
 
-Item remover_inicio_lista(Lista l) {
-  struct Lista *this;
-  struct Node *node;
-  Item item;
+Posic insert_after_lista(Lista lista, Posic posicao, Item info) {
+  struct Lista *this     = (struct Lista *) lista;
+  struct Posic *posic    = (struct Posic *) posicao;
+  struct Posic *newPosic = (struct Posic *) malloc(sizeof(struct Posic));
 
-  this = (struct Lista *) l;
-  node = this->start;
-  item = node->value;
+  if (!posicao)
+    return NULL;
 
-  this->start = this->start->next;
-  if (this->start)
-    this->start->prev = NULL;
+  newPosic->prev  = posic;
+  newPosic->next  = NULL;
+  newPosic->value = info;
 
-  free(node);
+  if (this->end == posic) {
+    this->end->next = newPosic;
+    this->end       = newPosic;
 
-  this->tamanho--;
-
-  return item;
-}
-
-void destruir_lista(Lista l) {
-  struct Node *atual;
-  struct Lista *this;
-
-  this = (struct Lista *) l;
-
-  if (lista_vazia(l)) {
-    free(this);
-    return;
+    this->size++;
+    return newPosic;
   }
 
-  atual = this->end->prev;
+  posic->next->prev = newPosic;
+  newPosic->next    = posic->next;
+  posic->next       = newPosic;
 
-  while (atual) {
-    free(atual->next->value);
-    free(atual->next);
+  this->size++;
 
-    atual = atual->prev;
-  }
-
-  free(this->start->value);
-  free(this->start);
-
-  free(this);
+  return (Posic) newPosic;
 }
 
-void para_cada_lista(Lista l, void (*f)(Item)) {
-  struct Lista *this;
-  struct Node *atual;
-
-  this  = (struct Lista *) l;
-  atual = this->start;
-
-  while (atual) {
-    (*f)(atual->value);
-
-    atual = atual->next;
-  }
+Posic get_first_lista(Lista lista) {
+  struct Lista *this = (struct Lista *) lista;
+  return (Posic) this->start;
 }
 
-unsigned get_tamanho_lista(Lista l) {
-  return ((struct Lista *) l)->tamanho;
+Posic get_next_lista(Lista lista, Posic posicao) {
+  struct Posic *posic = (struct Posic *) posicao;
+  if (!posicao)
+    return NULL;
+  return (Posic) posic->next;
 }
 
-Node get_start_lista(Lista l) {
-  return (Node)((struct Lista *) l)->start;
+Posic get_last_lista(Lista lista) {
+  struct Lista *this = (struct Lista *) lista;
+  return (Posic) this->end;
 }
 
-/** Manupulacao do Nó */
-
-int tem_proximo_node(Node node) {
-  return (!!node);
+Posic get_previous_lista(Lista lista, Posic posicao) {
+  struct Posic *posic = (struct Posic *) posicao;
+  if (!posicao)
+    return NULL;
+  return (Posic) posic->prev;
 }
 
-Item get_proximo_node(Node *nodeP) {
-  struct Node *node;
-  Item item;
+void destruir_lista(Lista lista) {
+  // Destruir os nodes que ainda existam.
+  while (length_lista(lista) != 0)
+    remove_lista(lista, get_last_lista(lista));
 
-  node = (struct Node *) *nodeP;
-
-  item = node->value;
-
-  *nodeP = (Node) node->next;
-
-  return item;
+  free(lista);
 }

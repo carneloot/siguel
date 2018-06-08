@@ -27,6 +27,7 @@ SVG cria_SVG(char *path, float max_width, float max_height) {
   return (SVG) this;
 }
 
+// TODO: Adicionar opcao para ser dashed
 void desenha_figura(SVG s, Figura f) {
   struct SVG *this;
 
