@@ -6,6 +6,8 @@
 #include "arquivo.h"
 #include "utils.h"
 
+#define DASHED_STRING "stroke-dasharray=\"5, 5\" "
+
 struct SVG {
   Arquivo saida;
 };
@@ -27,8 +29,7 @@ SVG cria_SVG(char *path, float max_width, float max_height) {
   return (SVG) this;
 }
 
-// TODO: Adicionar opcao para ser dashed
-void desenha_figura(SVG s, Figura f) {
+void desenha_figura(SVG s, Figura f, float opacity, int is_dashed) {
   struct SVG *this;
 
   float x, y, r, h, w;
@@ -49,53 +50,31 @@ void desenha_figura(SVG s, Figura f) {
       escrever_linha(
         this->saida,
         "<circle cx=\"%.1f\" cy=\"%.1f\" r=\"%.1f\" "
-        "style=\"fill:%s;stroke-width:2;stroke:%s;opacity:0.4\" />\n",
+        "style=\"fill:%s;stroke-width:2;stroke:%s;opacity:%.2f\" %s/>\n",
         x,
         y,
         r,
         cor,
-        cor_borda);
+        cor_borda,
+        opacity,
+        (is_dashed) ? DASHED_STRING : "");
       break;
 
     case RETANGULO:
       escrever_linha(
         this->saida,
         "<rect x=\"%.1f\" y=\"%.1f\" width=\"%.1f\" height=\"%.1f\" "
-        "style=\"fill:%s;stroke-width:2;stroke:%s;opacity:0.4\" />\n",
+        "style=\"fill:%s;stroke-width:2;stroke:%s;opacity:%.2f\" %s/>\n",
         x,
         y,
         w,
         h,
         cor,
-        cor_borda);
+        cor_borda,
+        opacity,
+        (is_dashed) ? DASHED_STRING : "");
       break;
   }
-}
-
-void desenha_dashed_rect(SVG s, Figura f) {
-  struct SVG *this;
-
-  float x, y, h, w;
-
-  if (get_tipo_figura(f) != RETANGULO)
-    return;
-
-  this = (struct SVG *) s;
-
-  x = get_x(f);
-  y = get_y(f);
-  h = get_h(f);
-  w = get_w(f);
-
-  escrever_linha(
-    this->saida,
-    "<rect width=\"%.1f\" height=\"%.1f\" x=\"%.1f\" y=\"%.1f\" "
-    "stroke-dasharray=\"5, 5\" "
-    "style=\"fill:transparent;stroke-width:2;stroke:purple\"/>\n",
-    w,
-    h,
-    x,
-    y);
 }
 
 void escreve_texto(

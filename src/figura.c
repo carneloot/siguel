@@ -175,7 +175,7 @@ Figura get_rect_sobreposicao(Figura f1, Figura f2) {
   w += 2 * STROKE_SIZE;
   h += 2 * STROKE_SIZE;
 
-  return cria_retangulo(x, y, w, h, "", "");
+  return cria_retangulo(x, y, w, h, "transparent", "purple");
 }
 
 float distancia_figuras(Figura f, Figura f2) {

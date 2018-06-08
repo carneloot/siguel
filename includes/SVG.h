@@ -7,9 +7,7 @@ typedef void *SVG;
 
 SVG cria_SVG(char *path, float, float);
 
-void desenha_figura(SVG s, Figura f);
-
-void desenha_dashed_rect(SVG s, Figura f);
+void desenha_figura(SVG s, Figura f, float opacity, int is_dashed);
 
 void escreve_texto(
   SVG s, char *texto, float x, float y, float tamanho, char *cor);

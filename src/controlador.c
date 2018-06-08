@@ -461,7 +461,7 @@ void destruir_controlador(Controlador c) {
 
   Posic iterator = get_first_lista(this->sobreposicoes);
 
-  while (get_next_lista(this->sobreposicoes, iterator)) {
+  while (iterator) {
     destruir_figura(get_lista(this->sobreposicoes, iterator));
     iterator = get_next_lista(this->sobreposicoes, iterator);
   }
@@ -506,7 +506,7 @@ void desenhar_todas_figuras(Controlador c, SVG s) {
     figAtual = this->figuras[i];
 
     if (figAtual) {
-      desenha_figura(s, figAtual);
+      desenha_figura(s, figAtual, 0.4, 0);
 
       count++;
     }
@@ -555,10 +555,10 @@ void desenhar_sobreposicoes(Controlador c, SVG s) {
   /* Calcular retangulo das sobreposicoes */
   Posic iterator = get_first_lista(this->sobreposicoes);
 
-  while (get_next_lista(this->sobreposicoes, iterator)) {
+  while (iterator) {
     figDash = (Figura) get_lista(this->sobreposicoes, iterator);
 
-    desenha_dashed_rect(s, figDash);
+    desenha_figura(s, figDash, 1.0, 1);
     escreve_texto(
       s, "sobrepoe", get_x(figDash), get_y(figDash) - 5, 15, "purple");
 
@@ -588,7 +588,7 @@ void escrever_txt_final(Controlador c) {
 
   Posic iterator = get_first_lista(this->saida);
 
-  while (get_next_lista(this->saida, iterator)) {
+  while (iterator) {
     escrever_linha(arq, (char *) get_lista(this->saida, iterator));
     iterator = get_next_lista(this->saida, iterator);
   }
