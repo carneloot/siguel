@@ -11,9 +11,11 @@ Controlador cria_controlador();
 
 void lidar_parametros(Controlador c, int argc, const char *argv[]);
 
-int executar_comando(Controlador c, Comando com);
+int executar_comando(Controlador c);
 
-Lista get_linhas_entrada(Controlador c);
+int ha_comandos(Controlador c);
+
+void gerar_fila_execucao(Controlador c);
 
 void destruir_controlador(Controlador c);
 

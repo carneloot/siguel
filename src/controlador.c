@@ -26,6 +26,8 @@ struct Controlador {
 
   float max_width;
   float max_height;
+
+  Lista fila_execucao;
 };
 
 static void desenhar_todas_figuras(Controlador c, SVG s);
@@ -56,6 +58,8 @@ Controlador cria_controlador() {
 
   this->max_width  = 0;
   this->max_height = 0;
+
+  this->fila_execucao = cria_lista();
 
   return (void *) this;
 }
@@ -107,10 +111,13 @@ void lidar_parametros(Controlador c, int argc, const char *argv[]) {
   }
 }
 
-int executar_comando(Controlador c, Comando com) {
-  struct Controlador *this;
+int executar_comando(Controlador c) {
+  struct Controlador *this = (struct Controlador *) c;
+  Comando com;
   enum TipoComando tipo;
   char **params;
+
+  com = (Comando) remover_inicio_lista(this->fila_execucao);
 
   /* Parametros especificos */
   char *cor, *cor_borda, *saida, *sufixo;
@@ -120,7 +127,6 @@ int executar_comando(Controlador c, Comando com) {
   Figura figAtual, *newFiguras;
   SVG s;
 
-  this   = (struct Controlador *) c;
   tipo   = get_tipo(com);
   params = get_parametros(com);
 
@@ -393,42 +399,43 @@ int executar_comando(Controlador c, Comando com) {
     case NONE: break;
   }
 
+  destruir_comando(com);
+
   return 1;
 }
 
-Lista get_linhas_entrada(Controlador c) {
-  struct Controlador *this;
-  size_t tamanho_total;
-  char *full_path, *linha_atual;
+int ha_comandos(Controlador c) {
+  struct Controlador *this = (struct Controlador *) c;
+
+  return !lista_vazia(this->fila_execucao);
+}
+
+void gerar_fila_execucao(Controlador c) {
+  // Lê os arquivos de entrada e coloca os comandos numa fila de comandos
+  struct Controlador *this = (struct Controlador *) c;
   Arquivo arq;
-  Lista lista;
+  size_t length;
+  char *path, *linha;
 
-  this = (struct Controlador *) c;
+  length = strlen(this->nome_base) + strlen(this->dir_entrada) + 6;
 
-  if (!this->nome_base)
-    return NULL;
+  path = (char *) malloc(length * sizeof(char));
 
-  tamanho_total = strlen(this->dir_entrada) + strlen(this->nome_base) + 1 + 4;
-  full_path     = (char *) malloc(tamanho_total * sizeof(char));
+  sprintf(path, "%s/%s.geo", this->dir_entrada, this->nome_base);
 
-  sprintf(full_path, "%s%s.geo", this->dir_entrada, this->nome_base);
+  arq = abrir_arquivo(path, LEITURA);
 
-  arq = abrir_arquivo(full_path, LEITURA);
+  while ((linha = ler_proxima_linha(arq))) {
+    inserir_lista(this->fila_execucao, (Item) cria_comando(linha));
 
-  if (!arq)
-    return NULL;
-
-  free(full_path);
-
-  lista = cria_lista();
-
-  while ((linha_atual = ler_proxima_linha(arq))) {
-    inserir_lista(lista, (Item) linha_atual);
+    free(linha);
   }
+
+  free(path);
 
   fechar_arquivo(arq);
 
-  return lista;
+  // Adicionar leitura do arquivo .qry aqui
 }
 
 void destruir_controlador(Controlador c) {
@@ -460,6 +467,8 @@ void destruir_controlador(Controlador c) {
     free(this->dir_saida);
   if (this->dir_entrada)
     free(this->dir_entrada);
+
+  destruir_lista(this->fila_execucao);
 
   free(c);
 }
