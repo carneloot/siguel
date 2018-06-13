@@ -3,7 +3,6 @@
 
 #include "arquivo.h"
 #include "comando.h"
-#include "lista.h"
 
 typedef void *Controlador;
 

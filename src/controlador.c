@@ -7,6 +7,7 @@
 #include "SVG.h"
 #include "figura.h"
 #include "utils.h"
+#include "modules/lista.h"
 
 #define TOTAL_FIGURAS_DEFAULT 1000
 
