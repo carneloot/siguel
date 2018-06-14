@@ -13,14 +13,33 @@ struct Comando {
 const struct {
   char *id;
   enum TipoComando tipo;
-} comandos[] = {{"nx", MUDAR_NUM_FIGURAS},
-                {"c", DESENHA_CIRCULO},
-                {"r", DESENHA_RETANGULO},
-                {"o", CHECA_SOBREPOSICAO},
-                {"i", CHECA_PONTO},
-                {"d", DISTANCIA_FIGURAS},
-                {"a", CRIAR_SVG},
-                {"#", FIM_DO_ARQUIVO}};
+} comandos[] = {
+  {"nx", GEO_MUDAR_NUM_FIGURAS},
+  {"c", GEO_DESENHA_CIRCULO},
+  {"r", GEO_DESENHA_RETANGULO},
+  {"o", GEO_CHECA_SOBREPOSICAO},
+  {"i", GEO_CHECA_PONTO},
+  {"d", GEO_DISTANCIA_FIGURAS},
+  {"a", GEO_CRIAR_SVG},
+  {"#", GEO_FIM_DO_ARQUIVO},
+  {"q", GEO_INSERE_QUADRA},
+  {"h", GEO_INSERE_HIDRANTE},
+  {"s", GEO_INSERE_SEMAFORO},
+  {"t", GEO_INSERE_RADIO_BASE},
+  {"cq", GEO_COR_QUADRA},
+  {"ch", GEO_COR_HIDRANTE},
+  {"ct", GEO_COR_RADIO_BASE},
+  {"cs", GEO_COR_SEMAFORO},
+  {"q?", QRY_BUSCA_RECT},
+  {"Q?", QRY_BUSCA_CIRC},
+  {"dq", QRY_DELETE_QUADRA_RECT},
+  {"dle", QRY_DELETE_ALL_RECT},
+  {"Dq", QRY_DELETE_QUADRA_CIRC},
+  {"Dle", QRY_DELETE_ALL_CIRC},
+  {"cc", QRY_MUDA_COR_QUADRA},
+  {"crd?", QRY_PRINT_EQUIPAMENTO},
+  {"crb?", QRY_CHECA_RADIO_BASE_PROXIMA}
+};
 
 static int conta_params(char *entrada);
 

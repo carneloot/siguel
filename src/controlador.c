@@ -6,8 +6,8 @@
 #include <string.h>
 #include "SVG.h"
 #include "figura.h"
-#include "utils.h"
 #include "modules/lista.h"
+#include "utils.h"
 
 #define TOTAL_FIGURAS_DEFAULT 1000
 
@@ -16,6 +16,7 @@ struct Controlador {
   char *nome_base;
   char *dir_saida;
   char *dir_entrada;
+  char *arq_query;
 
   Figura *figuras;
   int total_figuras;
@@ -46,6 +47,7 @@ Controlador cria_controlador() {
   this->saida       = create_lista();
   this->nome_base   = NULL;
   this->dir_saida   = NULL;
+  this->arq_query   = NULL;
   this->dir_entrada = (char *) malloc(3 * sizeof(char));
   strcpy(this->dir_entrada, "./");
 
@@ -98,6 +100,12 @@ void lidar_parametros(Controlador c, int argc, const char *argv[]) {
       this->dir_entrada = evaluate_dir(this->dir_entrada);
     }
 
+    else if (!strcmp(argv[i], "-q")) {
+      i++;
+      this->arq_query = (char *) malloc((strlen(argv[i]) + 1) * sizeof(char));
+      strcpy(this->arq_query, argv[i]);
+    }
+
     i++;
   }
 
@@ -137,7 +145,7 @@ int executar_comando(Controlador c) {
   this->linha_atual++;
 
   switch (tipo) {
-    case MUDAR_NUM_FIGURAS:
+    case GEO_MUDAR_NUM_FIGURAS:
       this->max_figuras = atoi(params[0]);
 
       newFiguras = (Figura *) calloc(this->max_figuras, sizeof(Figura));
@@ -162,7 +170,7 @@ int executar_comando(Controlador c) {
 
       break;
 
-    case DESENHA_CIRCULO:
+    case GEO_DESENHA_CIRCULO:
       id        = atoi(params[0]) - 1;
       cor_borda = params[1];
       cor       = params[2];
@@ -190,7 +198,7 @@ int executar_comando(Controlador c) {
 
       break;
 
-    case DESENHA_RETANGULO:
+    case GEO_DESENHA_RETANGULO:
       id        = atoi(params[0]) - 1;
       cor_borda = params[1];
       cor       = params[2];
@@ -219,7 +227,7 @@ int executar_comando(Controlador c) {
 
       break;
 
-    case CHECA_SOBREPOSICAO:
+    case GEO_CHECA_SOBREPOSICAO:
       id  = atoi(params[0]) - 1;
       id2 = atoi(params[1]) - 1;
 
@@ -252,7 +260,7 @@ int executar_comando(Controlador c) {
 
       break;
 
-    case CHECA_PONTO:
+    case GEO_CHECA_PONTO:
       id = atoi(params[0]) - 1;
       x  = atof(params[1]);
       y  = atof(params[2]);
@@ -276,7 +284,7 @@ int executar_comando(Controlador c) {
 
       break;
 
-    case DISTANCIA_FIGURAS:
+    case GEO_DISTANCIA_FIGURAS:
       id  = atoi(params[0]) - 1;
       id2 = atoi(params[1]) - 1;
 
@@ -304,7 +312,7 @@ int executar_comando(Controlador c) {
 
       break;
 
-    case CRIAR_SVG:
+    case GEO_CRIAR_SVG:
       id = atoi(params[0]) - 1;
 
       if (!this->figuras[id]) {
@@ -378,7 +386,7 @@ int executar_comando(Controlador c) {
 
       break;
 
-    case FIM_DO_ARQUIVO:
+    case GEO_FIM_DO_ARQUIVO:
       /* Escrever SVG final */
       length = strlen(this->nome_base) + strlen(this->dir_saida) + 5;
 
@@ -400,6 +408,27 @@ int executar_comando(Controlador c) {
       escrever_txt_final(c);
 
       break;
+    // Inserir parte da cidade
+    case GEO_INSERE_QUADRA: break;
+    case GEO_INSERE_HIDRANTE: break;
+    case GEO_INSERE_SEMAFORO: break;
+    case GEO_INSERE_RADIO_BASE: break;
+    case GEO_COR_QUADRA: break;
+    case GEO_COR_HIDRANTE: break;
+    case GEO_COR_RADIO_BASE: break;
+    case GEO_COR_SEMAFORO: break;
+
+    // Comandos .qry
+    case QRY_BUSCA_RECT: break;
+    case QRY_BUSCA_CIRC: break;
+    case QRY_DELETE_QUADRA_RECT: break;
+    case QRY_DELETE_ALL_RECT: break;
+    case QRY_DELETE_QUADRA_CIRC: break;
+    case QRY_DELETE_ALL_CIRC: break;
+    case QRY_MUDA_COR_QUADRA: break;
+    case QRY_PRINT_EQUIPAMENTO: break;
+    case QRY_CHECA_RADIO_BASE_PROXIMA: break;
+
     case NONE: break;
   }
 
@@ -439,7 +468,27 @@ void gerar_fila_execucao(Controlador c) {
 
   fechar_arquivo(arq);
 
-  // Adicionar leitura do arquivo .qry aqui
+  // Caso exista um arquivo .qry
+  if (!this->arq_query)
+    return;
+
+  length = strlen(this->arq_query) + strlen(this->dir_entrada) + 2;
+
+  path = (char *) malloc(length * sizeof(char));
+
+  sprintf(path, "%s/%s", this->dir_entrada, this->arq_query);
+
+  arq = abrir_arquivo(path, LEITURA);
+
+  while ((linha = ler_proxima_linha(arq))) {
+    insert_lista(this->fila_execucao, (Item) cria_comando(linha));
+
+    free(linha);
+  }
+
+  free(path);
+
+  fechar_arquivo(arq);
 }
 
 void destruir_controlador(Controlador c) {
@@ -475,6 +524,8 @@ void destruir_controlador(Controlador c) {
     free(this->dir_saida);
   if (this->dir_entrada)
     free(this->dir_entrada);
+  if (this->arq_query)
+    free(this->arq_query);
 
   destruir_lista(this->fila_execucao);
 
