@@ -86,6 +86,6 @@ Posic get_previous_lista(Lista, Posic);
 /**
  * Destroi a lista.
  */
-void destruir_lista(Lista);
+void destruir_lista(Lista, void (*)(Item));
 
 #endif /* __LISTA_H__ */

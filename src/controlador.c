@@ -158,6 +158,7 @@ int executar_comando(Controlador c) {
   float x, y, x2, y2, r, h, w, distancia;
   size_t length;
   Figura figAtual, *newFiguras;
+  Elemento new_elemento;
   SVG s;
 
   tipo   = get_tipo(com);
@@ -430,10 +431,57 @@ int executar_comando(Controlador c) {
 
       break;
     // Inserir parte da cidade
-    case GEO_INSERE_QUADRA: break;
-    case GEO_INSERE_HIDRANTE: break;
-    case GEO_INSERE_SEMAFORO: break;
-    case GEO_INSERE_RADIO_BASE: break;
+    case GEO_INSERE_QUADRA:
+      cor = params[0];  // Cep
+      x   = strtof(params[1], &saida);
+      y   = strtof(params[2], &saida);
+      w   = strtof(params[3], &saida);
+      h   = strtof(params[4], &saida);
+
+      new_elemento = cria_quadra(x, y, cor, w, h);
+
+      set_cor_elemento(new_elemento, this->cores[QUADRA]);
+      set_cor_borda_elemento(new_elemento, this->cores_borda[QUADRA]);
+
+      insert_lista(this->elementos[QUADRA], (Item) new_elemento);
+
+      break;
+    case GEO_INSERE_HIDRANTE:
+      id = (int) strtol(params[0], &saida, 10);
+      x  = strtof(params[1], &saida);
+      y  = strtof(params[2], &saida);
+
+      new_elemento = cria_hidrante(id, x, y);
+
+      set_cor_elemento(new_elemento, this->cores[HIDRANTE]);
+      set_cor_borda_elemento(new_elemento, this->cores_borda[HIDRANTE]);
+
+      insert_lista(this->elementos[HIDRANTE], (Item) new_elemento);
+      break;
+    case GEO_INSERE_SEMAFORO:
+      id = (int) strtol(params[0], &saida, 10);
+      x  = strtof(params[1], &saida);
+      y  = strtof(params[2], &saida);
+
+      new_elemento = cria_semaforo(id, x, y);
+
+      set_cor_elemento(new_elemento, this->cores[SEMAFORO]);
+      set_cor_borda_elemento(new_elemento, this->cores_borda[SEMAFORO]);
+
+      insert_lista(this->elementos[SEMAFORO], (Item) new_elemento);
+      break;
+    case GEO_INSERE_RADIO_BASE:
+      id = (int) strtol(params[0], &saida, 10);
+      x  = strtof(params[1], &saida);
+      y  = strtof(params[2], &saida);
+
+      new_elemento = cria_radio_base(id, x, y);
+
+      set_cor_elemento(new_elemento, this->cores[RADIO_BASE]);
+      set_cor_borda_elemento(new_elemento, this->cores_borda[RADIO_BASE]);
+
+      insert_lista(this->elementos[RADIO_BASE], (Item) new_elemento);
+      break;
     case GEO_COR_QUADRA:
     case GEO_COR_HIDRANTE:
     case GEO_COR_RADIO_BASE:
@@ -533,7 +581,7 @@ void destruir_controlador(Controlador c) {
 
   this = (struct Controlador *) c;
 
-  destruir_lista(this->saida);
+  destruir_lista(this->saida, NULL);
 
   i = 0;
   while (this->total_figuras) {
@@ -545,19 +593,14 @@ void destruir_controlador(Controlador c) {
   }
   free(this->figuras);
 
-  Posic iterator = get_first_lista(this->sobreposicoes);
+  // Sobreposicoes
+  destruir_lista(this->sobreposicoes, &destruir_figura);
 
-  while (iterator) {
-    destruir_figura(get_lista(this->sobreposicoes, iterator));
-    iterator = get_next_lista(this->sobreposicoes, iterator);
-  }
-
-  destruir_lista(this->sobreposicoes);
-
-  destruir_lista(this->elementos[QUADRA]);
-  destruir_lista(this->elementos[HIDRANTE]);
-  destruir_lista(this->elementos[SEMAFORO]);
-  destruir_lista(this->elementos[RADIO_BASE]);
+  // Elementos
+  destruir_lista(this->elementos[QUADRA], &destruir_elemento);
+  destruir_lista(this->elementos[HIDRANTE], &destruir_elemento);
+  destruir_lista(this->elementos[SEMAFORO], &destruir_elemento);
+  destruir_lista(this->elementos[RADIO_BASE], &destruir_elemento);
 
   for (i = 0; i < 4; i++) {
     if (!this->cores[i])
@@ -576,7 +619,7 @@ void destruir_controlador(Controlador c) {
   if (this->arq_query)
     free(this->arq_query);
 
-  destruir_lista(this->fila_execucao);
+  destruir_lista(this->fila_execucao, NULL);
 
   free(c);
 }

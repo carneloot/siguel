@@ -172,7 +172,17 @@ Posic get_previous_lista(Lista lista, Posic posicao) {
   return (Posic) posic->prev;
 }
 
-void destruir_lista(Lista lista) {
+void destruir_lista(Lista lista, void (*destruir_item)(Item item)) {
+  if (destruir_item) {
+    Posic iterator;
+
+    iterator = get_first_lista(lista);
+    while (iterator) {
+      destruir_item(get_lista(lista, iterator));
+      iterator = get_next_lista(lista, iterator);
+    }
+  }
+
   // Destruir os nodes que ainda existam.
   while (length_lista(lista) != 0)
     remove_lista(lista, get_last_lista(lista));

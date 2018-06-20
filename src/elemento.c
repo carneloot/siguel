@@ -2,7 +2,6 @@
 
 #include <stdlib.h>
 #include <string.h>
-#include "figura.h"
 
 #define RAIO_EQUIPAMENTOS 5
 
@@ -24,16 +23,16 @@ struct Elemento {
     } quadra;
 
     // ===== HIDRANTE =====
-    struct {
-    } hidrante;
+    // struct {
+    // } hidrante;
 
     // ===== SEMAFORO =====
-    struct {
-    } semaforo;
+    // struct {
+    // } semaforo;
 
     // ===== RADIO-BASE =====
-    struct {
-    } radio_base;
+    // struct {
+    // } radio_base;
 
   } data;
 };
@@ -105,6 +104,30 @@ void set_cor_borda_elemento(Elemento e, char *cor_borda) {
   strcpy(this->cor_borda, cor_borda);
 }
 
+Figura get_figura_elemento(Elemento e) {
+  struct Elemento *this = (struct Elemento *) e;
+  Figura figura;
+
+  switch (this->tipo) {
+    case QUADRA:
+      figura = cria_retangulo(
+        this->x,
+        this->y,
+        this->data.quadra.largura,
+        this->data.quadra.altura,
+        this->cor,
+        this->cor_borda);
+      break;
+    case HIDRANTE:
+    case RADIO_BASE:
+    case SEMAFORO:
+      figura = cria_circulo(
+        this->x, this->y, RAIO_EQUIPAMENTOS, this->cor, this->cor_borda);
+      break;
+  }
+
+  return figura;
+}
 
 void destruir_elemento(Elemento e) {
   struct Elemento *this = (struct Elemento *) e;
@@ -116,7 +139,7 @@ void destruir_elemento(Elemento e) {
     free(this->cor_borda);
 
   // QUADRA
-  if (this->data.quadra.cep)
+  if (this->tipo == QUADRA)
     free(this->data.quadra.cep);
 
   free(this);
