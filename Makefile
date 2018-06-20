@@ -48,17 +48,17 @@ $(OBJECTS): $(OBJDIR)/%.o : $(SRCDIR)/%.c
 
 .PHONY: clean
 clean:
-	@$(rm) $(OBJECTS)/*
+	@$(rm) $(OBJECTS)
 	@echo "Cleanup complete!"
 
 .PHONY: remove
 remove: clean
-	@$(rm) $(BINDIR)/*
+	@$(rm) $(BINDIR)/$(TARGET)
 	@echo "Executable removed!"
 
 .PHONY: clean-test
 clean-test:
-	@$(rm) $(OUTDIR)/*.svg $(OUTDIR)/*.txt
+	@$(rm) $(OUTDIR)/**/*.svg $(OUTDIR)/**/*.txt
 	@echo "Tests removed!"
 
 remake: remove $(BINDIR)/$(TARGET)

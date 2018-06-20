@@ -5,6 +5,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include "SVG.h"
+#include "elemento.h"
 #include "figura.h"
 #include "modules/lista.h"
 #include "utils.h"
@@ -26,6 +27,10 @@ struct Controlador {
 
   Lista sobreposicoes;
 
+  Lista elementos[4];
+  char *cores[4];
+  char *cores_borda[4];
+
   float max_width;
   float max_height;
 
@@ -41,6 +46,7 @@ static void escrever_txt_final(Controlador c);
 /** METODOS PUBLICOS */
 
 Controlador cria_controlador() {
+  int i;
   struct Controlador *this =
     (struct Controlador *) malloc(sizeof(struct Controlador));
 
@@ -59,6 +65,16 @@ Controlador cria_controlador() {
 
   this->sobreposicoes = create_lista();
 
+  this->elementos[QUADRA]     = create_lista();
+  this->elementos[HIDRANTE]   = create_lista();
+  this->elementos[SEMAFORO]   = create_lista();
+  this->elementos[RADIO_BASE] = create_lista();
+
+  for (i = 0; i < 4; i++) {
+    this->cores[i]       = NULL;
+    this->cores_borda[i] = NULL;
+  }
+
   this->max_width  = 0;
   this->max_height = 0;
 
@@ -70,6 +86,7 @@ Controlador cria_controlador() {
 void lidar_parametros(Controlador c, int argc, const char *argv[]) {
   struct Controlador *this;
   int i = 1, j, length;
+  char *texto_auxiliar;
 
   this = (struct Controlador *) c;
 
@@ -87,17 +104,21 @@ void lidar_parametros(Controlador c, int argc, const char *argv[]) {
     /* Pega o default directory */
     else if (!strcmp(argv[i], "-o")) {
       i++;
-      this->dir_saida = (char *) malloc((strlen(argv[i]) + 1) * sizeof(char));
-      strcpy(this->dir_saida, argv[i]);
-      this->dir_saida = evaluate_dir(this->dir_saida);
+      texto_auxiliar = (char *) malloc((strlen(argv[i]) + 1) * sizeof(char));
+      strcpy(texto_auxiliar, argv[i]);
+
+      this->dir_saida = evaluate_dir(texto_auxiliar);
+      free(texto_auxiliar);
     }
 
     else if (!strcmp(argv[i], "-e")) {
       i++;
+      texto_auxiliar = (char *) malloc((strlen(argv[i]) + 1) * sizeof(char));
+      strcpy(texto_auxiliar, argv[i]);
+
       free(this->dir_entrada);
-      this->dir_entrada = (char *) malloc((strlen(argv[i]) + 1) * sizeof(char));
-      strcpy(this->dir_entrada, argv[i]);
-      this->dir_entrada = evaluate_dir(this->dir_entrada);
+      this->dir_entrada = evaluate_dir(texto_auxiliar);
+      free(texto_auxiliar);
     }
 
     else if (!strcmp(argv[i], "-q")) {
@@ -133,7 +154,7 @@ int executar_comando(Controlador c) {
 
   /* Parametros especificos */
   char *cor, *cor_borda, *saida, *sufixo;
-  int id, id2, i, count;
+  int id, id2, i, count, elemento_id;
   float x, y, x2, y2, r, h, w, distancia;
   size_t length;
   Figura figAtual, *newFiguras;
@@ -413,10 +434,25 @@ int executar_comando(Controlador c) {
     case GEO_INSERE_HIDRANTE: break;
     case GEO_INSERE_SEMAFORO: break;
     case GEO_INSERE_RADIO_BASE: break;
-    case GEO_COR_QUADRA: break;
-    case GEO_COR_HIDRANTE: break;
-    case GEO_COR_RADIO_BASE: break;
-    case GEO_COR_SEMAFORO: break;
+    case GEO_COR_QUADRA:
+    case GEO_COR_HIDRANTE:
+    case GEO_COR_RADIO_BASE:
+    case GEO_COR_SEMAFORO:
+      elemento_id = tipo - GEO_COR_QUADRA;
+
+      if (this->cores[elemento_id])
+        free(this->cores[elemento_id]);
+      if (this->cores_borda[elemento_id])
+        free(this->cores_borda[elemento_id]);
+
+      this->cores[elemento_id] =
+        (char *) malloc((strlen(params[1]) + 1) * sizeof(char));
+      strcpy(this->cores[elemento_id], params[1]);
+
+      this->cores_borda[elemento_id] =
+        (char *) malloc((strlen(params[0]) + 1) * sizeof(char));
+      strcpy(this->cores_borda[elemento_id], params[0]);
+      break;
 
     // Comandos .qry
     case QRY_BUSCA_RECT: break;
@@ -517,6 +553,19 @@ void destruir_controlador(Controlador c) {
   }
 
   destruir_lista(this->sobreposicoes);
+
+  destruir_lista(this->elementos[QUADRA]);
+  destruir_lista(this->elementos[HIDRANTE]);
+  destruir_lista(this->elementos[SEMAFORO]);
+  destruir_lista(this->elementos[RADIO_BASE]);
+
+  for (i = 0; i < 4; i++) {
+    if (!this->cores[i])
+      continue;
+
+    free(this->cores[i]);
+    free(this->cores_borda[i]);
+  }
 
   if (this->nome_base)
     free(this->nome_base);

@@ -108,15 +108,13 @@ char *evaluate_dir(char *dir) {
   tam = strlen(dir);
 
   if (dir[tam - 1] == '/')
-    return dir;
+    tam -= 1;
 
   newDir = (char *) calloc(tam + 2, sizeof(char));
 
   strcat(newDir, dir);
-  strcat(newDir, "/");
-
-  if (dir)
-    free(dir);
+  if (dir[tam] != '/')
+    strcat(newDir, "/");
 
   return newDir;
 }
