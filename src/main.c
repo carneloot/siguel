@@ -2,9 +2,11 @@
 
 #include "arquivo.h"
 #include "controlador.h"
+#include "modules/logger.h"
 
 int main(int argc, const char *argv[]) {
   Controlador controlador;
+  char *nome_base;
   int eh_erro;
 
   /* Setup */
@@ -19,11 +21,13 @@ int main(int argc, const char *argv[]) {
     eh_erro = !executar_comando(controlador);
   }
 
-  if (eh_erro)
-    printf(
-      "Arquivo \"%s.geo\" finalizado com erro.\n", get_nome_base(controlador));
-  else
-    printf("Arquivo \"%s.geo\" finalizado.\n", get_nome_base(controlador));
+  nome_base = get_nome_base(controlador);
+
+  if (eh_erro) {
+    LOG_PRINT(LOG_STDOUT, "Arquivo \"%s.geo\" finalizado com erro.", nome_base);
+  } else {
+    LOG_PRINT(LOG_STDOUT, "Arquivo \"%s.geo\" finalizado.", nome_base);
+  }
 
   destruir_controlador(controlador);
 

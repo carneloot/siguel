@@ -87,7 +87,7 @@ build
 lib/*
 
 # Ignore the Executables
-bin/*
+bin
 
 # Ignorar PDFs
 *.pdf
@@ -96,7 +96,6 @@ bin/*
 .clang-format
 
 *.svg
-test/*.txt
 
 GPATH
 GRTAGS
@@ -105,3 +104,5 @@ GTAGS
 *.zip
 
 out
+
+log.txt

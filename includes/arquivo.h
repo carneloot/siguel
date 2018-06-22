@@ -37,4 +37,9 @@ int numero_linha_atual(Arquivo a);
  */
 void fechar_arquivo(Arquivo a);
 
+/**
+ * Retorna o caminho do arquivo.
+ */
+char *get_path(Arquivo a);
+
 #endif /* __ARQUIVO_H__ */

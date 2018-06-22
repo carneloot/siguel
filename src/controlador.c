@@ -8,6 +8,7 @@
 #include "elemento.h"
 #include "figura.h"
 #include "modules/lista.h"
+#include "modules/logger.h"
 #include "utils.h"
 
 #define TOTAL_FIGURAS_DEFAULT 1000
@@ -131,14 +132,16 @@ void lidar_parametros(Controlador c, int argc, const char *argv[]) {
   }
 
   if (!this->nome_base) {
-    printf("Nao foi inserido um nome de arquivo.\nFechando programa.\n");
+    LOG_PRINT(LOG_STDOUT, "Nao foi inserido um nome de arquivo.");
     exit(EXIT_FAILURE);
   }
 
   if (!this->dir_saida) {
-    printf("Nao foi inserido um diretorio de saida.\nFechando programa.\n");
+    LOG_PRINT(LOG_STDOUT, "Nao foi inserido um diretorio de saida.");
     exit(EXIT_FAILURE);
   }
+
+  LOG_PRINT(LOG_FILE, "Parametros sem problemas.");
 }
 
 int executar_comando(Controlador c) {
@@ -254,14 +257,20 @@ int executar_comando(Controlador c) {
       id2 = atoi(params[1]) - 1;
 
       if (!this->figuras[id]) {
-        printf(
-          "Nao ha figura no id %d! (linha %d)\n", id + 1, this->linha_atual);
+        LOG_PRINT(
+          LOG_STDOUT,
+          "Nao ha figura no id %d! (linha %d)",
+          id + 1,
+          this->linha_atual);
         return 0;
       }
 
       if (!this->figuras[id2]) {
-        printf(
-          "Nao ha figura no id %d! (linha %d)\n", id2 + 1, this->linha_atual);
+        LOG_PRINT(
+          LOG_STDOUT,
+          "Nao ha figura no id %d! (linha %d)",
+          id2 + 1,
+          this->linha_atual);
         return 0;
       }
 
@@ -288,8 +297,11 @@ int executar_comando(Controlador c) {
       y  = atof(params[2]);
 
       if (!this->figuras[id]) {
-        printf(
-          "Nao ha figura no id %d! (linha %d)\n", id + 1, this->linha_atual);
+        LOG_PRINT(
+          LOG_STDOUT,
+          "Nao ha figura no id %d! (linha %d)",
+          id + 1,
+          this->linha_atual);
         return 0;
       }
 
@@ -311,14 +323,20 @@ int executar_comando(Controlador c) {
       id2 = atoi(params[1]) - 1;
 
       if (!this->figuras[id]) {
-        printf(
-          "Nao ha figura no id %d! (linha %d)\n", id + 1, this->linha_atual);
+        LOG_PRINT(
+          LOG_STDOUT,
+          "Nao ha figura no id %d! (linha %d)",
+          id + 1,
+          this->linha_atual);
         return 0;
       }
 
       if (!this->figuras[id2]) {
-        printf(
-          "Nao ha figura no id %d! (linha %d)\n", id2 + 1, this->linha_atual);
+        LOG_PRINT(
+          LOG_STDOUT,
+          "Nao ha figura no id %d! (linha %d)",
+          id2 + 1,
+          this->linha_atual);
         return 0;
       }
 
@@ -338,8 +356,11 @@ int executar_comando(Controlador c) {
       id = atoi(params[0]) - 1;
 
       if (!this->figuras[id]) {
-        printf(
-          "Nao ha figura no id %d! (linha %d)\n", id + 1, this->linha_atual);
+        LOG_PRINT(
+          LOG_STDOUT,
+          "Nao ha figura no id %d! (linha %d)",
+          id + 1,
+          this->linha_atual);
         return 0;
       }
 
@@ -573,6 +594,8 @@ void gerar_fila_execucao(Controlador c) {
   free(path);
 
   fechar_arquivo(arq);
+
+  LOG_PRINT(LOG_FILE, "Fila de execução gerada com sucesso.");
 }
 
 void destruir_controlador(Controlador c) {
@@ -658,8 +681,8 @@ void desenhar_todas_figuras(Controlador c, SVG s) {
     i++;
   }
 
-  /* Printa os ids */
   #ifdef DEBUG
+  /* Printa os ids */
 
   i = count = 0;
 

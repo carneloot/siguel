@@ -116,6 +116,10 @@ void fechar_arquivo(Arquivo a) {
   free(a);
 }
 
+char *get_path(Arquivo a) {
+  return ((struct Arquivo *) a)->path;
+}
+
 /* ----------------- DEFINIÇÔES MÉTODOS PRIVADOS ------------------- */
 
 int tamanho_linha(FILE *arq) {
