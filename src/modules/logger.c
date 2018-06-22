@@ -14,6 +14,8 @@
 #include <time.h>
 
 FILE *fp;
+
+#ifdef DEBUG
 static int SESSION_TRACKER;  // Keeps track of session
 
 /*
@@ -33,9 +35,20 @@ static char *getDateString() {
 
   return date;
 }
+#endif
 
 void log_print(char *filename, int line, int stdout_print, char *fmt, ...) {
   va_list list;
+
+  if (stdout_print) {
+    va_start(list, fmt);
+    vfprintf(stdout, fmt, list);
+    va_end(list);
+    fputc('\n', stdout);
+  }
+
+  #ifdef DEBUG
+
   char *time_string;
 
   if (SESSION_TRACKER > 0)
@@ -53,17 +66,11 @@ void log_print(char *filename, int line, int stdout_print, char *fmt, ...) {
   vfprintf(fp, fmt, list);
   va_end(list);
 
-  if (stdout_print) {
-    va_start(list, fmt);
-    vfprintf(stdout, fmt, list);
-    va_end(list);
-  }
-
-  if (stdout_print)
-    fputc('\n', stdout);
   fputc('\n', fp);
 
   SESSION_TRACKER++;
 
   fclose(fp);
+
+  #endif
 }

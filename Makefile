@@ -21,7 +21,7 @@ BINDIR   = bin
 OUTDIR   = out
 INCDIR   = includes
 
-PFLAGS   = -pedantic -std=c99 -fstack-protector-all# -D DEBUG
+PFLAGS   = -pedantic -std=c99 -fstack-protector-all -D DEBUG
 
 CC       = gcc
 # compiling flags here
