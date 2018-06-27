@@ -118,3 +118,17 @@ char *evaluate_dir(char *dir) {
 
   return newDir;
 }
+
+char *remover_extensao(const char *path) {
+  size_t length;
+  char *saida;
+  int j;
+
+  length = strlen(path) - 4;
+  saida = (char *) malloc((length + 1) * sizeof(char));
+  for (j = 0; j < length; j++)
+    saida[j] = path[j];
+  saida[j] = 0;
+
+  return saida;
+}

@@ -8,6 +8,10 @@
 
 #define STROKE_SIZE 2
 
+#define w(f) ((f)->data.rect.w)
+#define h(f) ((f)->data.rect.h)
+#define r(f) ((f)->data.circ.r)
+
 struct Figura {
   float x, y;
   char *cor, *cor_borda;
@@ -199,6 +203,21 @@ void destruir_figura(Figura f) {
   free(this->cor_borda);
 
   free(f);
+}
+
+int dentro_figura(Figura _this, Figura _other) {
+  struct Figura *this  = (struct Figura *) _this;
+  struct Figura *other = (struct Figura *) _other;
+
+  if (this->tipo != RETANGULO || other->tipo != RETANGULO)
+    return -1;
+
+  return (
+    other->x > this->x &&
+    other->y > this->y &&
+    other->x + w(other) < this->x + w(this) &&
+    other->y + h(other) < this->y + h(this)
+  );
 }
 
 /** Getters */

@@ -16,6 +16,8 @@ int ha_comandos(Controlador c);
 
 void gerar_fila_execucao(Controlador c);
 
+void finalizar_arquivos(Controlador c);
+
 void destruir_controlador(Controlador c);
 
 char *get_nome_base(Controlador c);

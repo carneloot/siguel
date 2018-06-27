@@ -29,6 +29,8 @@ int main(int argc, const char *argv[]) {
     LOG_PRINT(LOG_STDOUT, "Arquivo \"%s.geo\" finalizado.", nome_base);
   }
 
+  finalizar_arquivos(controlador);
+
   destruir_controlador(controlador);
 
   return 0;

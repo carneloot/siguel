@@ -15,6 +15,9 @@
 
 struct Controlador {
   Lista saida;
+  Lista saida_qry;
+  Lista saida_svg_qry;
+
   char *nome_base;
   char *dir_saida;
   char *dir_entrada;
@@ -51,7 +54,10 @@ Controlador cria_controlador() {
   struct Controlador *this =
     (struct Controlador *) malloc(sizeof(struct Controlador));
 
-  this->saida       = create_lista();
+  this->saida         = create_lista();
+  this->saida_qry     = create_lista();
+  this->saida_svg_qry = create_lista();
+
   this->nome_base   = NULL;
   this->dir_saida   = NULL;
   this->arq_query   = NULL;
@@ -86,7 +92,7 @@ Controlador cria_controlador() {
 
 void lidar_parametros(Controlador c, int argc, const char *argv[]) {
   struct Controlador *this;
-  int i = 1, j, length;
+  int i = 1;
   char *texto_auxiliar;
 
   this = (struct Controlador *) c;
@@ -94,12 +100,8 @@ void lidar_parametros(Controlador c, int argc, const char *argv[]) {
   while (i < argc) {
     if (!strcmp(argv[i], "-f")) {
       i++;
-      length = strlen(argv[i]) - 4;
 
-      this->nome_base = (char *) malloc((length + 1) * sizeof(char));
-      for (j = 0; j < length; j++)
-        this->nome_base[j] = argv[i][j];
-      this->nome_base[j] = 0;
+      this->nome_base = remover_extensao(argv[i]);
     }
 
     /* Pega o default directory */
@@ -124,8 +126,8 @@ void lidar_parametros(Controlador c, int argc, const char *argv[]) {
 
     else if (!strcmp(argv[i], "-q")) {
       i++;
-      this->arq_query = (char *) malloc((strlen(argv[i]) + 1) * sizeof(char));
-      strcpy(this->arq_query, argv[i]);
+
+      this->arq_query = remover_extensao(argv[i]);
     }
 
     i++;
@@ -156,7 +158,7 @@ int executar_comando(Controlador c) {
   remove_lista(this->fila_execucao, inicio_lista);
 
   /* Parametros especificos */
-  char *cor, *cor_borda, *saida, *sufixo;
+  char *cor, *cor_borda, *saida, *sufixo, *cep;
   int id, id2, i, count, elemento_id;
   float x, y, x2, y2, r, h, w, distancia;
   size_t length;
@@ -453,13 +455,13 @@ int executar_comando(Controlador c) {
       break;
     // Inserir parte da cidade
     case GEO_INSERE_QUADRA:
-      cor = params[0];  // Cep
+      cep = params[0];
       x   = strtof(params[1], &saida);
       y   = strtof(params[2], &saida);
       w   = strtof(params[3], &saida);
       h   = strtof(params[4], &saida);
 
-      new_elemento = cria_quadra(x, y, cor, w, h);
+      new_elemento = cria_quadra(x, y, cep, w, h);
 
       set_cor_elemento(new_elemento, this->cores[QUADRA]);
       set_cor_borda_elemento(new_elemento, this->cores_borda[QUADRA]);
@@ -468,11 +470,11 @@ int executar_comando(Controlador c) {
 
       break;
     case GEO_INSERE_HIDRANTE:
-      id = (int) strtol(params[0], &saida, 10);
-      x  = strtof(params[1], &saida);
-      y  = strtof(params[2], &saida);
+      cep = params[0];
+      x   = strtof(params[1], &saida);
+      y   = strtof(params[2], &saida);
 
-      new_elemento = cria_hidrante(id, x, y);
+      new_elemento = cria_hidrante(x, y, cep);
 
       set_cor_elemento(new_elemento, this->cores[HIDRANTE]);
       set_cor_borda_elemento(new_elemento, this->cores_borda[HIDRANTE]);
@@ -480,11 +482,11 @@ int executar_comando(Controlador c) {
       insert_lista(this->elementos[HIDRANTE], (Item) new_elemento);
       break;
     case GEO_INSERE_SEMAFORO:
-      id = (int) strtol(params[0], &saida, 10);
-      x  = strtof(params[1], &saida);
-      y  = strtof(params[2], &saida);
+      cep = params[0];
+      x   = strtof(params[1], &saida);
+      y   = strtof(params[2], &saida);
 
-      new_elemento = cria_semaforo(id, x, y);
+      new_elemento = cria_semaforo(x, y, cep);
 
       set_cor_elemento(new_elemento, this->cores[SEMAFORO]);
       set_cor_borda_elemento(new_elemento, this->cores_borda[SEMAFORO]);
@@ -492,11 +494,11 @@ int executar_comando(Controlador c) {
       insert_lista(this->elementos[SEMAFORO], (Item) new_elemento);
       break;
     case GEO_INSERE_RADIO_BASE:
-      id = (int) strtol(params[0], &saida, 10);
-      x  = strtof(params[1], &saida);
-      y  = strtof(params[2], &saida);
+      cep = params[0];
+      x   = strtof(params[1], &saida);
+      y   = strtof(params[2], &saida);
 
-      new_elemento = cria_radio_base(id, x, y);
+      new_elemento = cria_radio_base(x, y, cep);
 
       set_cor_elemento(new_elemento, this->cores[RADIO_BASE]);
       set_cor_borda_elemento(new_elemento, this->cores_borda[RADIO_BASE]);
@@ -524,7 +526,44 @@ int executar_comando(Controlador c) {
       break;
 
     // Comandos .qry
-    case QRY_BUSCA_RECT: break;
+    case QRY_BUSCA_RECT:
+      x = strtof(params[0], NULL);
+      y = strtof(params[1], NULL);
+      w = strtof(params[2], NULL);
+      h = strtof(params[3], NULL);
+
+      figAtual = cria_retangulo(x, y, w, h, "transparent", "black");
+
+      for (i = 0; i < 4; i++) {
+        Lista listAtual = this->elementos[i];
+
+        Posic iterator = get_first_lista(listAtual);
+
+        while (iterator) {
+          new_elemento = (Elemento) get_lista(listAtual, iterator);
+
+          int contem;
+
+          // Checar se retangulo esta dentro do outro
+          if (get_tipo_elemento(new_elemento) == QUADRA)
+            contem = dentro_figura(figAtual, get_figura_elemento(new_elemento));
+
+          // Saber se o new_elemento está dentro da figAtual;
+          else
+            contem = contem_ponto(figAtual, get_x(new_elemento), get_y(new_elemento));
+
+          if (contem) {
+            saida = get_info_elemento(new_elemento);
+            insert_lista(this->saida_qry, (Item) saida);
+          }
+
+          iterator = get_next_lista(listAtual, iterator);
+        }
+      }
+
+      insert_lista(this->saida_svg_qry, (Item) figAtual);
+
+      break;
     case QRY_BUSCA_CIRC: break;
     case QRY_DELETE_QUADRA_RECT: break;
     case QRY_DELETE_ALL_RECT: break;
@@ -577,11 +616,11 @@ void gerar_fila_execucao(Controlador c) {
   if (!this->arq_query)
     return;
 
-  length = strlen(this->arq_query) + strlen(this->dir_entrada) + 2;
+  length = strlen(this->arq_query) + strlen(this->dir_entrada) + 2 + 4;
 
   path = (char *) malloc(length * sizeof(char));
 
-  sprintf(path, "%s/%s", this->dir_entrada, this->arq_query);
+  sprintf(path, "%s/%s.qry", this->dir_entrada, this->arq_query);
 
   arq = abrir_arquivo(path, LEITURA);
 
@@ -598,6 +637,54 @@ void gerar_fila_execucao(Controlador c) {
   LOG_PRINT(LOG_FILE, "Fila de execução gerada com sucesso.");
 }
 
+/**
+ * Essa função desenha e escreve os arquivos de devem fazer isso
+ * É meio que uma função que deve ser chamada antes do programa
+ * finalizar, mas depois de rodar todos os comandos.
+ */
+void finalizar_arquivos(Controlador c) {
+  struct Controlador *this = (struct Controlador *) c;
+  char *full_path;
+  size_t length;
+  Arquivo arq;
+  Posic iterator;
+
+  // Arquivo [nome_base]-[nome_qry].txt
+  length    = strlen(this->nome_base) + strlen(this->dir_saida) + strlen(this->arq_query) + 1 + 1 + 4;
+  full_path = calloc(length, sizeof(char));
+  sprintf(full_path, "%s%s-%s.txt", this->dir_saida, this->nome_base, this->arq_query);
+
+  arq = abrir_arquivo(full_path, ESCRITA);
+
+  iterator = get_first_lista(this->saida_qry);
+  while (iterator) {
+    escrever_linha(arq, get_lista(this->saida_qry, iterator));
+    iterator = get_next_lista(this->saida_qry, iterator);
+  }
+
+  free(full_path);
+  fechar_arquivo(arq);
+
+  // Arquivo [nome_base]-[nome_qry].svg
+  SVG s;
+
+  full_path = calloc(length, sizeof(char));
+  sprintf(full_path, "%s%s-%s.svg", this->dir_saida, this->nome_base, this->arq_query);
+
+  s = cria_SVG(full_path, 5000, 5000);
+
+  iterator = get_first_lista(this->saida_svg_qry);
+  while (iterator) {
+    desenha_figura(s, get_lista(this->saida_svg_qry, iterator), 0.4, SVG_BORDA_TRACEJADA);
+    iterator = get_next_lista(this->saida_svg_qry, iterator);
+  }
+
+  salva_SVG(s);
+
+  free(full_path);
+  destruir_SVG(s);
+}
+
 void destruir_controlador(Controlador c) {
   struct Controlador *this;
   int i;
@@ -605,6 +692,8 @@ void destruir_controlador(Controlador c) {
   this = (struct Controlador *) c;
 
   destruir_lista(this->saida, NULL);
+  destruir_lista(this->saida_qry, &free);
+  destruir_lista(this->saida_svg_qry, &destruir_figura);
 
   i = 0;
   while (this->total_figuras) {
@@ -653,7 +742,7 @@ char *get_nome_base(Controlador c) {
 
 /** METODOS PRIVADOS */
 
-void desenhar_todas_figuras(Controlador c, SVG s) {
+static void desenhar_todas_figuras(Controlador c, SVG s) {
   struct Controlador *this;
 
   int i, count;
@@ -673,7 +762,7 @@ void desenhar_todas_figuras(Controlador c, SVG s) {
     figAtual = this->figuras[i];
 
     if (figAtual) {
-      desenha_figura(s, figAtual, 0.4, 0);
+      desenha_figura(s, figAtual, 0.4, SVG_BORDA_SOLIDA);
 
       count++;
     }
@@ -710,7 +799,7 @@ void desenhar_todas_figuras(Controlador c, SVG s) {
   #endif
 }
 
-void desenhar_sobreposicoes(Controlador c, SVG s) {
+static void desenhar_sobreposicoes(Controlador c, SVG s) {
   struct Controlador *this;
   Figura figDash;
 
@@ -725,7 +814,7 @@ void desenhar_sobreposicoes(Controlador c, SVG s) {
   while (iterator) {
     figDash = (Figura) get_lista(this->sobreposicoes, iterator);
 
-    desenha_figura(s, figDash, 1.0, 1);
+    desenha_figura(s, figDash, 1.0, SVG_BORDA_TRACEJADA);
     escreve_texto(
       s, "sobrepoe", get_x(figDash), get_y(figDash) - 5, 15, "purple");
 
@@ -733,7 +822,7 @@ void desenhar_sobreposicoes(Controlador c, SVG s) {
   }
 }
 
-void escrever_txt_final(Controlador c) {
+static void escrever_txt_final(Controlador c) {
   struct Controlador *this;
   size_t tamanho_total;
   char *full_path;

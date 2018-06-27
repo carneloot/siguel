@@ -30,6 +30,11 @@ float distancia_figuras(Figura f, Figura f2);
 
 void destruir_figura(Figura f);
 
+/**
+ * Verifica se other está dentro de this.
+ */
+int dentro_figura(Figura this, Figura other);
+
 /** Getters */
 
 float get_x(Figura f);

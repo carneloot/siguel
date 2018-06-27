@@ -3,6 +3,8 @@
 
 #include "figura.h"
 
+enum FiguraTracejada { SVG_BORDA_SOLIDA, SVG_BORDA_TRACEJADA };
+
 typedef void *SVG;
 
 SVG cria_SVG(char *path, float, float);
