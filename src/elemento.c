@@ -4,8 +4,6 @@
 #include <stdio.h>
 #include <string.h>
 
-#define RAIO_EQUIPAMENTOS 5
-
 struct Elemento {
   float x, y;
   enum TipoElemento tipo;
@@ -152,7 +150,7 @@ char *get_info_elemento(Elemento e) {
       length = 28 + strlen(this->cep) + 4 * 8;
       saida = (char *) calloc(length, sizeof(char));
       sprintf(saida,
-        "Quadra: %s em (%5.2f,%5.2f) tamanho (%5.2f,%5.2f)",
+        "Quadra: %s em (%5.2f,%5.2f) tamanho (%5.2f,%5.2f)\n",
         this->cep,
         this->x, this->y,
         this->data.quadra.largura, this->data.quadra.altura
@@ -163,7 +161,7 @@ char *get_info_elemento(Elemento e) {
       length = 18 + strlen(this->cep) + 2 * 8;
       saida = (char *) calloc(length, sizeof(char));
       sprintf(saida,
-        "Hidrante: %s em (%5.2f,%5.2f)",
+        "Hidrante: %s em (%5.2f,%5.2f)\n",
         this->cep,
         this->x, this->y
       );
@@ -173,7 +171,7 @@ char *get_info_elemento(Elemento e) {
       length = 20 + strlen(this->cep) + 2 * 8;
       saida = (char *) calloc(length, sizeof(char));
       sprintf(saida,
-        "Radio Base: %s em (%5.2f,%5.2f)",
+        "Radio Base: %s em (%5.2f,%5.2f)\n",
         this->cep,
         this->x, this->y
       );
@@ -183,7 +181,7 @@ char *get_info_elemento(Elemento e) {
       length = 18 + strlen(this->cep) + 2 * 8;
       saida = (char *) calloc(length, sizeof(char));
       sprintf(saida,
-        "Semaforo: %s em (%5.2f,%5.2f)",
+        "Semaforo: %s em (%5.2f,%5.2f)\n",
         this->cep,
         this->x, this->y
       );

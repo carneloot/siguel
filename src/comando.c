@@ -38,7 +38,8 @@ const struct {
   {"Dle", QRY_DELETE_ALL_CIRC},
   {"cc", QRY_MUDA_COR_QUADRA},
   {"crd?", QRY_PRINT_EQUIPAMENTO},
-  {"crb?", QRY_CHECA_RADIO_BASE_PROXIMA}
+  {"crb?", QRY_CHECA_RADIO_BASE_PROXIMA},
+  {"//", COMENTARIO}
 };
 
 static int conta_params(char *entrada);

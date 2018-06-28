@@ -209,15 +209,35 @@ int dentro_figura(Figura _this, Figura _other) {
   struct Figura *this  = (struct Figura *) _this;
   struct Figura *other = (struct Figura *) _other;
 
-  if (this->tipo != RETANGULO || other->tipo != RETANGULO)
-    return -1;
+  if (this->tipo == CIRCULO && other->tipo == RETANGULO) {
+    int result;
+    float x, y;
 
-  return (
-    other->x > this->x &&
-    other->y > this->y &&
-    other->x + w(other) < this->x + w(this) &&
-    other->y + h(other) < this->y + h(this)
-  );
+    x = other->x;
+    y = other->y;
+
+    result = contem_ponto(this, x, y);
+
+    x += w(other);
+    result &= contem_ponto(this, x, y);
+
+    x = other->x;
+    y += h(other);
+    result &= contem_ponto(this, x, y);
+
+    x += w(other);
+    result &= contem_ponto(this, x, y);
+
+    return result;
+  }
+
+  if (this->tipo == RETANGULO && other->tipo == RETANGULO)
+    return (
+      other->x >= this->x && other->y >= this->y &&
+      other->x + w(other) <= this->x + w(this) &&
+      other->y + h(other) <= this->y + h(this));
+
+  return -1;
 }
 
 /** Getters */

@@ -84,6 +84,17 @@ Posic get_last_lista(Lista);
 Posic get_previous_lista(Lista, Posic);
 
 /**
+ * Retorna o indicador da primeira posicao a partir de start que encontrar o
+ * elemento de acordo com a funcao compare. Se nao encontrar um Item que caiba
+ * na funcao compare retorna um indicador invalido.
+ */
+Posic search_lista(
+  Lista lista,
+  Posic start,
+  const void *other,
+  int (*compare)(const Item item, const void *other));
+
+/**
  * Destroi a lista.
  */
 void destruir_lista(Lista, void (*)(Item));

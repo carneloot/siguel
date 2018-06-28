@@ -45,6 +45,8 @@ static void desenhar_todas_figuras(Controlador c, SVG s);
 
 static void desenhar_sobreposicoes(Controlador c, SVG s);
 
+static void desenhar_elementos(Controlador this, SVG svg);
+
 static void escrever_txt_final(Controlador c);
 
 /** METODOS PUBLICOS */
@@ -215,11 +217,8 @@ int executar_comando(Controlador c) {
       w = get_x(this->figuras[id]) + get_r(this->figuras[id]);
       h = get_y(this->figuras[id]) + get_r(this->figuras[id]);
 
-      if (w > this->max_width)
-        this->max_width = w + 4;
-
-      if (h > this->max_height)
-        this->max_height = h + 4;
+      this->max_width  = max(this->max_width, w + 4);
+      this->max_height = max(this->max_height, h + 4);
 
       this->total_figuras++;
 
@@ -244,11 +243,8 @@ int executar_comando(Controlador c) {
       w = get_x(this->figuras[id]) + get_w(this->figuras[id]);
       h = get_y(this->figuras[id]) + get_h(this->figuras[id]);
 
-      if (w > this->max_width)
-        this->max_width = w + 4;
-
-      if (h > this->max_height)
-        this->max_height = h + 4;
+      this->max_width  = max(this->max_width, w + 4);
+      this->max_height = max(this->max_height, h + 4);
 
       this->total_figuras++;
 
@@ -445,6 +441,8 @@ int executar_comando(Controlador c) {
 
       desenhar_sobreposicoes(c, s);
 
+      desenhar_elementos(c, s);
+
       salva_SVG(s);
 
       destruir_SVG(s);
@@ -461,6 +459,9 @@ int executar_comando(Controlador c) {
       w   = strtof(params[3], &saida);
       h   = strtof(params[4], &saida);
 
+      this->max_width  = max(this->max_width, x + w + 4);
+      this->max_height = max(this->max_height, y + h + 4);
+
       new_elemento = cria_quadra(x, y, cep, w, h);
 
       set_cor_elemento(new_elemento, this->cores[QUADRA]);
@@ -474,6 +475,9 @@ int executar_comando(Controlador c) {
       x   = strtof(params[1], &saida);
       y   = strtof(params[2], &saida);
 
+      this->max_width  = max(this->max_width, x + RAIO_EQUIPAMENTOS + 4);
+      this->max_height = max(this->max_height, y + RAIO_EQUIPAMENTOS + 4);
+
       new_elemento = cria_hidrante(x, y, cep);
 
       set_cor_elemento(new_elemento, this->cores[HIDRANTE]);
@@ -486,6 +490,9 @@ int executar_comando(Controlador c) {
       x   = strtof(params[1], &saida);
       y   = strtof(params[2], &saida);
 
+      this->max_width  = max(this->max_width, x + RAIO_EQUIPAMENTOS + 4);
+      this->max_height = max(this->max_height, y + RAIO_EQUIPAMENTOS + 4);
+
       new_elemento = cria_semaforo(x, y, cep);
 
       set_cor_elemento(new_elemento, this->cores[SEMAFORO]);
@@ -497,6 +504,9 @@ int executar_comando(Controlador c) {
       cep = params[0];
       x   = strtof(params[1], &saida);
       y   = strtof(params[2], &saida);
+
+      this->max_width  = max(this->max_width, x + RAIO_EQUIPAMENTOS + 4);
+      this->max_height = max(this->max_height, y + RAIO_EQUIPAMENTOS + 4);
 
       new_elemento = cria_radio_base(x, y, cep);
 
@@ -526,45 +536,72 @@ int executar_comando(Controlador c) {
       break;
 
     // Comandos .qry
+    case QRY_BUSCA_CIRC:
     case QRY_BUSCA_RECT:
-      x = strtof(params[0], NULL);
-      y = strtof(params[1], NULL);
-      w = strtof(params[2], NULL);
-      h = strtof(params[3], NULL);
+      saida = calloc(5, sizeof(char));
+      if (tipo == QRY_BUSCA_RECT) {
+        x = strtof(params[0], NULL);
+        y = strtof(params[1], NULL);
+        w = strtof(params[2], NULL);
+        h = strtof(params[3], NULL);
 
-      figAtual = cria_retangulo(x, y, w, h, "transparent", "black");
+        figAtual = cria_retangulo(x, y, w, h, "transparent", "black");
+
+        this->max_width  = max(this->max_width, x + w + 4);
+        this->max_height = max(this->max_height, y + h + 4);
+
+        strcpy(saida, "q?:\n");
+      } else {
+        r = strtof(params[0], NULL);
+        x = strtof(params[1], NULL);
+        y = strtof(params[2], NULL);
+
+        figAtual = cria_circulo(x, y, r, "transparent", "black");
+
+        this->max_width  = max(this->max_width, x + r + 4);
+        this->max_height = max(this->max_height, y + r + 4);
+
+        strcpy(saida, "Q?:\n");
+      }
+
+      insert_lista(this->saida_qry, (Item) saida);
 
       for (i = 0; i < 4; i++) {
-        Lista listAtual = this->elementos[i];
+        Lista lista_atual = this->elementos[i];
 
-        Posic iterator = get_first_lista(listAtual);
+        Posic iterator = get_first_lista(lista_atual);
 
         while (iterator) {
-          new_elemento = (Elemento) get_lista(listAtual, iterator);
+          new_elemento = (Elemento) get_lista(lista_atual, iterator);
 
           int contem;
 
-          // Checar se retangulo esta dentro do outro
-          if (get_tipo_elemento(new_elemento) == QUADRA)
-            contem = dentro_figura(figAtual, get_figura_elemento(new_elemento));
+          // Se for quadra, checar a figura
+          if (get_tipo_elemento(new_elemento) == QUADRA) {
+            Figura figura_temp = get_figura_elemento(new_elemento);
 
-          // Saber se o new_elemento está dentro da figAtual;
+            contem = dentro_figura(figAtual, figura_temp);
+
+            destruir_figura(figura_temp);
+          }
+
+          // Se nao for quadra, comparar como ponto
           else
-            contem = contem_ponto(figAtual, get_x(new_elemento), get_y(new_elemento));
+            contem =
+              contem_ponto(figAtual, get_x(new_elemento), get_y(new_elemento));
 
           if (contem) {
             saida = get_info_elemento(new_elemento);
             insert_lista(this->saida_qry, (Item) saida);
           }
 
-          iterator = get_next_lista(listAtual, iterator);
+          iterator = get_next_lista(lista_atual, iterator);
         }
       }
 
       insert_lista(this->saida_svg_qry, (Item) figAtual);
 
       break;
-    case QRY_BUSCA_CIRC: break;
     case QRY_DELETE_QUADRA_RECT: break;
     case QRY_DELETE_ALL_RECT: break;
     case QRY_DELETE_QUADRA_CIRC: break;
@@ -573,6 +610,7 @@ int executar_comando(Controlador c) {
     case QRY_PRINT_EQUIPAMENTO: break;
     case QRY_CHECA_RADIO_BASE_PROXIMA: break;
 
+    case COMENTARIO:
     case NONE: break;
   }
 
@@ -593,6 +631,7 @@ void gerar_fila_execucao(Controlador c) {
   Arquivo arq;
   size_t length;
   char *path, *linha;
+  Comando comando;
 
   length = strlen(this->nome_base) + strlen(this->dir_entrada) + 6;
 
@@ -603,7 +642,16 @@ void gerar_fila_execucao(Controlador c) {
   arq = abrir_arquivo(path, LEITURA);
 
   while ((linha = ler_proxima_linha(arq))) {
-    insert_lista(this->fila_execucao, (Item) cria_comando(linha));
+    comando = cria_comando(linha);
+
+    // Comentarios nao sao inseridos na fila de execução
+    if (get_tipo(comando) == COMENTARIO) {
+      destruir_comando(comando);
+      free(linha);
+      continue;
+    }
+
+    insert_lista(this->fila_execucao, (Item) comando);
 
     free(linha);
   }
@@ -650,9 +698,15 @@ void finalizar_arquivos(Controlador c) {
   Posic iterator;
 
   // Arquivo [nome_base]-[nome_qry].txt
-  length    = strlen(this->nome_base) + strlen(this->dir_saida) + strlen(this->arq_query) + 1 + 1 + 4;
+  length = strlen(this->nome_base) + strlen(this->dir_saida) +
+           strlen(this->arq_query) + 1 + 1 + 4;
   full_path = calloc(length, sizeof(char));
-  sprintf(full_path, "%s%s-%s.txt", this->dir_saida, this->nome_base, this->arq_query);
+  sprintf(
+    full_path,
+    "%s%s-%s.txt",
+    this->dir_saida,
+    this->nome_base,
+    this->arq_query);
 
   arq = abrir_arquivo(full_path, ESCRITA);
 
@@ -669,13 +723,21 @@ void finalizar_arquivos(Controlador c) {
   SVG s;
 
   full_path = calloc(length, sizeof(char));
-  sprintf(full_path, "%s%s-%s.svg", this->dir_saida, this->nome_base, this->arq_query);
+  sprintf(
+    full_path,
+    "%s%s-%s.svg",
+    this->dir_saida,
+    this->nome_base,
+    this->arq_query);
 
-  s = cria_SVG(full_path, 5000, 5000);
+  s = cria_SVG(full_path, this->max_width, this->max_height);
+
+  desenhar_elementos(c, s);
 
   iterator = get_first_lista(this->saida_svg_qry);
   while (iterator) {
-    desenha_figura(s, get_lista(this->saida_svg_qry, iterator), 0.4, SVG_BORDA_TRACEJADA);
+    desenha_figura(
+      s, get_lista(this->saida_svg_qry, iterator), 0.4, SVG_BORDA_TRACEJADA);
     iterator = get_next_lista(this->saida_svg_qry, iterator);
   }
 
@@ -748,12 +810,6 @@ static void desenhar_todas_figuras(Controlador c, SVG s) {
   int i, count;
   Figura figAtual;
 
-  #ifdef DEBUG
-  char *saida;
-  float x, y;
-  size_t length;
-  #endif
-
   this  = (struct Controlador *) c;
   i     = 0;
   count = 0;
@@ -769,34 +825,6 @@ static void desenhar_todas_figuras(Controlador c, SVG s) {
 
     i++;
   }
-
-  #ifdef DEBUG
-  /* Printa os ids */
-
-  i = count = 0;
-
-  while (count < this->total_figuras) {
-    figAtual = this->figuras[i];
-
-    if (figAtual) {
-      /* Escrever numero */
-      length = floor(log10(i + 1)) + 1 + 1;
-
-      saida = (char *) malloc(length * sizeof(char));
-      sprintf(saida, "%d", i + 1);
-      get_centro_massa(figAtual, &x, &y);
-      x -= 2;
-      y += 2;
-      escreve_texto(s, saida, x, y, 7, get_cor_borda(figAtual));
-
-      free(saida);
-    }
-
-    count++;
-    i++;
-  }
-
-  #endif
 }
 
 static void desenhar_sobreposicoes(Controlador c, SVG s) {
@@ -850,4 +878,31 @@ static void escrever_txt_final(Controlador c) {
   }
 
   fechar_arquivo(arq);
+}
+
+static void desenhar_elementos(Controlador _this, SVG svg) {
+  struct Controlador *this = (struct Controlador *) _this;
+  int i;
+  Lista lista_atual;
+  Posic iterator;
+  Elemento elemento_atual;
+  Figura figura_atual;
+
+  // Para cada tipo de elemento
+  for (i = 0; i < 4; i++) {
+    lista_atual = this->elementos[i];
+
+    // Itera pela lista e desesenha no SVG os elementos
+    iterator = get_first_lista(lista_atual);
+    while (iterator) {
+      elemento_atual = (Elemento) get_lista(lista_atual, iterator);
+      figura_atual   = get_figura_elemento(elemento_atual);
+
+      desenha_figura(svg, figura_atual, 0.4, SVG_BORDA_SOLIDA);
+
+      destruir_figura(figura_atual);
+
+      iterator = get_next_lista(lista_atual, iterator);
+    }
+  }
 }

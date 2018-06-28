@@ -172,6 +172,29 @@ Posic get_previous_lista(Lista lista, Posic posicao) {
   return (Posic) posic->prev;
 }
 
+Posic search_lista(
+  Lista _lista,
+  Posic _start,
+  const void *other,
+  int (*compare)(const Item item, const void *other)) {
+  struct Lista *lista = (struct Lista *) _lista;
+  struct Posic *iterator = NULL;
+
+  if (_start)
+    iterator = (struct Posic *) _start;
+  else
+    iterator = lista->start;
+    
+  while (iterator) {
+    if (!compare(iterator->value, other))
+      return (Posic) iterator;
+
+    iterator = iterator->next;
+  }
+
+  return NULL;
+}
+
 void destruir_lista(Lista lista, void (*destruir_item)(Item item)) {
   if (destruir_item) {
     Posic iterator;

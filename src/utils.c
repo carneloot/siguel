@@ -18,7 +18,7 @@ char *trim(char *entrada) {
     tam--;
   }
 
-  saida = (char *) malloc((tam + 1) * sizeof(char));
+  saida = (char *) calloc(tam + 1, sizeof(char));
 
   /* Copia os 'tam' primeiros caracteres de entrada para saida */
   /* strncpy deu problema no valgrind (????) */

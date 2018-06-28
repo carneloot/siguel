@@ -3,6 +3,8 @@
 
 #include "figura.h"
 
+#define RAIO_EQUIPAMENTOS 5
+
 typedef void *Elemento;
 
 enum TipoElemento { QUADRA, HIDRANTE, RADIO_BASE, SEMAFORO };
