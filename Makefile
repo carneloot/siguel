@@ -58,7 +58,7 @@ remove: clean
 
 .PHONY: clean-test
 clean-test:
-	@$(rm) $(OUTDIR)/**/*.svg $(OUTDIR)/**/*.txt
+	@$(rm) $(OUTDIR)/***/*.svg $(OUTDIR)/***/*.txt
 	@echo "Tests removed!"
 
 remake: remove $(BINDIR)/$(TARGET)
