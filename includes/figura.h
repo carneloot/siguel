@@ -53,4 +53,10 @@ char *get_cor_borda(Figura f);
 
 enum TipoFigura get_tipo_figura(Figura f);
 
+int get_id_figura(Figura f);
+
+/** Setters */
+
+void set_id_figura(Figura f, int id);
+
 #endif /* __FIGURA_H__ */

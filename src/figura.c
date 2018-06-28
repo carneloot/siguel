@@ -16,6 +16,8 @@ struct Figura {
   float x, y;
   char *cor, *cor_borda;
 
+  int id;
+
   enum TipoFigura tipo;
 
   /** DADOS DE CADA TIPO */
@@ -43,6 +45,8 @@ Figura cria_retangulo(
   this->data.rect.w = w;
   this->data.rect.h = h;
 
+  this->id = -1;
+
   this->cor       = trim(cor);
   this->cor_borda = trim(cor_borda);
 
@@ -58,6 +62,8 @@ Figura cria_circulo(float x, float y, float r, char *cor, char *cor_borda) {
   this->x           = x;
   this->y           = y;
   this->data.circ.r = r;
+
+  this->id = -1;
 
   this->cor       = trim(cor);
   this->cor_borda = trim(cor_borda);
@@ -290,4 +296,12 @@ char *get_cor_borda(Figura f) {
 
 enum TipoFigura get_tipo_figura(Figura f) {
   return ((struct Figura *) f)->tipo;
+}
+
+int get_id_figura(Figura f) {
+  return ((struct Figura *) f)->id;
+}
+
+void set_id_figura(Figura f, int id) {
+  ((struct Figura *) f)->id = id;
 }

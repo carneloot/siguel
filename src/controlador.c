@@ -23,9 +23,7 @@ struct Controlador {
   char *dir_entrada;
   char *arq_query;
 
-  Figura *figuras;
-  int total_figuras;
-  int max_figuras;
+  Lista figuras;
 
   int linha_atual;
 
@@ -51,6 +49,8 @@ static void escrever_txt_final(Controlador c);
 
 static int elemento_dentro_figura(const Item _elemento, const void *_figura);
 
+static int checar_id_figura(const Item _figura, const void *_id);
+
 /** METODOS PUBLICOS */
 
 Controlador cria_controlador() {
@@ -68,9 +68,7 @@ Controlador cria_controlador() {
   this->dir_entrada = (char *) malloc(3 * sizeof(char));
   strcpy(this->dir_entrada, "./");
 
-  this->max_figuras   = TOTAL_FIGURAS_DEFAULT;
-  this->total_figuras = 0;
-  this->figuras       = (Figura *) calloc(this->max_figuras, sizeof(Figura));
+  this->figuras = create_lista();
 
   this->linha_atual = 0;
 
@@ -163,10 +161,15 @@ int executar_comando(Controlador c) {
 
   /* Parametros especificos */
   char *cor, *cor_borda, *saida, *sufixo, *cep;
-  int id, id2, i, count, elemento_id;
+  int id, id2, i, elemento_id;
   float x, y, x2, y2, r, h, w, distancia;
   size_t length;
-  Figura figAtual, *newFiguras;
+  Figura figAtual;
+  Figura figura1, figura2;
+
+  Posic posic_figura1, posic_figura2;
+  Posic iterator;
+
   Elemento new_elemento;
   SVG s;
 
@@ -176,31 +179,7 @@ int executar_comando(Controlador c) {
   this->linha_atual++;
 
   switch (tipo) {
-    case GEO_MUDAR_NUM_FIGURAS:
-      this->max_figuras = atoi(params[0]);
-
-      newFiguras = (Figura *) calloc(this->max_figuras, sizeof(Figura));
-
-      i     = 0;
-      count = 0;
-
-      while (count < this->total_figuras) {
-        figAtual = this->figuras[i];
-        if (!figAtual) {
-          i++;
-          continue;
-        }
-        newFiguras[i] = this->figuras[i];
-        count++;
-        i++;
-      }
-
-      free(this->figuras);
-
-      this->figuras = newFiguras;
-
-      break;
-
+    case GEO_MUDAR_NUM_FIGURAS: break;
     case GEO_DESENHA_CIRCULO:
       id        = atoi(params[0]) - 1;
       cor_borda = params[1];
@@ -209,20 +188,16 @@ int executar_comando(Controlador c) {
       x         = atof(params[4]);
       y         = atof(params[5]);
 
-      if (this->figuras[id]) {
-        free(this->figuras[id]);
-        this->total_figuras--;
-      }
+      figAtual = cria_circulo(x, y, r, cor, cor_borda);
+      set_id_figura(figAtual, id);
 
-      this->figuras[id] = cria_circulo(x, y, r, cor, cor_borda);
+      insert_lista(this->figuras, figAtual);
 
-      w = get_x(this->figuras[id]) + get_r(this->figuras[id]);
-      h = get_y(this->figuras[id]) + get_r(this->figuras[id]);
+      w = get_x(figAtual) + get_r(figAtual);
+      h = get_y(figAtual) + get_r(figAtual);
 
       this->max_width  = max(this->max_width, w + 4);
       this->max_height = max(this->max_height, h + 4);
-
-      this->total_figuras++;
 
       break;
 
@@ -235,28 +210,28 @@ int executar_comando(Controlador c) {
       x         = atof(params[5]);
       y         = atof(params[6]);
 
-      if (this->figuras[id]) {
-        free(this->figuras[id]);
-        this->total_figuras--;
-      }
+      figAtual = cria_retangulo(x, y, w, h, cor, cor_borda);
+      set_id_figura(figAtual, id);
 
-      this->figuras[id] = cria_retangulo(x, y, w, h, cor, cor_borda);
+      insert_lista(this->figuras, figAtual);
 
-      w = get_x(this->figuras[id]) + get_w(this->figuras[id]);
-      h = get_y(this->figuras[id]) + get_h(this->figuras[id]);
+      w = get_x(figAtual) + get_w(figAtual);
+      h = get_y(figAtual) + get_h(figAtual);
 
       this->max_width  = max(this->max_width, w + 4);
       this->max_height = max(this->max_height, h + 4);
 
-      this->total_figuras++;
-
       break;
 
     case GEO_CHECA_SOBREPOSICAO:
-      id  = atoi(params[0]) - 1;
-      id2 = atoi(params[1]) - 1;
+      id  = (int) strtol(params[0], NULL, 10) - 1;
+      id2 = (int) strtol(params[1], NULL, 10) - 1;
 
-      if (!this->figuras[id]) {
+      posic_figura1 = posic_figura2 = get_first_lista(this->figuras);
+
+      posic_figura1 =
+        search_lista(this->figuras, posic_figura1, &id, checar_id_figura);
+      if (!posic_figura1) {
         LOG_PRINT(
           LOG_STDOUT,
           "Nao ha figura no id %d! (linha %d)",
@@ -265,7 +240,9 @@ int executar_comando(Controlador c) {
         return 0;
       }
 
-      if (!this->figuras[id2]) {
+      posic_figura2 =
+        search_lista(this->figuras, posic_figura2, &id2, checar_id_figura);
+      if (!posic_figura2) {
         LOG_PRINT(
           LOG_STDOUT,
           "Nao ha figura no id %d! (linha %d)",
@@ -274,16 +251,18 @@ int executar_comando(Controlador c) {
         return 0;
       }
 
+      figura1 = get_lista(this->figuras, posic_figura1);
+      figura2 = get_lista(this->figuras, posic_figura2);
+
       length = 9 + strlen(params[0]) + strlen(params[1]);
 
       saida = (char *) malloc(length * sizeof(char));
 
-      if (intercepta_figura(this->figuras[id], this->figuras[id2])) {
+      if (intercepta_figura(figura1, figura2)) {
         sprintf(saida, "o %s %s\nSIM\n", params[0], params[1]);
         /* Desenhar retangulo no lugar da sobreposicao */
         insert_lista(
-          this->sobreposicoes,
-          (Item) get_rect_sobreposicao(this->figuras[id], this->figuras[id2]));
+          this->sobreposicoes, (Item) get_rect_sobreposicao(figura1, figura2));
       } else
         sprintf(saida, "o %s %s\nNAO\n", params[0], params[1]);
 
@@ -292,11 +271,15 @@ int executar_comando(Controlador c) {
       break;
 
     case GEO_CHECA_PONTO:
-      id = atoi(params[0]) - 1;
-      x  = atof(params[1]);
-      y  = atof(params[2]);
+      id = (int) strtol(params[0], NULL, 10) - 1;
+      x  = strtof(params[1], NULL);
+      y  = strtof(params[2], NULL);
 
-      if (!this->figuras[id]) {
+      posic_figura1 = get_first_lista(this->figuras);
+      posic_figura1 =
+        search_lista(this->figuras, posic_figura1, &id, checar_id_figura);
+
+      if (!posic_figura1) {
         LOG_PRINT(
           LOG_STDOUT,
           "Nao ha figura no id %d! (linha %d)",
@@ -305,11 +288,13 @@ int executar_comando(Controlador c) {
         return 0;
       }
 
+      figura1 = get_lista(this->figuras, posic_figura1);
+
       length = 10 + strlen(params[0]) + strlen(params[1]) + strlen(params[2]);
 
       saida = (char *) malloc(length * sizeof(char));
 
-      if (contem_ponto(this->figuras[id], x, y))
+      if (contem_ponto(figura1, x, y))
         sprintf(saida, "i %s %s %s\nSIM\n", params[0], params[1], params[2]);
       else
         sprintf(saida, "i %s %s %s\nNAO\n", params[0], params[1], params[2]);
@@ -319,10 +304,14 @@ int executar_comando(Controlador c) {
       break;
 
     case GEO_DISTANCIA_FIGURAS:
-      id  = atoi(params[0]) - 1;
-      id2 = atoi(params[1]) - 1;
+      id  = (int) strtol(params[0], NULL, 10) - 1;
+      id2 = (int) strtol(params[1], NULL, 10) - 1;
 
-      if (!this->figuras[id]) {
+      posic_figura1 = posic_figura2 = get_first_lista(this->figuras);
+
+      posic_figura1 =
+        search_lista(this->figuras, posic_figura1, &id, checar_id_figura);
+      if (!posic_figura1) {
         LOG_PRINT(
           LOG_STDOUT,
           "Nao ha figura no id %d! (linha %d)",
@@ -331,7 +320,9 @@ int executar_comando(Controlador c) {
         return 0;
       }
 
-      if (!this->figuras[id2]) {
+      posic_figura2 =
+        search_lista(this->figuras, posic_figura2, &id2, checar_id_figura);
+      if (!posic_figura2) {
         LOG_PRINT(
           LOG_STDOUT,
           "Nao ha figura no id %d! (linha %d)",
@@ -340,7 +331,10 @@ int executar_comando(Controlador c) {
         return 0;
       }
 
-      distancia = distancia_figuras(this->figuras[id], this->figuras[id2]);
+      figura1 = get_lista(this->figuras, posic_figura1);
+      figura2 = get_lista(this->figuras, posic_figura2);
+
+      distancia = distancia_figuras(figura1, figura2);
 
       length = 12 + strlen(params[0]) + strlen(params[1]);
 
@@ -353,9 +347,13 @@ int executar_comando(Controlador c) {
       break;
 
     case GEO_CRIAR_SVG:
-      id = atoi(params[0]) - 1;
+      id = (int) strtol(params[0], NULL, 10) - 1;
 
-      if (!this->figuras[id]) {
+      posic_figura1 = get_first_lista(this->figuras);
+      posic_figura1 =
+        search_lista(this->figuras, posic_figura1, &id, checar_id_figura);
+
+      if (!posic_figura1) {
         LOG_PRINT(
           LOG_STDOUT,
           "Nao ha figura no id %d! (linha %d)",
@@ -363,6 +361,8 @@ int executar_comando(Controlador c) {
           this->linha_atual);
         return 0;
       }
+
+      figura1 = get_lista(this->figuras, posic_figura1);
 
       /* Cria o sufixo padrao caso nao tenha sido especificado */
       if (get_numero_parametros(com) > 1)
@@ -384,40 +384,37 @@ int executar_comando(Controlador c) {
       desenhar_todas_figuras(c, s);
 
       i     = 0;
-      count = 1;
 
-      get_centro_massa(this->figuras[id], &x, &y);
+      get_centro_massa(figura1, &x, &y);
 
-      while (count < this->total_figuras) {
-        if (id == i) {
-          i++;
+      iterator = get_first_lista(this->figuras);
+
+      while (iterator) {
+        figura2 = get_lista(this->figuras, iterator);
+
+        if (figura1 == figura2) {
+          iterator = get_next_lista(this->figuras, iterator);
           continue;
         }
 
-        figAtual = this->figuras[i];
+        get_centro_massa(figura2, &x2, &y2);
 
-        if (figAtual) {
-          get_centro_massa(figAtual, &x2, &y2);
+        cor       = get_cor_borda(figura1);
+        distancia = distancia_figuras(figura1, figura2);
 
-          cor       = get_cor_borda(this->figuras[id]);
-          distancia = distancia_figuras(this->figuras[id], figAtual);
+        desenha_linha(s, x, y, x2, y2, cor);
 
-          desenha_linha(s, x, y, x2, y2, cor);
+        length = 9;
 
-          length = 9;
+        saida = calloc(length, sizeof(char));
 
-          saida = calloc(length, sizeof(char));
+        sprintf(saida, "%6.1f", distancia);
 
-          sprintf(saida, "%6.1f", distancia);
+        escreve_texto(s, saida, (x + x2) / 2 + 10, (y + y2) / 2, 15, cor);
 
-          escreve_texto(s, saida, (x + x2) / 2 + 10, (y + y2) / 2, 15, cor);
+        free(saida);
 
-          free(saida);
-
-          count++;
-        }
-
-        i++;
+        iterator = get_next_lista(this->figuras, iterator);
       }
 
       salva_SVG(s);
@@ -617,7 +614,7 @@ int executar_comando(Controlador c) {
       }
 
       Lista lista_atual = this->elementos[QUADRA];
-      Posic iterator    = get_first_lista(lista_atual);
+      iterator          = get_first_lista(lista_atual);
       Posic next_it;
 
       iterator =
@@ -863,15 +860,7 @@ void destruir_controlador(Controlador c) {
   destruir_lista(this->saida_qry, &free);
   destruir_lista(this->saida_svg_qry, &destruir_figura);
 
-  i = 0;
-  while (this->total_figuras) {
-    if (this->figuras[i]) {
-      destruir_figura(this->figuras[i]);
-      this->total_figuras--;
-    }
-    i++;
-  }
-  free(this->figuras);
+  destruir_lista(this->figuras, &destruir_figura);
 
   // Sobreposicoes
   destruir_lista(this->sobreposicoes, &destruir_figura);
@@ -913,23 +902,16 @@ char *get_nome_base(Controlador c) {
 static void desenhar_todas_figuras(Controlador c, SVG s) {
   struct Controlador *this;
 
-  int i, count;
   Figura figAtual;
 
   this  = (struct Controlador *) c;
-  i     = 0;
-  count = 0;
 
-  while (count < this->total_figuras) {
-    figAtual = this->figuras[i];
+  Posic iterator = get_first_lista(this->figuras);
 
-    if (figAtual) {
-      desenha_figura(s, figAtual, 0.4, SVG_BORDA_SOLIDA);
-
-      count++;
-    }
-
-    i++;
+  while (iterator) {
+    figAtual = get_lista(this->figuras, iterator);
+    desenha_figura(s, figAtual, 0.4, SVG_BORDA_SOLIDA);
+    iterator = get_next_lista(this->figuras, iterator);
   }
 }
 
@@ -1011,6 +993,13 @@ static void desenhar_elementos(Controlador _this, SVG svg) {
       iterator = get_next_lista(lista_atual, iterator);
     }
   }
+}
+
+static int checar_id_figura(const Item _figura, const void *_id) {
+  const Figura figura = (const Figura) _figura;
+  const int id        = (const int) *(int *) _id;
+
+  return !(get_id_figura(figura) == id);
 }
 
 static int elemento_dentro_figura(const Item _elemento, const void *_figura) {

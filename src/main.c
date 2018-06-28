@@ -23,13 +23,13 @@ int main(int argc, const char *argv[]) {
 
   nome_base = get_nome_base(controlador);
 
+  finalizar_arquivos(controlador);
+
   if (eh_erro) {
     LOG_PRINT(LOG_STDOUT, "Arquivo \"%s.geo\" finalizado com erro.", nome_base);
   } else {
     LOG_PRINT(LOG_STDOUT, "Arquivo \"%s.geo\" finalizado.", nome_base);
   }
-
-  finalizar_arquivos(controlador);
 
   destruir_controlador(controlador);
 
