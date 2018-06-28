@@ -150,7 +150,7 @@ char *get_info_elemento(Elemento e) {
       length = 28 + strlen(this->cep) + 4 * 8;
       saida = (char *) calloc(length, sizeof(char));
       sprintf(saida,
-        "Quadra: %s em (%5.2f,%5.2f) tamanho (%5.2f,%5.2f)\n",
+        "Quadra: %s em (%5.2f,%5.2f) tamanho (%5.2f,%5.2f)",
         this->cep,
         this->x, this->y,
         this->data.quadra.largura, this->data.quadra.altura
@@ -161,7 +161,7 @@ char *get_info_elemento(Elemento e) {
       length = 18 + strlen(this->cep) + 2 * 8;
       saida = (char *) calloc(length, sizeof(char));
       sprintf(saida,
-        "Hidrante: %s em (%5.2f,%5.2f)\n",
+        "Hidrante: %s em (%5.2f,%5.2f)",
         this->cep,
         this->x, this->y
       );
@@ -171,7 +171,7 @@ char *get_info_elemento(Elemento e) {
       length = 20 + strlen(this->cep) + 2 * 8;
       saida = (char *) calloc(length, sizeof(char));
       sprintf(saida,
-        "Radio Base: %s em (%5.2f,%5.2f)\n",
+        "Radio Base: %s em (%5.2f,%5.2f)",
         this->cep,
         this->x, this->y
       );
@@ -181,7 +181,7 @@ char *get_info_elemento(Elemento e) {
       length = 18 + strlen(this->cep) + 2 * 8;
       saida = (char *) calloc(length, sizeof(char));
       sprintf(saida,
-        "Semaforo: %s em (%5.2f,%5.2f)\n",
+        "Semaforo: %s em (%5.2f,%5.2f)",
         this->cep,
         this->x, this->y
       );
@@ -206,20 +206,10 @@ float get_altura(Elemento e) {
 }
 
 char *get_id_elemento(Elemento e) {
-  struct Elemento *this = (struct Elemento *) e;
-
-  if (this->tipo == QUADRA)
-    return 0;
-
   return ((struct Elemento *) e)->cep;
 }
 
 char *get_cep_elemento(Elemento e) {
-  struct Elemento *this = (struct Elemento *) e;
-
-  if (this->tipo != QUADRA)
-    return 0;
-
   return ((struct Elemento *) e)->cep;
 }
 

@@ -51,6 +51,8 @@ static int elemento_dentro_figura(const Item _elemento, const void *_figura);
 
 static int checar_id_figura(const Item _figura, const void *_id);
 
+static int checar_id_elemento(const Item _elemento, const void *_id);
+
 /** METODOS PUBLICOS */
 
 Controlador cria_controlador() {
@@ -383,7 +385,7 @@ int executar_comando(Controlador c) {
 
       desenhar_todas_figuras(c, s);
 
-      i     = 0;
+      i = 0;
 
       get_centro_massa(figura1, &x, &y);
 
@@ -577,6 +579,7 @@ int executar_comando(Controlador c) {
           new_elemento = (Elemento) get_lista(lista_atual, iterator);
 
           saida = get_info_elemento(new_elemento);
+          strcat(saida, "\n");
           insert_lista(this->saida_qry, (Item) saida);
 
           iterator = search_lista(
@@ -709,7 +712,26 @@ int executar_comando(Controlador c) {
 
       break;
     case QRY_MUDA_COR_QUADRA: break;
-    case QRY_PRINT_EQUIPAMENTO: break;
+    case QRY_PRINT_EQUIPAMENTO:
+      cep = params[0];
+
+      for (int i = 0; i < 4; i++) {
+        Lista lista_atual = this->elementos[i];
+
+        Posic posic_elemento = get_first_lista(lista_atual);
+        posic_elemento =
+          search_lista(lista_atual, posic_elemento, cep, checar_id_elemento);
+
+        if (!posic_elemento)
+          continue;
+
+        new_elemento = get_lista(lista_atual, posic_elemento);
+        saida        = get_info_elemento(new_elemento);
+        strcat(saida, "\n");
+        insert_lista(this->saida_qry, saida);
+      }
+
+      break;
     case QRY_CHECA_RADIO_BASE_PROXIMA: break;
 
     case COMENTARIO:
@@ -904,7 +926,7 @@ static void desenhar_todas_figuras(Controlador c, SVG s) {
 
   Figura figAtual;
 
-  this  = (struct Controlador *) c;
+  this = (struct Controlador *) c;
 
   Posic iterator = get_first_lista(this->figuras);
 
@@ -1022,4 +1044,13 @@ static int elemento_dentro_figura(const Item _elemento, const void *_figura) {
     contem = contem_ponto(figura, get_x(elemento), get_y(elemento));
 
   return !contem;
+}
+
+static int checar_id_elemento(const Item _elemento, const void *_id) {
+  const Elemento elemento = (const Elemento) _elemento;
+  const char *id          = (const char *) _id;
+
+  char *id_elemento = get_id_elemento(elemento);
+
+  return strcmp(id_elemento, id);
 }
