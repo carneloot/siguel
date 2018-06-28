@@ -59,6 +59,7 @@ if __name__ == "__main__":
 
         if os.path.exists(query_dir):
             querys = os.listdir(query_dir)
+            querys.sort()
 
             for queryname in querys:
                 

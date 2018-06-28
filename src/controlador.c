@@ -940,6 +940,10 @@ char *get_nome_base(Controlador c) {
   return ((struct Controlador *) c)->nome_base;
 }
 
+char *get_nome_query(Controlador c) {
+  return ((struct Controlador *) c)->arq_query;
+}
+
 /** METODOS PRIVADOS */
 
 static void desenhar_todas_figuras(Controlador c, SVG s) {

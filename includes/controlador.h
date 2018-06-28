@@ -22,4 +22,6 @@ void destruir_controlador(Controlador c);
 
 char *get_nome_base(Controlador c);
 
+char *get_nome_query(Controlador c);
+
 #endif /* __CONTROLADOR_H__ */
