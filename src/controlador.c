@@ -49,6 +49,8 @@ static void desenhar_elementos(Controlador this, SVG svg);
 
 static void escrever_txt_final(Controlador c);
 
+static int elemento_dentro_figura(const Item _elemento, const void *_figura);
+
 /** METODOS PUBLICOS */
 
 Controlador cria_controlador() {
@@ -571,31 +573,21 @@ int executar_comando(Controlador c) {
 
         Posic iterator = get_first_lista(lista_atual);
 
+        iterator = search_lista(
+          lista_atual, iterator,
+          figAtual, elemento_dentro_figura
+        );
+
         while (iterator) {
           new_elemento = (Elemento) get_lista(lista_atual, iterator);
 
-          int contem;
+          saida = get_info_elemento(new_elemento);
+          insert_lista(this->saida_qry, (Item) saida);
 
-          // Se for quadra, checar a figura
-          if (get_tipo_elemento(new_elemento) == QUADRA) {
-            Figura figura_temp = get_figura_elemento(new_elemento);
-
-            contem = dentro_figura(figAtual, figura_temp);
-
-            destruir_figura(figura_temp);
-          }
-
-          // Se nao for quadra, comparar como ponto
-          else
-            contem =
-              contem_ponto(figAtual, get_x(new_elemento), get_y(new_elemento));
-
-          if (contem) {
-            saida = get_info_elemento(new_elemento);
-            insert_lista(this->saida_qry, (Item) saida);
-          }
-
-          iterator = get_next_lista(lista_atual, iterator);
+          iterator = search_lista(
+            lista_atual, get_next_lista(lista_atual, iterator),
+            figAtual, elemento_dentro_figura
+          );
         }
       }
 
@@ -905,4 +897,26 @@ static void desenhar_elementos(Controlador _this, SVG svg) {
       iterator = get_next_lista(lista_atual, iterator);
     }
   }
+}
+
+static int elemento_dentro_figura(const Item _elemento, const void *_figura) {
+  const Elemento elemento = (const Elemento) _elemento;
+  const Figura figura     = (const Figura) _figura;
+
+  int contem;
+
+  // Se for quadra, checar a figura
+  if (get_tipo_elemento(elemento) == QUADRA) {
+    Figura figura_temp = get_figura_elemento(elemento);
+
+    contem = dentro_figura(figura, figura_temp);
+
+    destruir_figura(figura_temp);
+  }
+
+  // Se nao for quadra, comparar como ponto
+  else
+    contem = contem_ponto(figura, get_x(elemento), get_y(elemento));
+
+  return !contem;
 }

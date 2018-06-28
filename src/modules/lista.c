@@ -178,12 +178,9 @@ Posic search_lista(
   const void *other,
   int (*compare)(const Item item, const void *other)) {
   struct Lista *lista = (struct Lista *) _lista;
-  struct Posic *iterator = NULL;
+  struct Posic *iterator;
 
-  if (_start)
-    iterator = (struct Posic *) _start;
-  else
-    iterator = lista->start;
+  iterator = (struct Posic *) _start;
     
   while (iterator) {
     if (!compare(iterator->value, other))
