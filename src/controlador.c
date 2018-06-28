@@ -573,10 +573,8 @@ int executar_comando(Controlador c) {
 
         Posic iterator = get_first_lista(lista_atual);
 
-        iterator = search_lista(
-          lista_atual, iterator,
-          figAtual, elemento_dentro_figura
-        );
+        iterator =
+          search_lista(lista_atual, iterator, figAtual, elemento_dentro_figura);
 
         while (iterator) {
           new_elemento = (Elemento) get_lista(lista_atual, iterator);
@@ -585,18 +583,68 @@ int executar_comando(Controlador c) {
           insert_lista(this->saida_qry, (Item) saida);
 
           iterator = search_lista(
-            lista_atual, get_next_lista(lista_atual, iterator),
-            figAtual, elemento_dentro_figura
-          );
+            lista_atual,
+            get_next_lista(lista_atual, iterator),
+            figAtual,
+            elemento_dentro_figura);
         }
       }
 
       insert_lista(this->saida_svg_qry, (Item) figAtual);
 
       break;
-    case QRY_DELETE_QUADRA_RECT: break;
+    case QRY_DELETE_QUADRA_RECT:
+    case QRY_DELETE_QUADRA_CIRC:
+      if (tipo == QRY_DELETE_QUADRA_RECT) {
+        x = strtof(params[0], NULL);
+        y = strtof(params[1], NULL);
+        w = strtof(params[2], NULL);
+        h = strtof(params[3], NULL);
+
+        figAtual = cria_retangulo(x, y, w, h, "transparent", "black");
+
+        this->max_width  = max(this->max_width, x + w + 4);
+        this->max_height = max(this->max_height, y + h + 4);
+      } else {
+        r = strtof(params[0], NULL);
+        x = strtof(params[1], NULL);
+        y = strtof(params[2], NULL);
+
+        figAtual = cria_circulo(x, y, r, "transparent", "black");
+
+        this->max_width  = max(this->max_width, x + r + 4);
+        this->max_height = max(this->max_height, y + r + 4);
+      }
+
+      Lista lista_atual = this->elementos[QUADRA];
+      Posic iterator    = get_first_lista(lista_atual);
+      Posic next_it;
+
+      iterator =
+        search_lista(lista_atual, iterator, figAtual, elemento_dentro_figura);
+
+      while (iterator) {
+        next_it = get_next_lista(lista_atual, iterator);
+
+        new_elemento = get_lista(lista_atual, iterator);
+
+        remove_lista(lista_atual, iterator);
+
+        cep   = get_cep_elemento(new_elemento);
+        saida = calloc(20 + strlen(cep), sizeof(char));
+        sprintf(saida, "Quadra: %s deletada.\n", cep);  // 20 Caracteres
+        insert_lista(this->saida_qry, (Item) saida);
+
+        destruir_elemento(new_elemento);
+
+        iterator =
+          search_lista(lista_atual, next_it, figAtual, elemento_dentro_figura);
+      }
+
+      insert_lista(this->saida_svg_qry, (Item) figAtual);
+
+      break;
     case QRY_DELETE_ALL_RECT: break;
-    case QRY_DELETE_QUADRA_CIRC: break;
     case QRY_DELETE_ALL_CIRC: break;
     case QRY_MUDA_COR_QUADRA: break;
     case QRY_PRINT_EQUIPAMENTO: break;
