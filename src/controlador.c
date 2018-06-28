@@ -644,8 +644,73 @@ int executar_comando(Controlador c) {
       insert_lista(this->saida_svg_qry, (Item) figAtual);
 
       break;
-    case QRY_DELETE_ALL_RECT: break;
-    case QRY_DELETE_ALL_CIRC: break;
+    case QRY_DELETE_ALL_RECT:
+    case QRY_DELETE_ALL_CIRC:
+      if (tipo == QRY_DELETE_ALL_RECT) {
+        x = strtof(params[1], NULL);
+        y = strtof(params[2], NULL);
+        w = strtof(params[3], NULL);
+        h = strtof(params[4], NULL);
+
+        figAtual = cria_retangulo(x, y, w, h, "transparent", "black");
+
+        this->max_width  = max(this->max_width, x + w + 4);
+        this->max_height = max(this->max_height, y + h + 4);
+      } else {
+        r = strtof(params[1], NULL);
+        x = strtof(params[2], NULL);
+        y = strtof(params[3], NULL);
+
+        figAtual = cria_circulo(x, y, r, "transparent", "black");
+
+        this->max_width  = max(this->max_width, x + r + 4);
+        this->max_height = max(this->max_height, y + r + 4);
+      }
+
+      // Parsear params[0] para pegar variaveis
+      int *tipos_pesquisa = (int *) calloc(4, sizeof(int));
+
+      for (i = 0; i < strlen(params[0]); i++) {
+        switch (params[0][i]) {
+          case 'h': tipos_pesquisa[HIDRANTE] = 1; break;
+          case 's': tipos_pesquisa[SEMAFORO] = 1; break;
+          case 'r': tipos_pesquisa[RADIO_BASE] = 1; break;
+        }
+      }
+
+      for (i = 1; i < 4; i++) {
+        if (!tipos_pesquisa[i])
+          continue;
+
+        Lista lista_atual = this->elementos[i];
+        Posic iterator    = get_first_lista(lista_atual);
+        Posic next_it;
+
+        iterator =
+          search_lista(lista_atual, iterator, figAtual, elemento_dentro_figura);
+
+        while (iterator) {
+          next_it = get_next_lista(lista_atual, iterator);
+
+          new_elemento = get_lista(lista_atual, iterator);
+
+          remove_lista(lista_atual, iterator);
+
+          sufixo = get_info_elemento(new_elemento);
+          saida  = calloc(12 + strlen(sufixo), sizeof(char));
+          sprintf(saida, "%s deletada.\n", sufixo);
+          insert_lista(this->saida_qry, (Item) saida);
+
+          destruir_elemento(new_elemento);
+
+          iterator = search_lista(
+            lista_atual, next_it, figAtual, elemento_dentro_figura);
+        }
+      }
+
+      insert_lista(this->saida_svg_qry, (Item) figAtual);
+
+      break;
     case QRY_MUDA_COR_QUADRA: break;
     case QRY_PRINT_EQUIPAMENTO: break;
     case QRY_CHECA_RADIO_BASE_PROXIMA: break;
@@ -737,16 +802,21 @@ void finalizar_arquivos(Controlador c) {
   Arquivo arq;
   Posic iterator;
 
+  char *qry_dir, *qry_file, *geo_file;
+
+  if (!this->arq_query)
+    return;
+
+  qry_dir  = get_diretorio(this->arq_query);
+  qry_file = get_nome(this->arq_query);
+  geo_file = get_nome(this->nome_base);
+
   // Arquivo [nome_base]-[nome_qry].txt
-  length = strlen(this->nome_base) + strlen(this->dir_saida) +
-           strlen(this->arq_query) + 1 + 1 + 4;
+  length = 7 + strlen(this->dir_saida) + strlen(qry_dir) + strlen(qry_file) +
+           strlen(geo_file);
   full_path = calloc(length, sizeof(char));
   sprintf(
-    full_path,
-    "%s%s-%s.txt",
-    this->dir_saida,
-    this->nome_base,
-    this->arq_query);
+    full_path, "%s%s%s-%s.txt", this->dir_saida, qry_dir, geo_file, qry_file);
 
   arq = abrir_arquivo(full_path, ESCRITA);
 
@@ -764,11 +834,7 @@ void finalizar_arquivos(Controlador c) {
 
   full_path = calloc(length, sizeof(char));
   sprintf(
-    full_path,
-    "%s%s-%s.svg",
-    this->dir_saida,
-    this->nome_base,
-    this->arq_query);
+    full_path, "%s%s%s-%s.svg", this->dir_saida, qry_dir, geo_file, qry_file);
 
   s = cria_SVG(full_path, this->max_width, this->max_height);
 
@@ -793,7 +859,7 @@ void destruir_controlador(Controlador c) {
 
   this = (struct Controlador *) c;
 
-  destruir_lista(this->saida, NULL);
+  destruir_lista(this->saida, &free);
   destruir_lista(this->saida_qry, &free);
   destruir_lista(this->saida_svg_qry, &destruir_figura);
 

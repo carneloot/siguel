@@ -45,7 +45,7 @@ char *get_nome(char *path) {
   i     = tam;
   count = 0;
 
-  while (path[--i] != '/') {
+  while (path[--i] != '/' && i >= 0) {
     if (path[i] == '.')
       count = -1;
     count++;
@@ -67,14 +67,17 @@ char *get_diretorio(char *path) {
   tam = strlen(path);
   i   = tam;
 
-  while (path[--i] != '/') {}
+  while (path[--i] != '/' && i > 0) {}
 
   count = i;
 
-  diretorio = (char *) malloc((count + 1) * sizeof(char));
+  diretorio = (char *) malloc((count + 2) * sizeof(char));
   for (i = 0; i < count; i++)
     diretorio[i] = path[i];
   diretorio[i] = 0;
+
+  if (count != 0)
+    strcat(diretorio, "/");
 
   return diretorio;
 }
@@ -125,7 +128,7 @@ char *remover_extensao(const char *path) {
   int j;
 
   length = strlen(path) - 4;
-  saida = (char *) malloc((length + 1) * sizeof(char));
+  saida  = (char *) malloc((length + 1) * sizeof(char));
   for (j = 0; j < length; j++)
     saida[j] = path[j];
   saida[j] = 0;
