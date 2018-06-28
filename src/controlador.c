@@ -711,7 +711,28 @@ int executar_comando(Controlador c) {
       insert_lista(this->saida_svg_qry, (Item) figAtual);
 
       break;
-    case QRY_MUDA_COR_QUADRA: break;
+    case QRY_MUDA_COR_QUADRA:
+      cep       = params[0];
+      cor_borda = params[1];
+      cor       = params[2];
+
+      for (int i = 0; i < 4; i++) {
+        Lista lista_atual = this->elementos[i];
+
+        Posic posic_elemento = get_first_lista(lista_atual);
+        posic_elemento =
+          search_lista(lista_atual, posic_elemento, cep, checar_id_elemento);
+
+        if (!posic_elemento)
+          continue;
+
+        new_elemento = get_lista(lista_atual, posic_elemento);
+
+        set_cor_elemento(new_elemento, cor);
+        set_cor_borda_elemento(new_elemento, cor_borda);
+      }
+
+      break;
     case QRY_PRINT_EQUIPAMENTO:
       cep = params[0];
 
