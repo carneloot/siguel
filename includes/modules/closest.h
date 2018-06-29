@@ -1,12 +1,16 @@
 #ifndef __CLOSEST_H__
 #define __CLOSEST_H__
 
-struct Point {
-  float x, y;
-};
+typedef void *Point;
 
-typedef struct Point *Point;
+typedef void *ClosestPair;
 
-float closest(Point p[], int n);
+ClosestPair closest(void **p, int n);
+
+Point get_point1(ClosestPair this);
+
+Point get_point2(ClosestPair this);
+
+float get_dist(ClosestPair this);
 
 #endif /* __CLOSEST_H__ */

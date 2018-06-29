@@ -180,7 +180,7 @@ Posic search_lista(
   struct Posic *iterator;
 
   iterator = (struct Posic *) _start;
-    
+
   while (iterator) {
     if (!compare(iterator->value, other))
       return (Posic) iterator;
@@ -189,6 +189,24 @@ Posic search_lista(
   }
 
   return NULL;
+}
+
+Item *to_array_lista(Lista _this) {
+  struct Lista *this = (struct Lista *) _this;
+
+  Item *array = (Item *) calloc(this->size, sizeof(Item));
+
+  struct Posic *iterator = this->start;
+
+  int i = 0;
+  while (iterator) {
+    array[i] = iterator->value;
+
+    iterator = iterator->next;
+    i++;
+  }
+
+  return array;
 }
 
 void destruir_lista(Lista lista, void (*destruir_item)(Item item)) {

@@ -95,6 +95,12 @@ Posic search_lista(
   int (*compare)(const Item item, const void *other));
 
 /**
+ * Retorna uma array de Item com todos os itens da lista.
+ * O tamanho do array é o mesmo da lista. Deve ser dado free no retorno.
+ */
+Item *to_array_lista(Lista lista);
+
+/**
  * Destroi a lista.
  */
 void destruir_lista(Lista, void (*)(Item));
