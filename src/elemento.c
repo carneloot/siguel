@@ -6,11 +6,10 @@
 
 struct Elemento {
   float x, y;
-  enum TipoElemento tipo;
+  char *cor, *cor_borda;
 
   char *cep;
-  char *cor;
-  char *cor_borda;
+  enum TipoElemento tipo;
 
   // ===== ESPECIFICO DE ELEMENTO =====
   union {

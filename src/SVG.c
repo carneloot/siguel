@@ -79,6 +79,28 @@ void desenha_figura(SVG s, Figura f, float opacity, int is_dashed) {
   }
 }
 
+void desenha_elemento(SVG this, Elemento e) {
+  Figura figura = get_figura_elemento(e);
+
+  desenha_figura(this, figura, 0.4, SVG_BORDA_SOLIDA);
+
+  // Se for quadra, desenhar o CEP no meio
+  if (get_tipo_elemento(e) == QUADRA) {
+    float x, y;
+    char *cep;
+
+    x = get_x(e) + 5;
+    y = get_y(e) + get_altura(e) - 5;
+
+    cep = get_cep_elemento(e);
+
+    escreve_texto(this, cep, x, y, 10, get_cor_borda(e));
+  }
+
+  destruir_figura(figura);
+
+}
+
 void escreve_texto(
   SVG s, char *texto, float x, float y, float tamanho, char *cor) {
   struct SVG *this;

@@ -33,8 +33,11 @@ struct Controlador {
   char *cores[4];
   char *cores_borda[4];
 
-  float max_width;
-  float max_height;
+  float max_width_geo;
+  float max_height_geo;
+
+  float max_width_qry;
+  float max_height_qry;
 
   Lista fila_execucao;
 };
@@ -85,8 +88,11 @@ Controlador cria_controlador() {
     this->cores_borda[i] = NULL;
   }
 
-  this->max_width  = 0;
-  this->max_height = 0;
+  this->max_width_geo  = 0;
+  this->max_height_geo = 0;
+
+  this->max_width_qry  = 0;
+  this->max_height_qry = 0;
 
   this->fila_execucao = create_lista();
 
@@ -197,8 +203,8 @@ int executar_comando(Controlador c) {
       w = get_x(figAtual) + get_r(figAtual);
       h = get_y(figAtual) + get_r(figAtual);
 
-      this->max_width  = max(this->max_width, w + 4);
-      this->max_height = max(this->max_height, h + 4);
+      this->max_width_geo  = max(this->max_width_geo, w + 4);
+      this->max_height_geo = max(this->max_height_geo, h + 4);
 
       break;
 
@@ -219,8 +225,8 @@ int executar_comando(Controlador c) {
       w = get_x(figAtual) + get_w(figAtual);
       h = get_y(figAtual) + get_h(figAtual);
 
-      this->max_width  = max(this->max_width, w + 4);
-      this->max_height = max(this->max_height, h + 4);
+      this->max_width_geo  = max(this->max_width_geo, w + 4);
+      this->max_height_geo = max(this->max_height_geo, h + 4);
 
       break;
 
@@ -378,7 +384,7 @@ int executar_comando(Controlador c) {
 
       sprintf(saida, "%s%s-%s.svg", this->dir_saida, this->nome_base, sufixo);
 
-      s = cria_SVG(saida, this->max_width, this->max_height);
+      s = cria_SVG(saida, this->max_width_geo, this->max_height_geo);
 
       free(saida);
 
@@ -435,7 +441,7 @@ int executar_comando(Controlador c) {
 
       sprintf(saida, "%s%s.svg", this->dir_saida, this->nome_base);
 
-      s = cria_SVG(saida, this->max_width, this->max_height);
+      s = cria_SVG(saida, this->max_width_geo, this->max_height_geo);
 
       desenhar_todas_figuras(c, s);
 
@@ -457,8 +463,11 @@ int executar_comando(Controlador c) {
       w   = strtof(params[3], &saida);
       h   = strtof(params[4], &saida);
 
-      this->max_width  = max(this->max_width, x + w + 4);
-      this->max_height = max(this->max_height, y + h + 4);
+      this->max_width_geo  = max(this->max_width_geo, x + w + 4);
+      this->max_height_geo = max(this->max_height_geo, y + h + 4);
+
+      this->max_width_qry  = max(this->max_width_qry, x + w + 4);
+      this->max_height_qry = max(this->max_height_qry, y + h + 4);
 
       new_elemento = cria_quadra(x, y, cep, w, h);
 
@@ -473,8 +482,11 @@ int executar_comando(Controlador c) {
       x   = strtof(params[1], &saida);
       y   = strtof(params[2], &saida);
 
-      this->max_width  = max(this->max_width, x + RAIO_EQUIPAMENTOS + 4);
-      this->max_height = max(this->max_height, y + RAIO_EQUIPAMENTOS + 4);
+      this->max_width_geo  = max(this->max_width_geo, x + RAIO_EQUIPAMENTOS + 4);
+      this->max_height_geo = max(this->max_height_geo, y + RAIO_EQUIPAMENTOS + 4);
+
+      this->max_width_qry  = max(this->max_width_qry, x + RAIO_EQUIPAMENTOS + 4);
+      this->max_height_qry = max(this->max_height_qry, y + RAIO_EQUIPAMENTOS + 4);
 
       new_elemento = cria_hidrante(x, y, cep);
 
@@ -488,8 +500,11 @@ int executar_comando(Controlador c) {
       x   = strtof(params[1], &saida);
       y   = strtof(params[2], &saida);
 
-      this->max_width  = max(this->max_width, x + RAIO_EQUIPAMENTOS + 4);
-      this->max_height = max(this->max_height, y + RAIO_EQUIPAMENTOS + 4);
+      this->max_width_geo  = max(this->max_width_geo, x + RAIO_EQUIPAMENTOS + 4);
+      this->max_height_geo = max(this->max_height_geo, y + RAIO_EQUIPAMENTOS + 4);
+
+      this->max_width_qry  = max(this->max_width_qry, x + RAIO_EQUIPAMENTOS + 4);
+      this->max_height_qry = max(this->max_height_qry, y + RAIO_EQUIPAMENTOS + 4);
 
       new_elemento = cria_semaforo(x, y, cep);
 
@@ -503,8 +518,11 @@ int executar_comando(Controlador c) {
       x   = strtof(params[1], &saida);
       y   = strtof(params[2], &saida);
 
-      this->max_width  = max(this->max_width, x + RAIO_EQUIPAMENTOS + 4);
-      this->max_height = max(this->max_height, y + RAIO_EQUIPAMENTOS + 4);
+      this->max_width_geo  = max(this->max_width_geo, x + RAIO_EQUIPAMENTOS + 4);
+      this->max_height_geo = max(this->max_height_geo, y + RAIO_EQUIPAMENTOS + 4);
+
+      this->max_width_qry  = max(this->max_width_qry, x + RAIO_EQUIPAMENTOS + 4);
+      this->max_height_qry = max(this->max_height_qry, y + RAIO_EQUIPAMENTOS + 4);
 
       new_elemento = cria_radio_base(x, y, cep);
 
@@ -545,8 +563,8 @@ int executar_comando(Controlador c) {
 
         figAtual = cria_retangulo(x, y, w, h, "transparent", "black");
 
-        this->max_width  = max(this->max_width, x + w + 4);
-        this->max_height = max(this->max_height, y + h + 4);
+        this->max_width_qry  = max(this->max_width_qry, x + w + 4);
+        this->max_height_qry = max(this->max_height_qry, y + h + 4);
 
         strcpy(saida, "q?:\n");
       } else {
@@ -556,8 +574,8 @@ int executar_comando(Controlador c) {
 
         figAtual = cria_circulo(x, y, r, "transparent", "black");
 
-        this->max_width  = max(this->max_width, x + r + 4);
-        this->max_height = max(this->max_height, y + r + 4);
+        this->max_width_qry  = max(this->max_width_qry, x + r + 4);
+        this->max_height_qry = max(this->max_height_qry, y + r + 4);
 
         strcpy(saida, "Q?:\n");
       }
@@ -600,8 +618,8 @@ int executar_comando(Controlador c) {
 
         figAtual = cria_retangulo(x, y, w, h, "transparent", "black");
 
-        this->max_width  = max(this->max_width, x + w + 4);
-        this->max_height = max(this->max_height, y + h + 4);
+        this->max_width_qry  = max(this->max_width_qry, x + w + 4);
+        this->max_height_qry = max(this->max_height_qry, y + h + 4);
       } else {
         r = strtof(params[0], NULL);
         x = strtof(params[1], NULL);
@@ -609,8 +627,8 @@ int executar_comando(Controlador c) {
 
         figAtual = cria_circulo(x, y, r, "transparent", "black");
 
-        this->max_width  = max(this->max_width, x + r + 4);
-        this->max_height = max(this->max_height, y + r + 4);
+        this->max_width_qry  = max(this->max_width_qry, x + r + 4);
+        this->max_height_qry = max(this->max_height_qry, y + r + 4);
       }
 
       Lista lista_atual = this->elementos[QUADRA];
@@ -651,8 +669,8 @@ int executar_comando(Controlador c) {
 
         figAtual = cria_retangulo(x, y, w, h, "transparent", "black");
 
-        this->max_width  = max(this->max_width, x + w + 4);
-        this->max_height = max(this->max_height, y + h + 4);
+        this->max_width_qry  = max(this->max_width_qry, x + w + 4);
+        this->max_height_qry = max(this->max_height_qry, y + h + 4);
       } else {
         r = strtof(params[1], NULL);
         x = strtof(params[2], NULL);
@@ -660,8 +678,8 @@ int executar_comando(Controlador c) {
 
         figAtual = cria_circulo(x, y, r, "transparent", "black");
 
-        this->max_width  = max(this->max_width, x + r + 4);
-        this->max_height = max(this->max_height, y + r + 4);
+        this->max_width_qry  = max(this->max_width_qry, x + r + 4);
+        this->max_height_qry = max(this->max_height_qry, y + r + 4);
       }
 
       // Parsear params[0] para pegar variaveis
@@ -759,7 +777,7 @@ int executar_comando(Controlador c) {
       // Quer dizer que nao há Tores de Celular
       if (tam == 0) {
         length = 51;
-        saida = calloc(length, sizeof(char));
+        saida  = calloc(length, sizeof(char));
         sprintf(saida, "Nao ha torres de celular para checar a distancia.\n");
         insert_lista(this->saida, saida);
 
@@ -913,7 +931,7 @@ void finalizar_arquivos(Controlador c) {
   full_path = calloc(length, sizeof(char));
   sprintf(full_path, "%s%s-%s.svg", this->dir_saida, geo_file, qry_file);
 
-  s = cria_SVG(full_path, this->max_width, this->max_height);
+  s = cria_SVG(full_path, this->max_width_qry, this->max_height_qry);
 
   desenhar_elementos(c, s);
 
@@ -1060,7 +1078,6 @@ static void desenhar_elementos(Controlador _this, SVG svg) {
   Lista lista_atual;
   Posic iterator;
   Elemento elemento_atual;
-  Figura figura_atual;
 
   // Para cada tipo de elemento
   for (i = 0; i < 4; i++) {
@@ -1070,11 +1087,8 @@ static void desenhar_elementos(Controlador _this, SVG svg) {
     iterator = get_first_lista(lista_atual);
     while (iterator) {
       elemento_atual = (Elemento) get_lista(lista_atual, iterator);
-      figura_atual   = get_figura_elemento(elemento_atual);
 
-      desenha_figura(svg, figura_atual, 0.4, SVG_BORDA_SOLIDA);
-
-      destruir_figura(figura_atual);
+      desenha_elemento(svg, elemento_atual);
 
       iterator = get_next_lista(lista_atual, iterator);
     }
