@@ -111,20 +111,20 @@ static ClosestPair closestUtil(void **_p, int n) {
   return (d->dist < new_d->dist) ? d : new_d;
 }
 
-ClosestPair closest(void **p, int n) {
+ClosestPair closest_pair(void **p, int n) {
   heap_sort((void **) p, n, compareX);
 
   return closestUtil(p, n);
 }
 
-Point get_point1(ClosestPair this) {
+Point get_point1_pair(ClosestPair this) {
   return (Point) ((struct ClosestPair *) this)->point1;
 }
 
-Point get_point2(ClosestPair this) {
+Point get_point2_pair(ClosestPair this) {
   return (Point) ((struct ClosestPair *) this)->point2;
 }
 
-float get_dist(ClosestPair this) {
+float get_dist_pair(ClosestPair this) {
   return ((struct ClosestPair *) this)->dist;
 }

@@ -7,15 +7,15 @@
 #include "SVG.h"
 #include "elemento.h"
 #include "figura.h"
+#include "modules/closest.h"
 #include "modules/lista.h"
 #include "modules/logger.h"
 #include "utils.h"
 
-#define TOTAL_FIGURAS_DEFAULT 1000
+#define RAIO_RADIOS_PROXIMOS 25
 
 struct Controlador {
   Lista saida;
-  Lista saida_qry;
   Lista saida_svg_qry;
 
   char *nome_base;
@@ -61,7 +61,6 @@ Controlador cria_controlador() {
     (struct Controlador *) malloc(sizeof(struct Controlador));
 
   this->saida         = create_lista();
-  this->saida_qry     = create_lista();
   this->saida_svg_qry = create_lista();
 
   this->nome_base   = NULL;
@@ -449,8 +448,6 @@ int executar_comando(Controlador c) {
       destruir_SVG(s);
       free(saida);
 
-      escrever_txt_final(c);
-
       break;
     // Inserir parte da cidade
     case GEO_INSERE_QUADRA:
@@ -565,7 +562,7 @@ int executar_comando(Controlador c) {
         strcpy(saida, "Q?:\n");
       }
 
-      insert_lista(this->saida_qry, (Item) saida);
+      insert_lista(this->saida, (Item) saida);
 
       for (i = 0; i < 4; i++) {
         Lista lista_atual = this->elementos[i];
@@ -580,7 +577,7 @@ int executar_comando(Controlador c) {
 
           saida = get_info_elemento(new_elemento);
           strcat(saida, "\n");
-          insert_lista(this->saida_qry, (Item) saida);
+          insert_lista(this->saida, (Item) saida);
 
           iterator = search_lista(
             lista_atual,
@@ -633,7 +630,7 @@ int executar_comando(Controlador c) {
         cep   = get_cep_elemento(new_elemento);
         saida = calloc(20 + strlen(cep), sizeof(char));
         sprintf(saida, "Quadra: %s deletada.\n", cep);  // 20 Caracteres
-        insert_lista(this->saida_qry, (Item) saida);
+        insert_lista(this->saida, (Item) saida);
 
         destruir_elemento(new_elemento);
 
@@ -699,7 +696,8 @@ int executar_comando(Controlador c) {
           sufixo = get_info_elemento(new_elemento);
           saida  = calloc(12 + strlen(sufixo), sizeof(char));
           sprintf(saida, "%s deletada.\n", sufixo);
-          insert_lista(this->saida_qry, (Item) saida);
+          insert_lista(this->saida, (Item) saida);
+          free(sufixo);
 
           destruir_elemento(new_elemento);
 
@@ -709,6 +707,8 @@ int executar_comando(Controlador c) {
       }
 
       insert_lista(this->saida_svg_qry, (Item) figAtual);
+
+      free(tipos_pesquisa);
 
       break;
     case QRY_MUDA_COR_QUADRA:
@@ -749,11 +749,65 @@ int executar_comando(Controlador c) {
         new_elemento = get_lista(lista_atual, posic_elemento);
         saida        = get_info_elemento(new_elemento);
         strcat(saida, "\n");
-        insert_lista(this->saida_qry, saida);
+        insert_lista(this->saida, saida);
       }
 
       break;
-    case QRY_CHECA_RADIO_BASE_PROXIMA: break;
+    case QRY_CHECA_RADIO_BASE_PROXIMA:;
+      int tam = length_lista(this->elementos[RADIO_BASE]);
+
+      // Quer dizer que nao há Tores de Celular
+      if (tam == 0) {
+        length = 51;
+        saida = calloc(length, sizeof(char));
+        sprintf(saida, "Nao ha torres de celular para checar a distancia.\n");
+        insert_lista(this->saida, saida);
+
+        break;
+      }
+
+      Elemento *radios_base = to_array_lista(this->elementos[RADIO_BASE]);
+
+      ClosestPair pair = closest_pair(radios_base, tam);
+
+      Elemento radio1, radio2;
+
+      radio1    = get_point1_pair(pair);
+      radio2    = get_point2_pair(pair);
+      distancia = get_dist_pair(pair);
+
+      // Reportar as id das torres
+      cor = get_id_elemento(radio1);
+      cep = get_id_elemento(radio2);
+
+      length = 49 + strlen(cor) + strlen(cep) + 6;
+
+      saida = (char *) calloc(length, sizeof(char));
+
+      sprintf(
+        saida,
+        "Torres de radio mais proximas:\n%s e %s. Distancia: %3.2f\n",
+        cor,
+        cep,
+        distancia);
+
+      insert_lista(this->saida, saida);
+
+      x = get_x(radio1);
+      y = get_y(radio1);
+      insert_lista(
+        this->saida_svg_qry,
+        cria_circulo(x, y, RAIO_RADIOS_PROXIMOS, "transparent", "purple"));
+
+      x = get_x(radio2);
+      y = get_y(radio2);
+      insert_lista(
+        this->saida_svg_qry,
+        cria_circulo(x, y, RAIO_RADIOS_PROXIMOS, "transparent", "purple"));
+
+      free(radios_base);
+      free(pair);
+      break;
 
     case COMENTARIO:
     case NONE: break;
@@ -839,42 +893,25 @@ void finalizar_arquivos(Controlador c) {
   struct Controlador *this = (struct Controlador *) c;
   char *full_path;
   size_t length;
-  Arquivo arq;
   Posic iterator;
 
-  char *qry_dir, *qry_file, *geo_file;
+  // Escreve o txt do .geo
+  escrever_txt_final(c);
+
+  char *qry_file, *geo_file;
 
   if (!this->arq_query)
     return;
 
-  qry_dir  = get_diretorio(this->arq_query);
   qry_file = get_nome(this->arq_query);
   geo_file = get_nome(this->nome_base);
-
-  // Arquivo [nome_base]-[nome_qry].txt
-  length = 7 + strlen(this->dir_saida) + strlen(qry_dir) + strlen(qry_file) +
-           strlen(geo_file);
-  full_path = calloc(length, sizeof(char));
-  sprintf(
-    full_path, "%s%s%s-%s.txt", this->dir_saida, qry_dir, geo_file, qry_file);
-
-  arq = abrir_arquivo(full_path, ESCRITA);
-
-  iterator = get_first_lista(this->saida_qry);
-  while (iterator) {
-    escrever_linha(arq, get_lista(this->saida_qry, iterator));
-    iterator = get_next_lista(this->saida_qry, iterator);
-  }
-
-  free(full_path);
-  fechar_arquivo(arq);
 
   // Arquivo [nome_base]-[nome_qry].svg
   SVG s;
 
+  length    = 7 + strlen(this->dir_saida) + strlen(qry_file) + strlen(geo_file);
   full_path = calloc(length, sizeof(char));
-  sprintf(
-    full_path, "%s%s%s-%s.svg", this->dir_saida, qry_dir, geo_file, qry_file);
+  sprintf(full_path, "%s%s-%s.svg", this->dir_saida, geo_file, qry_file);
 
   s = cria_SVG(full_path, this->max_width, this->max_height);
 
@@ -883,13 +920,16 @@ void finalizar_arquivos(Controlador c) {
   iterator = get_first_lista(this->saida_svg_qry);
   while (iterator) {
     desenha_figura(
-      s, get_lista(this->saida_svg_qry, iterator), 0.4, SVG_BORDA_TRACEJADA);
+      s, get_lista(this->saida_svg_qry, iterator), 0.8, SVG_BORDA_TRACEJADA);
     iterator = get_next_lista(this->saida_svg_qry, iterator);
   }
 
   salva_SVG(s);
 
   free(full_path);
+  free(qry_file);
+  free(geo_file);
+
   destruir_SVG(s);
 }
 
@@ -900,7 +940,6 @@ void destruir_controlador(Controlador c) {
   this = (struct Controlador *) c;
 
   destruir_lista(this->saida, &free);
-  destruir_lista(this->saida_qry, &free);
   destruir_lista(this->saida_svg_qry, &destruir_figura);
 
   destruir_lista(this->figuras, &destruir_figura);

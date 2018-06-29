@@ -42,13 +42,14 @@ char *get_nome(char *path) {
   int i, tam, count, start;
 
   tam   = strlen(path);
-  i     = tam;
+  i     = tam - 1;
   count = 0;
 
-  while (path[--i] != '/' && i >= 0) {
+  while (i >= 0 && path[i] != '/') {
     if (path[i] == '.')
       count = -1;
     count++;
+    i--;
   }
   start = i + 1;
 

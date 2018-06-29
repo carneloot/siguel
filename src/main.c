@@ -35,7 +35,7 @@ int main(int argc, const char *argv[]) {
         LOG_STDOUT,
         "Arquivos \"%s.geo\" e \"%s.qry\" finalizados.",
         nome_base,
-        get_nome(nome_query));
+        nome_query);
     else
       LOG_PRINT(LOG_STDOUT, "Arquivo  \"%s.geo\" finalizado.", nome_base);
   }
