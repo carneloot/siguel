@@ -672,9 +672,9 @@ int executar_comando(Controlador c) {
         this->max_width_qry  = max(this->max_width_qry, x + w + 4);
         this->max_height_qry = max(this->max_height_qry, y + h + 4);
       } else {
-        r = strtof(params[1], NULL);
-        x = strtof(params[2], NULL);
-        y = strtof(params[3], NULL);
+        x = strtof(params[1], NULL);
+        y = strtof(params[2], NULL);
+        r = strtof(params[3], NULL);
 
         figAtual = cria_circulo(x, y, r, "transparent", "black");
 
@@ -775,10 +775,10 @@ int executar_comando(Controlador c) {
       int tam = length_lista(this->elementos[RADIO_BASE]);
 
       // Quer dizer que nao há Tores de Celular
-      if (tam == 0) {
-        length = 51;
+      if (tam <= 1) {
+        length = 63;
         saida  = calloc(length, sizeof(char));
-        sprintf(saida, "Nao ha torres de celular para checar a distancia.\n");
+        sprintf(saida, "Nao ha torres de celular suficientes para checar a distancia.\n");
         insert_lista(this->saida, saida);
 
         break;
