@@ -1,10 +1,19 @@
 #include "modules/sorts.h"
 
-static int quick_partition(
-  void **arr, int ini, int fim, int (*)(void *, void *));
+#include <stdlib.h>
 
 static void heapify(
   void **arr, int size, int i, int (*compare)(const void *, const void *));
+
+static void merge(
+  void **arr,
+  int ini,
+  int meio,
+  int fim,
+  int (*compare)(const void *, const void *));
+
+static void merge_s(
+  void **arr, int ini, int fim, int (*compare)(const void *, const void *));
 
 static void swap(void **a, void **b);
 
@@ -15,51 +24,8 @@ void swap(void **a, void **b) {
   *b  = aux;
 }
 
-void quick_sort(
-  void **arr, int ini, int fim, int (*compare)(void *x1, void *x2)) {
-  int pivo;
-
-  if (ini >= fim)
-    return;
-
-  pivo = quick_partition(arr, ini, fim, compare);
-
-  quick_sort(arr, ini, pivo - 1, compare);
-  quick_sort(arr, pivo + 1, fim, compare);
-}
-
-int quick_partition(
-  void **arr, int ini, int fim, int (*compare)(void *x1, void *x2)) {
-  int j, k, pivo;
-
-  void *vPivo;
-
-  pivo = ini + (fim - ini + 1) / 2;
-
-  vPivo = arr[pivo];
-
-  j = ini;
-  k = fim;
-
-  while (j < k) {
-    while (compare(arr[j], vPivo))
-      j++;
-
-    while (compare(arr[k], vPivo))
-      k--;
-
-    if (arr[j] == arr[k])
-      break;
-
-    vPivo  = arr[j];
-    arr[j] = arr[k];
-    arr[k] = vPivo;
-  }
-
-  return j;
-}
-
-void heap_sort(void **arr, int size, int (*compare)(const void *, const void *)) {
+void heap_sort(
+  void **arr, int size, int (*compare)(const void *, const void *)) {
   int i;
 
   // Monta o heap inicial
@@ -74,7 +40,13 @@ void heap_sort(void **arr, int size, int (*compare)(const void *, const void *))
   }
 }
 
-void heapify(void **arr, int size, int i, int (*compare)(const void *, const void *)) {
+void merge_sort(
+  void **arr, int size, int (*compare)(const void *, const void *)) {
+  merge_s(arr, 0, size - 1, compare);
+}
+
+static void heapify(
+  void **arr, int size, int i, int (*compare)(const void *, const void *)) {
   int j, k, h;
 
   if (i >= size / 2)
@@ -101,4 +73,54 @@ void heapify(void **arr, int size, int i, int (*compare)(const void *, const voi
 
   swap(&arr[i], &arr[h]);
   heapify(arr, size, h, compare);
+}
+
+static void merge_s(
+  void **arr, int ini, int fim, int (*compare)(const void *, const void *)) {
+  if (ini >= fim)
+    return;
+
+  int meio = (ini + fim) / 2;
+
+  merge_s(arr, ini, meio, compare);
+  merge_s(arr, meio + 1, fim, compare);
+
+  merge(arr, ini, meio, fim, compare);
+}
+
+void merge(
+  void **arr,
+  int ini,
+  int meio,
+  int fim,
+  int (*compare)(const void *, const void *)) {
+  int i, j, k;
+
+  int n1 = meio - ini + 1;
+  int n2 = fim - meio;
+
+  // Criando e setando arrays temporarias
+  void *L[n1], *R[n2];
+  for (i = 0; i < n1; i++)
+    L[i] = arr[ini + i];
+  for (i = 0; i < n2; i++)
+    R[i] = arr[meio + 1 + i];
+
+  // Junta as arrays temporarias de volta no vetorzao
+  i = j = 0;
+  k = ini;
+  while (i < n1 && j < n2) {
+    if (compare(L[i], R[j]) < 0)
+      arr[k] = L[i++];
+    else
+      arr[k] = R[j++];
+    k++;
+  }
+
+  // Coloca o resto que sobrou no vetorzao
+  while (i < n1)
+    arr[k++] = L[i++];
+
+  while (j < n2)
+    arr[k++] = R[j++];
 }

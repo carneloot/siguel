@@ -88,12 +88,18 @@ Elemento cria_radio_base(float x, float y, char *id) {
 void set_cor_elemento(Elemento e, char *cor) {
   struct Elemento *this = (struct Elemento *) e;
 
+  if (this->cor)
+    free(this->cor);
+
   this->cor = calloc(strlen(cor) + 1, sizeof(char));
   strcpy(this->cor, cor);
 }
 
 void set_cor_borda_elemento(Elemento e, char *cor_borda) {
   struct Elemento *this = (struct Elemento *) e;
+
+  if (this->cor_borda)
+    free(this->cor_borda);
 
   this->cor_borda = calloc(strlen(cor_borda) + 1, sizeof(char));
   strcpy(this->cor_borda, cor_borda);
