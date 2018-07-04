@@ -482,11 +482,13 @@ int executar_comando(Controlador c) {
       x   = strtof(params[1], &saida);
       y   = strtof(params[2], &saida);
 
-      this->max_width_geo  = max(this->max_width_geo, x + RAIO_EQUIPAMENTOS + 4);
-      this->max_height_geo = max(this->max_height_geo, y + RAIO_EQUIPAMENTOS + 4);
+      this->max_width_geo = max(this->max_width_geo, x + RAIO_EQUIPAMENTOS + 4);
+      this->max_height_geo =
+        max(this->max_height_geo, y + RAIO_EQUIPAMENTOS + 4);
 
-      this->max_width_qry  = max(this->max_width_qry, x + RAIO_EQUIPAMENTOS + 4);
-      this->max_height_qry = max(this->max_height_qry, y + RAIO_EQUIPAMENTOS + 4);
+      this->max_width_qry = max(this->max_width_qry, x + RAIO_EQUIPAMENTOS + 4);
+      this->max_height_qry =
+        max(this->max_height_qry, y + RAIO_EQUIPAMENTOS + 4);
 
       new_elemento = cria_hidrante(x, y, cep);
 
@@ -500,11 +502,13 @@ int executar_comando(Controlador c) {
       x   = strtof(params[1], &saida);
       y   = strtof(params[2], &saida);
 
-      this->max_width_geo  = max(this->max_width_geo, x + RAIO_EQUIPAMENTOS + 4);
-      this->max_height_geo = max(this->max_height_geo, y + RAIO_EQUIPAMENTOS + 4);
+      this->max_width_geo = max(this->max_width_geo, x + RAIO_EQUIPAMENTOS + 4);
+      this->max_height_geo =
+        max(this->max_height_geo, y + RAIO_EQUIPAMENTOS + 4);
 
-      this->max_width_qry  = max(this->max_width_qry, x + RAIO_EQUIPAMENTOS + 4);
-      this->max_height_qry = max(this->max_height_qry, y + RAIO_EQUIPAMENTOS + 4);
+      this->max_width_qry = max(this->max_width_qry, x + RAIO_EQUIPAMENTOS + 4);
+      this->max_height_qry =
+        max(this->max_height_qry, y + RAIO_EQUIPAMENTOS + 4);
 
       new_elemento = cria_semaforo(x, y, cep);
 
@@ -518,11 +522,13 @@ int executar_comando(Controlador c) {
       x   = strtof(params[1], &saida);
       y   = strtof(params[2], &saida);
 
-      this->max_width_geo  = max(this->max_width_geo, x + RAIO_EQUIPAMENTOS + 4);
-      this->max_height_geo = max(this->max_height_geo, y + RAIO_EQUIPAMENTOS + 4);
+      this->max_width_geo = max(this->max_width_geo, x + RAIO_EQUIPAMENTOS + 4);
+      this->max_height_geo =
+        max(this->max_height_geo, y + RAIO_EQUIPAMENTOS + 4);
 
-      this->max_width_qry  = max(this->max_width_qry, x + RAIO_EQUIPAMENTOS + 4);
-      this->max_height_qry = max(this->max_height_qry, y + RAIO_EQUIPAMENTOS + 4);
+      this->max_width_qry = max(this->max_width_qry, x + RAIO_EQUIPAMENTOS + 4);
+      this->max_height_qry =
+        max(this->max_height_qry, y + RAIO_EQUIPAMENTOS + 4);
 
       new_elemento = cria_radio_base(x, y, cep);
 
@@ -778,7 +784,9 @@ int executar_comando(Controlador c) {
       if (tam <= 1) {
         length = 63;
         saida  = calloc(length, sizeof(char));
-        sprintf(saida, "Nao ha torres de celular suficientes para checar a distancia.\n");
+        sprintf(
+          saida,
+          "Nao ha torres de celular suficientes para checar a distancia.\n");
         insert_lista(this->saida, saida);
 
         break;
@@ -817,11 +825,19 @@ int executar_comando(Controlador c) {
         this->saida_svg_qry,
         cria_circulo(x, y, RAIO_RADIOS_PROXIMOS, "transparent", "purple"));
 
+      this->max_width_qry = max(this->max_width_qry, x + RAIO_RADIOS_PROXIMOS);
+      this->max_height_qry =
+        max(this->max_height_qry, y + RAIO_RADIOS_PROXIMOS);
+
       x = get_x(radio2);
       y = get_y(radio2);
       insert_lista(
         this->saida_svg_qry,
         cria_circulo(x, y, RAIO_RADIOS_PROXIMOS, "transparent", "purple"));
+
+      this->max_width_qry = max(this->max_width_qry, x + RAIO_RADIOS_PROXIMOS);
+      this->max_height_qry =
+        max(this->max_height_qry, y + RAIO_RADIOS_PROXIMOS);
 
       free(radios_base);
       free(pair);
