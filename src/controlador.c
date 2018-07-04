@@ -1074,7 +1074,7 @@ static void escrever_txt_final(Controlador c) {
 
   sprintf(full_path, "%s%s.txt", this->dir_saida, this->nome_base);
 
-  arq = abrir_arquivo(full_path, ESCRITA);
+  arq = abrir_arquivo(full_path, ALTERACAO);
 
   free(full_path);
 
