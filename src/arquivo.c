@@ -4,7 +4,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-
+#include "modules/logger.h"
 #include "utils.h"
 
 struct Arquivo {
@@ -60,18 +60,17 @@ char *ler_proxima_linha(Arquivo a) {
 
   tam = tamanho_linha(this->arq);
 
-  /* Se estiver no final do arquivo */
+  // Se estiver no final do arquivo
   if (tam <= 0)
     return NULL;
 
-  /* TODO: Lembrar de dar free nessa linha; */
+  // Lembrar de dar free nessa linha;
   linha = (char *) malloc((tam + 1) * sizeof(char));
 
-  /* Le a linha até antes do \n */
+  // Le a linha até antes do \n
   fgets(linha, tam, this->arq);
 
-  /* Pula o \n que ele nao leu */
-
+  // Pula o \n que ele nao leu
   while ((c = fgetc(this->arq)) != '\n' && c != '\r') {}
 
   linha_trimmed = trim(linha);
@@ -110,6 +109,9 @@ void fechar_arquivo(Arquivo a) {
   this = (struct Arquivo *) a;
 
   fclose(this->arq);
+
+  if (this->modo != LEITURA)
+    LOG_PRINT(LOG_FILE, "Arquivo \"%s\" salvo com sucesso.", this->path);
 
   free(this->path);
 

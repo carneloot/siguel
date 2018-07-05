@@ -6,8 +6,6 @@
 #include "arquivo.h"
 #include "utils.h"
 
-#include "modules/logger.h"
-
 #define DASHED_STRING "stroke-dasharray=\"5, 5\" "
 
 struct SVG {
@@ -138,8 +136,6 @@ void salva_SVG(SVG s) {
   struct SVG *this;
   this = (struct SVG *) s;
   escrever_linha(this->saida, "</svg>\n");
-
-  LOG_PRINT(LOG_FILE, "SVG \"%s\" salvo com sucesso.", get_path(this->saida));
 
   fechar_arquivo(this->saida);
 }

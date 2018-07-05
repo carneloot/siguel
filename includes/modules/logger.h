@@ -11,4 +11,6 @@ void log_print(char *filename, int line, int stdout_print, char *fmt, ...);
 
 #define LOG_PRINT(...) log_print(__FILENAME__, __LINE__, __VA_ARGS__)
 
+#define LOG_ERRO(...) log_print(__FILENAME__, __LINE__, LOG_STDOUT, __VA_ARGS__)
+
 #endif /* __LOGGER_H__ */

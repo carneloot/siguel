@@ -143,12 +143,12 @@ void lidar_parametros(Controlador c, int argc, const char *argv[]) {
   }
 
   if (!this->nome_base) {
-    LOG_PRINT(LOG_STDOUT, "Nao foi inserido um nome de arquivo.");
+    LOG_ERRO("Nao foi inserido um nome de arquivo.");
     exit(EXIT_FAILURE);
   }
 
   if (!this->dir_saida) {
-    LOG_PRINT(LOG_STDOUT, "Nao foi inserido um diretorio de saida.");
+    LOG_ERRO("Nao foi inserido um diretorio de saida.");
     exit(EXIT_FAILURE);
   }
 
@@ -239,22 +239,16 @@ int executar_comando(Controlador c) {
       posic_figura1 =
         search_lista(this->figuras, posic_figura1, &id, checar_id_figura);
       if (!posic_figura1) {
-        LOG_PRINT(
-          LOG_STDOUT,
-          "Nao ha figura no id %d! (linha %d)",
-          id + 1,
-          this->linha_atual);
+        LOG_ERRO(
+          "Nao ha figura no id %d! (linha %d)", id + 1, this->linha_atual);
         return 0;
       }
 
       posic_figura2 =
         search_lista(this->figuras, posic_figura2, &id2, checar_id_figura);
       if (!posic_figura2) {
-        LOG_PRINT(
-          LOG_STDOUT,
-          "Nao ha figura no id %d! (linha %d)",
-          id2 + 1,
-          this->linha_atual);
+        LOG_ERRO(
+          "Nao ha figura no id %d! (linha %d)", id2 + 1, this->linha_atual);
         return 0;
       }
 
@@ -287,11 +281,8 @@ int executar_comando(Controlador c) {
         search_lista(this->figuras, posic_figura1, &id, checar_id_figura);
 
       if (!posic_figura1) {
-        LOG_PRINT(
-          LOG_STDOUT,
-          "Nao ha figura no id %d! (linha %d)",
-          id + 1,
-          this->linha_atual);
+        LOG_ERRO(
+          "Nao ha figura no id %d! (linha %d)", id + 1, this->linha_atual);
         return 0;
       }
 
@@ -319,22 +310,16 @@ int executar_comando(Controlador c) {
       posic_figura1 =
         search_lista(this->figuras, posic_figura1, &id, checar_id_figura);
       if (!posic_figura1) {
-        LOG_PRINT(
-          LOG_STDOUT,
-          "Nao ha figura no id %d! (linha %d)",
-          id + 1,
-          this->linha_atual);
+        LOG_ERRO(
+          "Nao ha figura no id %d! (linha %d)", id + 1, this->linha_atual);
         return 0;
       }
 
       posic_figura2 =
         search_lista(this->figuras, posic_figura2, &id2, checar_id_figura);
       if (!posic_figura2) {
-        LOG_PRINT(
-          LOG_STDOUT,
-          "Nao ha figura no id %d! (linha %d)",
-          id2 + 1,
-          this->linha_atual);
+        LOG_ERRO(
+          "Nao ha figura no id %d! (linha %d)", id2 + 1, this->linha_atual);
         return 0;
       }
 
@@ -361,11 +346,8 @@ int executar_comando(Controlador c) {
         search_lista(this->figuras, posic_figura1, &id, checar_id_figura);
 
       if (!posic_figura1) {
-        LOG_PRINT(
-          LOG_STDOUT,
-          "Nao ha figura no id %d! (linha %d)",
-          id + 1,
-          this->linha_atual);
+        LOG_ERRO(
+          "Nao ha figura no id %d! (linha %d)", id + 1, this->linha_atual);
         return 0;
       }
 
