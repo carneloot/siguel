@@ -188,12 +188,12 @@ int executar_comando(Controlador c) {
   switch (tipo) {
     case GEO_MUDAR_NUM_FIGURAS: break;
     case GEO_DESENHA_CIRCULO:
-      id        = atoi(params[0]) - 1;
+      id        = strtol(params[0], NULL, 10);
       cor_borda = params[1];
       cor       = params[2];
-      r         = atof(params[3]);
-      x         = atof(params[4]);
-      y         = atof(params[5]);
+      r         = strtof(params[3], NULL);
+      x         = strtof(params[4], NULL);
+      y         = strtof(params[5], NULL);
 
       figAtual = cria_circulo(x, y, r, cor, cor_borda);
       set_id_figura(figAtual, id);
@@ -209,13 +209,13 @@ int executar_comando(Controlador c) {
       break;
 
     case GEO_DESENHA_RETANGULO:
-      id        = atoi(params[0]) - 1;
+      id        = strtol(params[0], NULL, 10);
       cor_borda = params[1];
       cor       = params[2];
-      w         = atof(params[3]);
-      h         = atof(params[4]);
-      x         = atof(params[5]);
-      y         = atof(params[6]);
+      w         = strtof(params[3], NULL);
+      h         = strtof(params[4], NULL);
+      x         = strtof(params[5], NULL);
+      y         = strtof(params[6], NULL);
 
       figAtual = cria_retangulo(x, y, w, h, cor, cor_borda);
       set_id_figura(figAtual, id);
@@ -231,8 +231,8 @@ int executar_comando(Controlador c) {
       break;
 
     case GEO_CHECA_SOBREPOSICAO:
-      id  = (int) strtol(params[0], NULL, 10) - 1;
-      id2 = (int) strtol(params[1], NULL, 10) - 1;
+      id  = (int) strtol(params[0], NULL, 10);
+      id2 = (int) strtol(params[1], NULL, 10);
 
       posic_figura1 = posic_figura2 = get_first_lista(this->figuras);
 
@@ -240,16 +240,16 @@ int executar_comando(Controlador c) {
         search_lista(this->figuras, posic_figura1, &id, checar_id_figura);
       if (!posic_figura1) {
         LOG_ERRO(
-          "Nao ha figura no id %d! (linha %d)", id + 1, this->linha_atual);
-        return 0;
+          "Nao ha figura no id %d! (linha %d)", id, this->linha_atual);
+        break;
       }
 
       posic_figura2 =
         search_lista(this->figuras, posic_figura2, &id2, checar_id_figura);
       if (!posic_figura2) {
         LOG_ERRO(
-          "Nao ha figura no id %d! (linha %d)", id2 + 1, this->linha_atual);
-        return 0;
+          "Nao ha figura no id %d! (linha %d)", id2, this->linha_atual);
+        break;
       }
 
       figura1 = get_lista(this->figuras, posic_figura1);
@@ -272,7 +272,7 @@ int executar_comando(Controlador c) {
       break;
 
     case GEO_CHECA_PONTO:
-      id = (int) strtol(params[0], NULL, 10) - 1;
+      id = (int) strtol(params[0], NULL, 10);
       x  = strtof(params[1], NULL);
       y  = strtof(params[2], NULL);
 
@@ -282,8 +282,8 @@ int executar_comando(Controlador c) {
 
       if (!posic_figura1) {
         LOG_ERRO(
-          "Nao ha figura no id %d! (linha %d)", id + 1, this->linha_atual);
-        return 0;
+          "Nao ha figura no id %d! (linha %d)", id, this->linha_atual);
+        break;
       }
 
       figura1 = get_lista(this->figuras, posic_figura1);
@@ -302,8 +302,8 @@ int executar_comando(Controlador c) {
       break;
 
     case GEO_DISTANCIA_FIGURAS:
-      id  = (int) strtol(params[0], NULL, 10) - 1;
-      id2 = (int) strtol(params[1], NULL, 10) - 1;
+      id  = (int) strtol(params[0], NULL, 10);
+      id2 = (int) strtol(params[1], NULL, 10);
 
       posic_figura1 = posic_figura2 = get_first_lista(this->figuras);
 
@@ -311,16 +311,16 @@ int executar_comando(Controlador c) {
         search_lista(this->figuras, posic_figura1, &id, checar_id_figura);
       if (!posic_figura1) {
         LOG_ERRO(
-          "Nao ha figura no id %d! (linha %d)", id + 1, this->linha_atual);
-        return 0;
+          "Nao ha figura no id %d! (linha %d)", id, this->linha_atual);
+        break;
       }
 
       posic_figura2 =
         search_lista(this->figuras, posic_figura2, &id2, checar_id_figura);
       if (!posic_figura2) {
         LOG_ERRO(
-          "Nao ha figura no id %d! (linha %d)", id2 + 1, this->linha_atual);
-        return 0;
+          "Nao ha figura no id %d! (linha %d)", id2, this->linha_atual);
+        break;
       }
 
       figura1 = get_lista(this->figuras, posic_figura1);
@@ -339,7 +339,7 @@ int executar_comando(Controlador c) {
       break;
 
     case GEO_CRIAR_SVG:
-      id = (int) strtol(params[0], NULL, 10) - 1;
+      id = (int) strtol(params[0], NULL, 10);
 
       posic_figura1 = get_first_lista(this->figuras);
       posic_figura1 =
@@ -347,8 +347,8 @@ int executar_comando(Controlador c) {
 
       if (!posic_figura1) {
         LOG_ERRO(
-          "Nao ha figura no id %d! (linha %d)", id + 1, this->linha_atual);
-        return 0;
+          "Nao ha figura no id %d! (linha %d)", id, this->linha_atual);
+        break;
       }
 
       figura1 = get_lista(this->figuras, posic_figura1);
