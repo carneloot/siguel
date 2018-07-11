@@ -45,14 +45,20 @@ char *get_nome(char *path) {
   i     = tam - 1;
   count = 0;
 
+  // Vai de tras para frente até achar a primeira barra
   while (i >= 0 && path[i] != '/') {
+
+    // Se achar o ponto, quer dizer que começa a contagem do tamanho do arquivo
     if (path[i] == '.')
       count = -1;
     count++;
     i--;
   }
+
+  // Start indica o incio do nome do arquivo
   start = i + 1;
 
+  // Transfere o nome para filename
   filename = (char *) malloc((count + 1) * sizeof(char));
   for (i = 0; i < count; i++)
     filename[i] = path[start + i];

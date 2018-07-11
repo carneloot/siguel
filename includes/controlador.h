@@ -10,7 +10,7 @@ Controlador cria_controlador();
 
 void lidar_parametros(Controlador c, int argc, const char *argv[]);
 
-int executar_comando(Controlador c);
+int executar_proximo_comando(Controlador c);
 
 int ha_comandos(Controlador c);
 

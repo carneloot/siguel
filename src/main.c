@@ -19,7 +19,7 @@ int main(int argc, const char *argv[]) {
 
   /* Main loop */
   while (ha_comandos(controlador) && !eh_erro) {
-    eh_erro = !executar_comando(controlador);
+    eh_erro = !executar_proximo_comando(controlador);
   }
 
   nome_base = get_nome_base(controlador);

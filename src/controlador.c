@@ -153,16 +153,16 @@ void lidar_parametros(Controlador c, int argc, const char *argv[]) {
   }
 
   if (!this->arq_query)
-    LOG_PRINT(LOG_STDOUT, "Arquivo  \"%s.geo\" iniciado.", this->nome_base);
+    LOG_PRINT(LOG_FILE, "Arquivo  \"%s.geo\" iniciado.", this->nome_base);
   else
     LOG_PRINT(
-      LOG_STDOUT,
+      LOG_FILE,
       "Arquivos \"%s.geo\" e \"%s.qry\" iniciados.",
       this->nome_base,
       this->arq_query);
 }
 
-int executar_comando(Controlador c) {
+int executar_proximo_comando(Controlador c) {
   struct Controlador *this = (struct Controlador *) c;
   Comando com;
   enum TipoComando tipo;

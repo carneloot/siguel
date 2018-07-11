@@ -62,4 +62,4 @@ clean-test:
 	@echo "Tests removed!"
 
 remake: remove $(BINDIR)/$(TARGET)
-		@echo "Remaked!"
+	@echo "Remaked!"
