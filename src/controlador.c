@@ -781,9 +781,9 @@ int executar_proximo_comando(Controlador c) {
 
       Elemento radio1, radio2;
 
-      radio1    = get_point1_pair(pair);
-      radio2    = get_point2_pair(pair);
-      distancia = get_dist_pair(pair);
+      radio1    = pair.point1;
+      radio2    = pair.point2;
+      distancia = pair.dist;
 
       // Reportar as id das torres
       cor = get_id_elemento(radio1);
@@ -823,7 +823,6 @@ int executar_proximo_comando(Controlador c) {
         max(this->max_height_qry, y + RAIO_RADIOS_PROXIMOS);
 
       free(radios_base);
-      free(pair);
       break;
 
     case COMENTARIO:

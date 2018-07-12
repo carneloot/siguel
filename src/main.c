@@ -1,9 +1,7 @@
 #include <stdio.h>
 
-#include "arquivo.h"
 #include "controlador.h"
 #include "modules/logger.h"
-#include "utils.h"
 
 int main(int argc, const char *argv[]) {
   Controlador controlador;
