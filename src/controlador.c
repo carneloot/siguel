@@ -63,8 +63,10 @@ Controlador cria_controlador() {
   struct Controlador *this =
     (struct Controlador *) malloc(sizeof(struct Controlador));
 
-  this->saida         = create_lista();
-  this->saida_svg_qry = create_lista();
+  init_lista();
+
+  this->saida         = Lista_t->create();
+  this->saida_svg_qry = Lista_t->create();
 
   this->nome_base   = NULL;
   this->dir_saida   = NULL;
@@ -72,16 +74,16 @@ Controlador cria_controlador() {
   this->dir_entrada = (char *) malloc(3 * sizeof(char));
   strcpy(this->dir_entrada, "./");
 
-  this->figuras = create_lista();
+  this->figuras = Lista_t->create();
 
   this->linha_atual = 0;
 
-  this->sobreposicoes = create_lista();
+  this->sobreposicoes = Lista_t->create();
 
-  this->elementos[QUADRA]     = create_lista();
-  this->elementos[HIDRANTE]   = create_lista();
-  this->elementos[SEMAFORO]   = create_lista();
-  this->elementos[RADIO_BASE] = create_lista();
+  this->elementos[QUADRA]     = Lista_t->create();
+  this->elementos[HIDRANTE]   = Lista_t->create();
+  this->elementos[SEMAFORO]   = Lista_t->create();
+  this->elementos[RADIO_BASE] = Lista_t->create();
 
   for (i = 0; i < 4; i++) {
     this->cores[i]       = NULL;
@@ -94,7 +96,7 @@ Controlador cria_controlador() {
   this->max_width_qry  = 0;
   this->max_height_qry = 0;
 
-  this->fila_execucao = create_lista();
+  this->fila_execucao = Lista_t->create();
 
   return (void *) this;
 }
@@ -168,10 +170,10 @@ int executar_proximo_comando(Controlador c) {
   enum TipoComando tipo;
   char **params;
 
-  Posic inicio_lista = get_first_lista(this->fila_execucao);
+  Posic inicio_lista = Lista_t->get_first(this->fila_execucao);
 
-  com = (Comando) get_lista(this->fila_execucao, inicio_lista);
-  remove_lista(this->fila_execucao, inicio_lista);
+  com = (Comando) Lista_t->get(this->fila_execucao, inicio_lista);
+  Lista_t->remove(this->fila_execucao, inicio_lista);
 
   /* Parametros especificos */
   char *cor, *cor_borda, *saida, *sufixo, *cep;
@@ -205,7 +207,7 @@ int executar_proximo_comando(Controlador c) {
       figAtual = cria_circulo(x, y, r, cor, cor_borda);
       set_id_figura(figAtual, id);
 
-      insert_lista(this->figuras, figAtual);
+      Lista_t->insert(this->figuras, figAtual);
 
       w = get_x(figAtual) + get_r(figAtual);
       h = get_y(figAtual) + get_r(figAtual);
@@ -227,7 +229,7 @@ int executar_proximo_comando(Controlador c) {
       figAtual = cria_retangulo(x, y, w, h, cor, cor_borda);
       set_id_figura(figAtual, id);
 
-      insert_lista(this->figuras, figAtual);
+      Lista_t->insert(this->figuras, figAtual);
 
       w = get_x(figAtual) + get_w(figAtual);
       h = get_y(figAtual) + get_h(figAtual);
@@ -241,38 +243,38 @@ int executar_proximo_comando(Controlador c) {
       id  = (int) strtol(params[0], NULL, 10);
       id2 = (int) strtol(params[1], NULL, 10);
 
-      posic_figura1 = posic_figura2 = get_first_lista(this->figuras);
+      posic_figura1 = posic_figura2 = Lista_t->get_first(this->figuras);
 
       posic_figura1 =
-        search_lista(this->figuras, posic_figura1, &id, checar_id_figura);
+        Lista_t->search(this->figuras, posic_figura1, &id, checar_id_figura);
       if (!posic_figura1) {
         LOG_ERRO("Nao ha figura no id %d! (linha %d)", id, this->linha_atual);
         break;
       }
 
       posic_figura2 =
-        search_lista(this->figuras, posic_figura2, &id2, checar_id_figura);
+        Lista_t->search(this->figuras, posic_figura2, &id2, checar_id_figura);
       if (!posic_figura2) {
         LOG_ERRO("Nao ha figura no id %d! (linha %d)", id2, this->linha_atual);
         break;
       }
 
-      figura1 = get_lista(this->figuras, posic_figura1);
-      figura2 = get_lista(this->figuras, posic_figura2);
+      figura1 = Lista_t->get(this->figuras, posic_figura1);
+      figura2 = Lista_t->get(this->figuras, posic_figura2);
 
       length = 9 + strlen(params[0]) + strlen(params[1]);
 
       saida = (char *) malloc(length * sizeof(char));
 
-      if (intercepta_figura(figura1, figura2)) {
+      if (sobrepoe_figura(figura1, figura2)) {
         sprintf(saida, "o %s %s\nSIM\n", params[0], params[1]);
         /* Desenhar retangulo no lugar da sobreposicao */
-        insert_lista(
+        Lista_t->insert(
           this->sobreposicoes, (Item) get_rect_sobreposicao(figura1, figura2));
       } else
         sprintf(saida, "o %s %s\nNAO\n", params[0], params[1]);
 
-      insert_lista(this->saida, (Item) saida);
+      Lista_t->insert(this->saida, (Item) saida);
 
       break;
 
@@ -281,16 +283,16 @@ int executar_proximo_comando(Controlador c) {
       x  = strtof(params[1], NULL);
       y  = strtof(params[2], NULL);
 
-      posic_figura1 = get_first_lista(this->figuras);
+      posic_figura1 = Lista_t->get_first(this->figuras);
       posic_figura1 =
-        search_lista(this->figuras, posic_figura1, &id, checar_id_figura);
+        Lista_t->search(this->figuras, posic_figura1, &id, checar_id_figura);
 
       if (!posic_figura1) {
         LOG_ERRO("Nao ha figura no id %d! (linha %d)", id, this->linha_atual);
         break;
       }
 
-      figura1 = get_lista(this->figuras, posic_figura1);
+      figura1 = Lista_t->get(this->figuras, posic_figura1);
 
       length = 10 + strlen(params[0]) + strlen(params[1]) + strlen(params[2]);
 
@@ -301,7 +303,7 @@ int executar_proximo_comando(Controlador c) {
       else
         sprintf(saida, "i %s %s %s\nNAO\n", params[0], params[1], params[2]);
 
-      insert_lista(this->saida, (Item) saida);
+      Lista_t->insert(this->saida, (Item) saida);
 
       break;
 
@@ -309,24 +311,24 @@ int executar_proximo_comando(Controlador c) {
       id  = (int) strtol(params[0], NULL, 10);
       id2 = (int) strtol(params[1], NULL, 10);
 
-      posic_figura1 = posic_figura2 = get_first_lista(this->figuras);
+      posic_figura1 = posic_figura2 = Lista_t->get_first(this->figuras);
 
       posic_figura1 =
-        search_lista(this->figuras, posic_figura1, &id, checar_id_figura);
+        Lista_t->search(this->figuras, posic_figura1, &id, checar_id_figura);
       if (!posic_figura1) {
         LOG_ERRO("Nao ha figura no id %d! (linha %d)", id, this->linha_atual);
         break;
       }
 
       posic_figura2 =
-        search_lista(this->figuras, posic_figura2, &id2, checar_id_figura);
+        Lista_t->search(this->figuras, posic_figura2, &id2, checar_id_figura);
       if (!posic_figura2) {
         LOG_ERRO("Nao ha figura no id %d! (linha %d)", id2, this->linha_atual);
         break;
       }
 
-      figura1 = get_lista(this->figuras, posic_figura1);
-      figura2 = get_lista(this->figuras, posic_figura2);
+      figura1 = Lista_t->get(this->figuras, posic_figura1);
+      figura2 = Lista_t->get(this->figuras, posic_figura2);
 
       distancia = distancia_figuras(figura1, figura2);
 
@@ -336,23 +338,23 @@ int executar_proximo_comando(Controlador c) {
 
       sprintf(saida, "d %s %s\n%4.1f\n", params[0], params[1], distancia);
 
-      insert_lista(this->saida, (Item) saida);
+      Lista_t->insert(this->saida, (Item) saida);
 
       break;
 
     case GEO_CRIAR_SVG:
       id = (int) strtol(params[0], NULL, 10);
 
-      posic_figura1 = get_first_lista(this->figuras);
+      posic_figura1 = Lista_t->get_first(this->figuras);
       posic_figura1 =
-        search_lista(this->figuras, posic_figura1, &id, checar_id_figura);
+        Lista_t->search(this->figuras, posic_figura1, &id, checar_id_figura);
 
       if (!posic_figura1) {
         LOG_ERRO("Nao ha figura no id %d! (linha %d)", id, this->linha_atual);
         break;
       }
 
-      figura1 = get_lista(this->figuras, posic_figura1);
+      figura1 = Lista_t->get(this->figuras, posic_figura1);
 
       /* Cria o sufixo padrao caso nao tenha sido especificado */
       if (get_numero_parametros(com) > 1)
@@ -377,13 +379,13 @@ int executar_proximo_comando(Controlador c) {
 
       get_centro_massa(figura1, &x, &y);
 
-      iterator = get_first_lista(this->figuras);
+      iterator = Lista_t->get_first(this->figuras);
 
       while (iterator) {
-        figura2 = get_lista(this->figuras, iterator);
+        figura2 = Lista_t->get(this->figuras, iterator);
 
         if (figura1 == figura2) {
-          iterator = get_next_lista(this->figuras, iterator);
+          iterator = Lista_t->get_next(this->figuras, iterator);
           continue;
         }
 
@@ -404,7 +406,7 @@ int executar_proximo_comando(Controlador c) {
 
         free(saida);
 
-        iterator = get_next_lista(this->figuras, iterator);
+        iterator = Lista_t->get_next(this->figuras, iterator);
       }
 
       salva_SVG(s);
@@ -457,7 +459,7 @@ int executar_proximo_comando(Controlador c) {
       set_cor_elemento(new_elemento, this->cores[QUADRA]);
       set_cor_borda_elemento(new_elemento, this->cores_borda[QUADRA]);
 
-      insert_lista(this->elementos[QUADRA], (Item) new_elemento);
+      Lista_t->insert(this->elementos[QUADRA], (Item) new_elemento);
 
       break;
     case GEO_INSERE_HIDRANTE:
@@ -478,7 +480,7 @@ int executar_proximo_comando(Controlador c) {
       set_cor_elemento(new_elemento, this->cores[HIDRANTE]);
       set_cor_borda_elemento(new_elemento, this->cores_borda[HIDRANTE]);
 
-      insert_lista(this->elementos[HIDRANTE], (Item) new_elemento);
+      Lista_t->insert(this->elementos[HIDRANTE], (Item) new_elemento);
       break;
     case GEO_INSERE_SEMAFORO:
       cep = params[0];
@@ -498,7 +500,7 @@ int executar_proximo_comando(Controlador c) {
       set_cor_elemento(new_elemento, this->cores[SEMAFORO]);
       set_cor_borda_elemento(new_elemento, this->cores_borda[SEMAFORO]);
 
-      insert_lista(this->elementos[SEMAFORO], (Item) new_elemento);
+      Lista_t->insert(this->elementos[SEMAFORO], (Item) new_elemento);
       break;
     case GEO_INSERE_RADIO_BASE:
       cep = params[0];
@@ -518,7 +520,7 @@ int executar_proximo_comando(Controlador c) {
       set_cor_elemento(new_elemento, this->cores[RADIO_BASE]);
       set_cor_borda_elemento(new_elemento, this->cores_borda[RADIO_BASE]);
 
-      insert_lista(this->elementos[RADIO_BASE], (Item) new_elemento);
+      Lista_t->insert(this->elementos[RADIO_BASE], (Item) new_elemento);
       break;
     case GEO_COR_QUADRA:
     case GEO_COR_HIDRANTE:
@@ -569,32 +571,32 @@ int executar_proximo_comando(Controlador c) {
         strcpy(saida, "Q?:\n");
       }
 
-      insert_lista(this->saida, (Item) saida);
+      Lista_t->insert(this->saida, (Item) saida);
 
       for (i = 0; i < 4; i++) {
         Lista lista_atual = this->elementos[i];
 
-        Posic iterator = get_first_lista(lista_atual);
+        Posic iterator = Lista_t->get_first(lista_atual);
 
-        iterator =
-          search_lista(lista_atual, iterator, figAtual, elemento_dentro_figura);
+        iterator = Lista_t->search(
+          lista_atual, iterator, figAtual, elemento_dentro_figura);
 
         while (iterator) {
-          new_elemento = (Elemento) get_lista(lista_atual, iterator);
+          new_elemento = (Elemento) Lista_t->get(lista_atual, iterator);
 
           saida = get_info_elemento(new_elemento);
           strcat(saida, "\n");
-          insert_lista(this->saida, (Item) saida);
+          Lista_t->insert(this->saida, (Item) saida);
 
-          iterator = search_lista(
+          iterator = Lista_t->search(
             lista_atual,
-            get_next_lista(lista_atual, iterator),
+            Lista_t->get_next(lista_atual, iterator),
             figAtual,
             elemento_dentro_figura);
         }
       }
 
-      insert_lista(this->saida_svg_qry, (Item) figAtual);
+      Lista_t->insert(this->saida_svg_qry, (Item) figAtual);
 
       break;
     case QRY_DELETE_QUADRA_RECT:
@@ -621,31 +623,31 @@ int executar_proximo_comando(Controlador c) {
       }
 
       Lista lista_atual = this->elementos[QUADRA];
-      iterator          = get_first_lista(lista_atual);
+      iterator          = Lista_t->get_first(lista_atual);
       Posic next_it;
 
-      iterator =
-        search_lista(lista_atual, iterator, figAtual, elemento_dentro_figura);
+      iterator = Lista_t->search(
+        lista_atual, iterator, figAtual, elemento_dentro_figura);
 
       while (iterator) {
-        next_it = get_next_lista(lista_atual, iterator);
+        next_it = Lista_t->get_next(lista_atual, iterator);
 
-        new_elemento = get_lista(lista_atual, iterator);
+        new_elemento = Lista_t->get(lista_atual, iterator);
 
-        remove_lista(lista_atual, iterator);
+        Lista_t->remove(lista_atual, iterator);
 
         cep   = get_cep_elemento(new_elemento);
         saida = calloc(20 + strlen(cep), sizeof(char));
         sprintf(saida, "Quadra: %s deletada.\n", cep);  // 20 Caracteres
-        insert_lista(this->saida, (Item) saida);
+        Lista_t->insert(this->saida, (Item) saida);
 
         destruir_elemento(new_elemento);
 
-        iterator =
-          search_lista(lista_atual, next_it, figAtual, elemento_dentro_figura);
+        iterator = Lista_t->search(
+          lista_atual, next_it, figAtual, elemento_dentro_figura);
       }
 
-      insert_lista(this->saida_svg_qry, (Item) figAtual);
+      Lista_t->insert(this->saida_svg_qry, (Item) figAtual);
 
       break;
     case QRY_DELETE_ALL_RECT:
@@ -687,33 +689,33 @@ int executar_proximo_comando(Controlador c) {
           continue;
 
         Lista lista_atual = this->elementos[i];
-        Posic iterator    = get_first_lista(lista_atual);
+        Posic iterator    = Lista_t->get_first(lista_atual);
         Posic next_it;
 
-        iterator =
-          search_lista(lista_atual, iterator, figAtual, elemento_dentro_figura);
+        iterator = Lista_t->search(
+          lista_atual, iterator, figAtual, elemento_dentro_figura);
 
         while (iterator) {
-          next_it = get_next_lista(lista_atual, iterator);
+          next_it = Lista_t->get_next(lista_atual, iterator);
 
-          new_elemento = get_lista(lista_atual, iterator);
+          new_elemento = Lista_t->get(lista_atual, iterator);
 
-          remove_lista(lista_atual, iterator);
+          Lista_t->remove(lista_atual, iterator);
 
           sufixo = get_info_elemento(new_elemento);
           saida  = calloc(12 + strlen(sufixo), sizeof(char));
           sprintf(saida, "%s deletada.\n", sufixo);
-          insert_lista(this->saida, (Item) saida);
+          Lista_t->insert(this->saida, (Item) saida);
           free(sufixo);
 
           destruir_elemento(new_elemento);
 
-          iterator = search_lista(
+          iterator = Lista_t->search(
             lista_atual, next_it, figAtual, elemento_dentro_figura);
         }
       }
 
-      insert_lista(this->saida_svg_qry, (Item) figAtual);
+      Lista_t->insert(this->saida_svg_qry, (Item) figAtual);
 
       free(tipos_pesquisa);
 
@@ -726,14 +728,14 @@ int executar_proximo_comando(Controlador c) {
       for (int i = 0; i < 4; i++) {
         Lista lista_atual = this->elementos[i];
 
-        Posic posic_elemento = get_first_lista(lista_atual);
+        Posic posic_elemento = Lista_t->get_first(lista_atual);
         posic_elemento =
-          search_lista(lista_atual, posic_elemento, cep, checar_id_elemento);
+          Lista_t->search(lista_atual, posic_elemento, cep, checar_id_elemento);
 
         if (!posic_elemento)
           continue;
 
-        new_elemento = get_lista(lista_atual, posic_elemento);
+        new_elemento = Lista_t->get(lista_atual, posic_elemento);
 
         set_cor_elemento(new_elemento, cor);
         set_cor_borda_elemento(new_elemento, cor_borda);
@@ -746,22 +748,22 @@ int executar_proximo_comando(Controlador c) {
       for (int i = 0; i < 4; i++) {
         Lista lista_atual = this->elementos[i];
 
-        Posic posic_elemento = get_first_lista(lista_atual);
+        Posic posic_elemento = Lista_t->get_first(lista_atual);
         posic_elemento =
-          search_lista(lista_atual, posic_elemento, cep, checar_id_elemento);
+          Lista_t->search(lista_atual, posic_elemento, cep, checar_id_elemento);
 
         if (!posic_elemento)
           continue;
 
-        new_elemento = get_lista(lista_atual, posic_elemento);
+        new_elemento = Lista_t->get(lista_atual, posic_elemento);
         saida        = get_info_elemento(new_elemento);
         strcat(saida, "\n");
-        insert_lista(this->saida, saida);
+        Lista_t->insert(this->saida, saida);
       }
 
       break;
     case QRY_CHECA_RADIO_BASE_PROXIMA:;
-      int tam = length_lista(this->elementos[RADIO_BASE]);
+      int tam = Lista_t->length(this->elementos[RADIO_BASE]);
 
       // Quer dizer que nao há Tores de Celular
       if (tam <= 1) {
@@ -770,12 +772,12 @@ int executar_proximo_comando(Controlador c) {
         sprintf(
           saida,
           "Nao ha torres de celular suficientes para checar a distancia.\n");
-        insert_lista(this->saida, saida);
+        Lista_t->insert(this->saida, saida);
 
         break;
       }
 
-      Elemento *radios_base = to_array_lista(this->elementos[RADIO_BASE]);
+      Elemento *radios_base = Lista_t->to_array(this->elementos[RADIO_BASE]);
 
       ClosestPair pair = closest_pair(radios_base, tam);
 
@@ -800,11 +802,11 @@ int executar_proximo_comando(Controlador c) {
         cep,
         distancia);
 
-      insert_lista(this->saida, saida);
+      Lista_t->insert(this->saida, saida);
 
       x = get_x(radio1);
       y = get_y(radio1);
-      insert_lista(
+      Lista_t->insert(
         this->saida_svg_qry,
         cria_circulo(x, y, RAIO_RADIOS_PROXIMOS, "transparent", "purple"));
 
@@ -814,7 +816,7 @@ int executar_proximo_comando(Controlador c) {
 
       x = get_x(radio2);
       y = get_y(radio2);
-      insert_lista(
+      Lista_t->insert(
         this->saida_svg_qry,
         cria_circulo(x, y, RAIO_RADIOS_PROXIMOS, "transparent", "purple"));
 
@@ -837,7 +839,7 @@ int executar_proximo_comando(Controlador c) {
 int ha_comandos(Controlador c) {
   struct Controlador *this = (struct Controlador *) c;
 
-  return !!length_lista(this->fila_execucao);
+  return !!Lista_t->length(this->fila_execucao);
 }
 
 void gerar_fila_execucao(Controlador c) {
@@ -866,7 +868,7 @@ void gerar_fila_execucao(Controlador c) {
       continue;
     }
 
-    insert_lista(this->fila_execucao, (Item) comando);
+    Lista_t->insert(this->fila_execucao, (Item) comando);
 
     free(linha);
   }
@@ -888,7 +890,7 @@ void gerar_fila_execucao(Controlador c) {
   arq = abrir_arquivo(path, LEITURA);
 
   while ((linha = ler_proxima_linha(arq))) {
-    insert_lista(this->fila_execucao, (Item) cria_comando(linha));
+    Lista_t->insert(this->fila_execucao, (Item) cria_comando(linha));
 
     free(linha);
   }
@@ -933,11 +935,11 @@ void finalizar_arquivos(Controlador c) {
 
   desenhar_elementos(c, s);
 
-  iterator = get_first_lista(this->saida_svg_qry);
+  iterator = Lista_t->get_first(this->saida_svg_qry);
   while (iterator) {
     desenha_figura(
-      s, get_lista(this->saida_svg_qry, iterator), 0.8, SVG_BORDA_TRACEJADA);
-    iterator = get_next_lista(this->saida_svg_qry, iterator);
+      s, Lista_t->get(this->saida_svg_qry, iterator), 0.8, SVG_BORDA_TRACEJADA);
+    iterator = Lista_t->get_next(this->saida_svg_qry, iterator);
   }
 
   salva_SVG(s);
@@ -955,19 +957,19 @@ void destruir_controlador(Controlador c) {
 
   this = (struct Controlador *) c;
 
-  destruir_lista(this->saida, &free);
-  destruir_lista(this->saida_svg_qry, &destruir_figura);
+  Lista_t->destruir(this->saida, &free);
+  Lista_t->destruir(this->saida_svg_qry, &destruir_figura);
 
-  destruir_lista(this->figuras, &destruir_figura);
+  Lista_t->destruir(this->figuras, &destruir_figura);
 
   // Sobreposicoes
-  destruir_lista(this->sobreposicoes, &destruir_figura);
+  Lista_t->destruir(this->sobreposicoes, &destruir_figura);
 
   // Elementos
-  destruir_lista(this->elementos[QUADRA], &destruir_elemento);
-  destruir_lista(this->elementos[HIDRANTE], &destruir_elemento);
-  destruir_lista(this->elementos[SEMAFORO], &destruir_elemento);
-  destruir_lista(this->elementos[RADIO_BASE], &destruir_elemento);
+  Lista_t->destruir(this->elementos[QUADRA], &destruir_elemento);
+  Lista_t->destruir(this->elementos[HIDRANTE], &destruir_elemento);
+  Lista_t->destruir(this->elementos[SEMAFORO], &destruir_elemento);
+  Lista_t->destruir(this->elementos[RADIO_BASE], &destruir_elemento);
 
   for (i = 0; i < 4; i++) {
     if (!this->cores[i])
@@ -986,7 +988,7 @@ void destruir_controlador(Controlador c) {
   if (this->arq_query)
     free(this->arq_query);
 
-  destruir_lista(this->fila_execucao, NULL);
+  Lista_t->destruir(this->fila_execucao, NULL);
 
   free(c);
 }
@@ -1008,12 +1010,12 @@ static void desenhar_todas_figuras(Controlador c, SVG s) {
 
   this = (struct Controlador *) c;
 
-  Posic iterator = get_first_lista(this->figuras);
+  Posic iterator = Lista_t->get_first(this->figuras);
 
   while (iterator) {
-    figAtual = get_lista(this->figuras, iterator);
+    figAtual = Lista_t->get(this->figuras, iterator);
     desenha_figura(s, figAtual, 0.4, SVG_BORDA_SOLIDA);
-    iterator = get_next_lista(this->figuras, iterator);
+    iterator = Lista_t->get_next(this->figuras, iterator);
   }
 }
 
@@ -1023,20 +1025,20 @@ static void desenhar_sobreposicoes(Controlador c, SVG s) {
 
   this = (struct Controlador *) c;
 
-  if (!length_lista(this->sobreposicoes))
+  if (!Lista_t->length(this->sobreposicoes))
     return;
 
   /* Calcular retangulo das sobreposicoes */
-  Posic iterator = get_first_lista(this->sobreposicoes);
+  Posic iterator = Lista_t->get_first(this->sobreposicoes);
 
   while (iterator) {
-    figDash = (Figura) get_lista(this->sobreposicoes, iterator);
+    figDash = (Figura) Lista_t->get(this->sobreposicoes, iterator);
 
     desenha_figura(s, figDash, 1.0, SVG_BORDA_TRACEJADA);
     escreve_texto(
       s, "sobrepoe", get_x(figDash), get_y(figDash) - 5, 15, "purple");
 
-    iterator = get_next_lista(this->sobreposicoes, iterator);
+    iterator = Lista_t->get_next(this->sobreposicoes, iterator);
   }
 }
 
@@ -1060,11 +1062,11 @@ static void escrever_txt_final(Controlador c) {
 
   free(full_path);
 
-  Posic iterator = get_first_lista(this->saida);
+  Posic iterator = Lista_t->get_first(this->saida);
 
   while (iterator) {
-    escrever_linha(arq, (char *) get_lista(this->saida, iterator));
-    iterator = get_next_lista(this->saida, iterator);
+    escrever_linha(arq, (char *) Lista_t->get(this->saida, iterator));
+    iterator = Lista_t->get_next(this->saida, iterator);
   }
 
   fechar_arquivo(arq);
@@ -1082,13 +1084,13 @@ static void desenhar_elementos(Controlador _this, SVG svg) {
     lista_atual = this->elementos[i];
 
     // Itera pela lista e desesenha no SVG os elementos
-    iterator = get_first_lista(lista_atual);
+    iterator = Lista_t->get_first(lista_atual);
     while (iterator) {
-      elemento_atual = (Elemento) get_lista(lista_atual, iterator);
+      elemento_atual = (Elemento) Lista_t->get(lista_atual, iterator);
 
       desenha_elemento(svg, elemento_atual);
 
-      iterator = get_next_lista(lista_atual, iterator);
+      iterator = Lista_t->get_next(lista_atual, iterator);
     }
   }
 }
