@@ -107,8 +107,6 @@ struct Lista_t {
   void (*destruir)(Lista, void (*)(Item));
 };
 
-extern struct Lista_t *Lista_t;
-
-void init_lista();
+extern const struct Lista_t Lista_t;
 
 #endif /* __LISTA_H__ */

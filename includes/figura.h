@@ -18,7 +18,7 @@ Figura cria_retangulo(
 
 Figura cria_circulo(float x, float y, float r, char *cor, char *cor_borda);
 
-int intercepta_figura(Figura f, Figura f2);
+int sobrepoe_figura(Figura f, Figura f2);
 
 int contem_ponto(Figura f, double x, double y);
 

@@ -71,7 +71,7 @@ Figura cria_circulo(float x, float y, float r, char *cor, char *cor_borda) {
   return (Figura) this;
 }
 
-int intercepta_figura(Figura f, Figura f2) {
+int sobrepoe_figura(Figura f, Figura f2) {
   struct Figura *this  = (struct Figura *) f;
   struct Figura *other = (struct Figura *) f2;
   struct Figura *circ, *rect;

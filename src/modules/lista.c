@@ -227,25 +227,18 @@ static void __destruir_lista(Lista lista, void (*destruir_item)(Item item)) {
   free(lista);
 }
 
-struct Lista_t *Lista_t;
-
-void init_lista() {
-  if (!Lista_t) {
-    Lista_t = malloc(sizeof(struct Lista_t));
-
-    Lista_t->create        = &__create_lista;
-    Lista_t->length        = &__length_lista;
-    Lista_t->insert        = &__insert_lista;
-    Lista_t->remove        = &__remove_lista;
-    Lista_t->get           = &__get_lista;
-    Lista_t->insert_before = &__insert_before_lista;
-    Lista_t->insert_after  = &__insert_after_lista;
-    Lista_t->get_first     = &__get_first_lista;
-    Lista_t->get_next      = &__get_next_lista;
-    Lista_t->get_last      = &__get_last_lista;
-    Lista_t->get_previous  = &__get_previous_lista;
-    Lista_t->search        = &__search_lista;
-    Lista_t->to_array      = &__to_array_lista;
-    Lista_t->destruir      = &__destruir_lista;
-  }
-}
+const struct Lista_t Lista_t = {  //
+  .create        = &__create_lista,
+  .length        = &__length_lista,
+  .insert        = &__insert_lista,
+  .remove        = &__remove_lista,
+  .get           = &__get_lista,
+  .insert_before = &__insert_before_lista,
+  .insert_after  = &__insert_after_lista,
+  .get_first     = &__get_first_lista,
+  .get_next      = &__get_next_lista,
+  .get_last      = &__get_last_lista,
+  .get_previous  = &__get_previous_lista,
+  .search        = &__search_lista,
+  .to_array      = &__to_array_lista,
+  .destruir      = &__destruir_lista};
