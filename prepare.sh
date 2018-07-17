@@ -6,7 +6,6 @@ mkdir -p $NAME
 
 # Copia os arquivos necessarios
 cp -r src $NAME/
-cp -r includes/* $NAME/src/
 cp LEIA-ME.txt $NAME/
 cp Makefile $NAME/src/
 
@@ -14,7 +13,7 @@ cp Makefile $NAME/src/
 sed -i -e 's/= src/= ./g' $NAME/src/Makefile
 sed -i -e 's/= build/= ..\/build/g' $NAME/src/Makefile
 sed -i -e 's/= bin/= ./g' $NAME/src/Makefile
-sed -i -e 's/= includes/= ./g' $NAME/src/Makefile
+sed -i -e 's/= $(SRCDIR)/= ./g' $NAME/src/Makefile
 
 # Removendo o que deve ser removido
 sed -i -e 's/-g\s*//g' $NAME/src/Makefile

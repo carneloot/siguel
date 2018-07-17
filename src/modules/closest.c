@@ -1,8 +1,8 @@
-#include "modules/closest.h"
+#include "closest.h"
 
 #include <math.h>
 #include <stdlib.h>
-#include "modules/sorts.h"
+#include "sorts.h"
 #include "utils.h"
 
 struct Point {

@@ -1,4 +1,4 @@
-#include "modules/lista.h"
+#include "lista.h"
 
 #include <stdlib.h>
 

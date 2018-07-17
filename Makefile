@@ -19,7 +19,7 @@ SRCDIR   = src
 OBJDIR   = build
 BINDIR   = bin
 OUTDIR   = out
-INCDIR   = includes
+INCDIR   = $(SRCDIR)
 
 PFLAGS   = -pedantic -std=c99 -fstack-protector-all -D DEBUG
 

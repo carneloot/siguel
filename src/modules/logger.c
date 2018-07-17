@@ -6,7 +6,7 @@
  * Alterado por Matheus Carnelutt
  */
 
-#include "modules/logger.h"
+#include "logger.h"
 
 #include <stdarg.h>
 #include <stdio.h>
