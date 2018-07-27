@@ -55,7 +55,7 @@ fim tipo
 tipo abstrato SVG
   "Tipo abstrato para guardar informações de um arquivo SVG a ser criado."
 
-  função cria_SVG(x_max: float, y_max: float): SVG
+  função cria_SVG(x_max: double, y_max: double): SVG
     pré-condição: x_max, y_max > 0
     pós-condição: Retorna um arquivo SVG nulo, sem nada.
 
@@ -63,7 +63,7 @@ tipo abstrato SVG
     pré-condição: 'x' de 'f' <= x_max; 'y' de 'f' <= y_max.
     pós-condição: Desenha a figura 'f', segundo as suas especificações, no svg 's'.
 
-  função escreve_texto(s: SVG, texto: string, x: float, y: float, tamanho: float, cor: string, cor_borda: string): void
+  função escreve_texto(s: SVG, texto: string, x: double, y: double, tamanho: double, cor: string, cor_borda: string): void
     pré-condição: x <= x_max; y <= y_max; cor e cor_borda são cores válidas de svg
     pós-condição: Escreve o texto 'texto', na posicão ('x', 'y'), com tamanho 'tamanho' e cores 'cor' e 'cor_borda' no SVG 's'.
 
@@ -76,11 +76,11 @@ fim tipo
 tipo abstrato Figura
   "Tipo abstrato para representar as figuras do programa. Pode ser do tipo Circulo ou do tipo Retangulo"
 
-  função cria_retangulo(x: float, y: float, w: float, h: float, cor: string, cor_borda: string): Figura
+  função cria_retangulo(x: double, y: double, w: double, h: double, cor: string, cor_borda: string): Figura
     pré-condição: 'cor' e 'cor_borda' devem ser cores válidas de SVG.
     pós-condição: Retorna uma Figura do tipo Retângulo com as especificações dadas.
 
-  função cria_circulo(x: float, y: float, r: float, cor: string): Figura
+  função cria_circulo(x: double, y: double, r: double, cor: string): Figura
     pré-condição: 'cor' e 'cor_borda' devem ser cores válidas de SVG.
     pós-condição: Retorna uma Figura do tipo Circulo com as especificações dadas.
 

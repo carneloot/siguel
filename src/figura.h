@@ -1,6 +1,8 @@
 #ifndef __FIGURA_H__
 #define __FIGURA_H__
 
+#include <modules/ponto2d.h>
+
 /**
  * Tipo abstrato para representar as figuras do programa. Pode ser do tipo
  * Circulo ou do tipo Retangulo
@@ -14,19 +16,19 @@ enum TipoFigura { CIRCULO, RETANGULO };
  * Retorna uma Figura do tipo Retângulo com as especificações dadas.
  */
 Figura cria_retangulo(
-  float x, float y, float w, float h, char *cor, char *cor_borda);
+  double x, double y, double w, double h, char *cor, char *cor_borda);
 
-Figura cria_circulo(float x, float y, float r, char *cor, char *cor_borda);
+Figura cria_circulo(double x, double y, double r, char *cor, char *cor_borda);
 
 int sobrepoe_figura(Figura f, Figura f2);
 
-int contem_ponto(Figura f, double x, double y);
+int contem_ponto(Figura f, Ponto2D ponto);
 
-void get_centro_massa(Figura f, float *x, float *y);
+Ponto2D get_centro_massa(Figura f);
 
 Figura get_rect_sobreposicao(Figura f1, Figura f2);
 
-float distancia_figuras(Figura f, Figura f2);
+double distancia_figuras(Figura f, Figura f2);
 
 void destruir_figura(Figura f);
 
@@ -37,15 +39,17 @@ int dentro_figura(Figura this, Figura other);
 
 /** Getters */
 
-float get_x(Figura f);
+Ponto2D get_pos(Figura f);
 
-float get_y(Figura f);
+double get_x(Figura f);
 
-float get_r(Figura f);
+double get_y(Figura f);
 
-float get_w(Figura f);
+double get_r(Figura f);
 
-float get_h(Figura f);
+double get_w(Figura f);
+
+double get_h(Figura f);
 
 char *get_cor(Figura f);
 

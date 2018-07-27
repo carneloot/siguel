@@ -39,7 +39,7 @@ const struct {
   {"cc", QRY_MUDA_COR_QUADRA},
   {"crd?", QRY_PRINT_EQUIPAMENTO},
   {"crb?", QRY_CHECA_RADIO_BASE_PROXIMA},
-  {"//", COMENTARIO}
+  {"//", COMENTARIO},
 };
 
 static int conta_params(char *entrada);

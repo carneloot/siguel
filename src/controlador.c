@@ -10,6 +10,7 @@
 #include "modules/closest.h"
 #include "modules/lista.h"
 #include "modules/logger.h"
+#include "modules/ponto2d.h"
 #include "utils.h"
 
 #define RAIO_RADIOS_PROXIMOS 25
@@ -33,11 +34,7 @@ struct Controlador {
   char *cores[4];
   char *cores_borda[4];
 
-  float max_width_geo;
-  float max_height_geo;
-
-  float max_width_qry;
-  float max_height_qry;
+  Ponto2D max_geo, max_qry;
 
   Lista fila_execucao;
 };
@@ -88,11 +85,8 @@ Controlador cria_controlador() {
     this->cores_borda[i] = NULL;
   }
 
-  this->max_width_geo  = 0;
-  this->max_height_geo = 0;
-
-  this->max_width_qry  = 0;
-  this->max_height_qry = 0;
+  this->max_geo = Ponto2D_t.new(0, 0);
+  this->max_qry = Ponto2D_t.new(0, 0);
 
   this->fila_execucao = Lista_t.create();
 
@@ -176,7 +170,9 @@ int executar_proximo_comando(Controlador c) {
   /* Parametros especificos */
   char *cor, *cor_borda, *saida, *sufixo, *cep;
   int id, id2, i, elemento_id;
-  float x, y, x2, y2, r, h, w, distancia;
+  // double x, y, h, w;
+  double r, distancia;
+  Ponto2D pos, size;
   size_t length;
   Figura figAtual;
   Figura figura1, figura2;
@@ -198,20 +194,18 @@ int executar_proximo_comando(Controlador c) {
       id        = strtol(params[0], NULL, 10);
       cor_borda = params[1];
       cor       = params[2];
-      r         = strtof(params[3], NULL);
-      x         = strtof(params[4], NULL);
-      y         = strtof(params[5], NULL);
+      r         = strtod(params[3], NULL);
+      pos = Ponto2D_t.new(strtod(params[4], NULL), strtod(params[5], NULL));
 
-      figAtual = cria_circulo(x, y, r, cor, cor_borda);
+      figAtual = cria_circulo(pos.x, pos.y, r, cor, cor_borda);
       set_id_figura(figAtual, id);
 
       Lista_t.insert(this->figuras, figAtual);
 
-      w = get_x(figAtual) + get_r(figAtual);
-      h = get_y(figAtual) + get_r(figAtual);
+      size = Ponto2D_t.add_scalar(pos, r);
 
-      this->max_width_geo  = max(this->max_width_geo, w + 4);
-      this->max_height_geo = max(this->max_height_geo, h + 4);
+      this->max_geo.x = max(this->max_geo.x, size.x + 4);
+      this->max_geo.y = max(this->max_geo.y, size.y + 4);
 
       break;
 
@@ -219,21 +213,18 @@ int executar_proximo_comando(Controlador c) {
       id        = strtol(params[0], NULL, 10);
       cor_borda = params[1];
       cor       = params[2];
-      w         = strtof(params[3], NULL);
-      h         = strtof(params[4], NULL);
-      x         = strtof(params[5], NULL);
-      y         = strtof(params[6], NULL);
+      size = Ponto2D_t.new(strtod(params[3], NULL), strtod(params[4], NULL));
+      pos  = Ponto2D_t.new(strtod(params[5], NULL), strtod(params[6], NULL));
 
-      figAtual = cria_retangulo(x, y, w, h, cor, cor_borda);
+      figAtual = cria_retangulo(pos.x, pos.y, size.x, size.y, cor, cor_borda);
       set_id_figura(figAtual, id);
 
       Lista_t.insert(this->figuras, figAtual);
 
-      w = get_x(figAtual) + get_w(figAtual);
-      h = get_y(figAtual) + get_h(figAtual);
+      size = Ponto2D_t.add(size, pos);
 
-      this->max_width_geo  = max(this->max_width_geo, w + 4);
-      this->max_height_geo = max(this->max_height_geo, h + 4);
+      this->max_geo.x = max(this->max_geo.x, size.x + 4);
+      this->max_geo.y = max(this->max_geo.y, size.y + 4);
 
       break;
 
@@ -277,9 +268,8 @@ int executar_proximo_comando(Controlador c) {
       break;
 
     case GEO_CHECA_PONTO:
-      id = (int) strtol(params[0], NULL, 10);
-      x  = strtof(params[1], NULL);
-      y  = strtof(params[2], NULL);
+      id  = (int) strtol(params[0], NULL, 10);
+      pos = Ponto2D_t.new(strtod(params[1], NULL), strtod(params[2], NULL));
 
       posic_figura1 = Lista_t.get_first(this->figuras);
       posic_figura1 =
@@ -296,7 +286,7 @@ int executar_proximo_comando(Controlador c) {
 
       saida = (char *) malloc(length * sizeof(char));
 
-      if (contem_ponto(figura1, x, y))
+      if (contem_ponto(figura1, pos))
         sprintf(saida, "i %s %s %s\nSIM\n", params[0], params[1], params[2]);
       else
         sprintf(saida, "i %s %s %s\nNAO\n", params[0], params[1], params[2]);
@@ -367,7 +357,7 @@ int executar_proximo_comando(Controlador c) {
 
       sprintf(saida, "%s%s-%s.svg", this->dir_saida, this->nome_base, sufixo);
 
-      s = cria_SVG(saida, this->max_width_geo, this->max_height_geo);
+      s = cria_SVG(saida, this->max_geo.x, this->max_geo.y);
 
       free(saida);
 
@@ -375,7 +365,9 @@ int executar_proximo_comando(Controlador c) {
 
       i = 0;
 
-      get_centro_massa(figura1, &x, &y);
+      Ponto2D pos, pos2;
+
+      pos = get_centro_massa(figura1);
 
       iterator = Lista_t.get_first(this->figuras);
 
@@ -387,12 +379,12 @@ int executar_proximo_comando(Controlador c) {
           continue;
         }
 
-        get_centro_massa(figura2, &x2, &y2);
+        pos2 = get_centro_massa(figura2);
 
         cor       = get_cor_borda(figura1);
         distancia = distancia_figuras(figura1, figura2);
 
-        desenha_linha(s, x, y, x2, y2, cor);
+        desenha_linha(s, pos, pos2, cor);
 
         length = 9;
 
@@ -400,7 +392,11 @@ int executar_proximo_comando(Controlador c) {
 
         sprintf(saida, "%6.1f", distancia);
 
-        escreve_texto(s, saida, (x + x2) / 2 + 10, (y + y2) / 2, 15, cor);
+        Ponto2D aux = Ponto2D_t.add(pos, pos2);
+        aux         = Ponto2D_t.mult(aux, 0.5);
+        aux.x += 10;
+
+        escreve_texto(s, saida, aux, 15, cor);
 
         free(saida);
 
@@ -424,7 +420,7 @@ int executar_proximo_comando(Controlador c) {
 
       sprintf(saida, "%s%s.svg", this->dir_saida, this->nome_base);
 
-      s = cria_SVG(saida, this->max_width_geo, this->max_height_geo);
+      s = cria_SVG(saida, this->max_geo.x, this->max_geo.y);
 
       desenhar_todas_figuras(c, s);
 
@@ -440,19 +436,17 @@ int executar_proximo_comando(Controlador c) {
       break;
     // Inserir parte da cidade
     case GEO_INSERE_QUADRA:
-      cep = params[0];
-      x   = strtof(params[1], &saida);
-      y   = strtof(params[2], &saida);
-      w   = strtof(params[3], &saida);
-      h   = strtof(params[4], &saida);
+      cep  = params[0];
+      pos  = Ponto2D_t.new(strtod(params[1], NULL), strtod(params[2], NULL));
+      size = Ponto2D_t.new(strtod(params[3], NULL), strtod(params[4], NULL));
 
-      this->max_width_geo  = max(this->max_width_geo, x + w + 4);
-      this->max_height_geo = max(this->max_height_geo, y + h + 4);
+      this->max_geo.x = max(this->max_geo.x, pos.x + size.x + 4);
+      this->max_geo.y = max(this->max_geo.y, pos.y + size.y + 4);
 
-      this->max_width_qry  = max(this->max_width_qry, x + w + 4);
-      this->max_height_qry = max(this->max_height_qry, y + h + 4);
+      this->max_qry.x = max(this->max_qry.x, pos.x + size.x + 4);
+      this->max_qry.y = max(this->max_qry.y, pos.y + size.y + 4);
 
-      new_elemento = cria_quadra(x, y, cep, w, h);
+      new_elemento = cria_quadra(pos.x, pos.y, cep, size.x, size.y);
 
       set_cor_elemento(new_elemento, this->cores[QUADRA]);
       set_cor_borda_elemento(new_elemento, this->cores_borda[QUADRA]);
@@ -462,18 +456,15 @@ int executar_proximo_comando(Controlador c) {
       break;
     case GEO_INSERE_HIDRANTE:
       cep = params[0];
-      x   = strtof(params[1], &saida);
-      y   = strtof(params[2], &saida);
+      pos = Ponto2D_t.new(strtod(params[1], NULL), strtod(params[2], NULL));
 
-      this->max_width_geo = max(this->max_width_geo, x + RAIO_EQUIPAMENTOS + 4);
-      this->max_height_geo =
-        max(this->max_height_geo, y + RAIO_EQUIPAMENTOS + 4);
+      this->max_geo.x = max(this->max_geo.x, pos.x + RAIO_EQUIPAMENTOS + 4);
+      this->max_geo.y = max(this->max_geo.y, pos.y + RAIO_EQUIPAMENTOS + 4);
 
-      this->max_width_qry = max(this->max_width_qry, x + RAIO_EQUIPAMENTOS + 4);
-      this->max_height_qry =
-        max(this->max_height_qry, y + RAIO_EQUIPAMENTOS + 4);
+      this->max_qry.x = max(this->max_qry.x, pos.x + RAIO_EQUIPAMENTOS + 4);
+      this->max_qry.y = max(this->max_qry.y, pos.y + RAIO_EQUIPAMENTOS + 4);
 
-      new_elemento = cria_hidrante(x, y, cep);
+      new_elemento = cria_hidrante(pos.x, pos.y, cep);
 
       set_cor_elemento(new_elemento, this->cores[HIDRANTE]);
       set_cor_borda_elemento(new_elemento, this->cores_borda[HIDRANTE]);
@@ -482,18 +473,15 @@ int executar_proximo_comando(Controlador c) {
       break;
     case GEO_INSERE_SEMAFORO:
       cep = params[0];
-      x   = strtof(params[1], &saida);
-      y   = strtof(params[2], &saida);
+      pos = Ponto2D_t.new(strtod(params[1], NULL), strtod(params[2], NULL));
 
-      this->max_width_geo = max(this->max_width_geo, x + RAIO_EQUIPAMENTOS + 4);
-      this->max_height_geo =
-        max(this->max_height_geo, y + RAIO_EQUIPAMENTOS + 4);
+      this->max_geo.x = max(this->max_geo.x, pos.x + RAIO_EQUIPAMENTOS + 4);
+      this->max_geo.y = max(this->max_geo.y, pos.y + RAIO_EQUIPAMENTOS + 4);
 
-      this->max_width_qry = max(this->max_width_qry, x + RAIO_EQUIPAMENTOS + 4);
-      this->max_height_qry =
-        max(this->max_height_qry, y + RAIO_EQUIPAMENTOS + 4);
+      this->max_qry.x = max(this->max_qry.x, pos.x + RAIO_EQUIPAMENTOS + 4);
+      this->max_qry.y = max(this->max_qry.y, pos.y + RAIO_EQUIPAMENTOS + 4);
 
-      new_elemento = cria_semaforo(x, y, cep);
+      new_elemento = cria_semaforo(pos.x, pos.y, cep);
 
       set_cor_elemento(new_elemento, this->cores[SEMAFORO]);
       set_cor_borda_elemento(new_elemento, this->cores_borda[SEMAFORO]);
@@ -502,18 +490,15 @@ int executar_proximo_comando(Controlador c) {
       break;
     case GEO_INSERE_RADIO_BASE:
       cep = params[0];
-      x   = strtof(params[1], &saida);
-      y   = strtof(params[2], &saida);
+      pos = Ponto2D_t.new(strtod(params[1], NULL), strtod(params[2], NULL));
 
-      this->max_width_geo = max(this->max_width_geo, x + RAIO_EQUIPAMENTOS + 4);
-      this->max_height_geo =
-        max(this->max_height_geo, y + RAIO_EQUIPAMENTOS + 4);
+      this->max_geo.x = max(this->max_geo.x, pos.x + RAIO_EQUIPAMENTOS + 4);
+      this->max_geo.y = max(this->max_geo.y, pos.y + RAIO_EQUIPAMENTOS + 4);
 
-      this->max_width_qry = max(this->max_width_qry, x + RAIO_EQUIPAMENTOS + 4);
-      this->max_height_qry =
-        max(this->max_height_qry, y + RAIO_EQUIPAMENTOS + 4);
+      this->max_qry.x = max(this->max_qry.x, pos.x + RAIO_EQUIPAMENTOS + 4);
+      this->max_qry.y = max(this->max_qry.y, pos.y + RAIO_EQUIPAMENTOS + 4);
 
-      new_elemento = cria_radio_base(x, y, cep);
+      new_elemento = cria_radio_base(pos.x, pos.y, cep);
 
       set_cor_elemento(new_elemento, this->cores[RADIO_BASE]);
       set_cor_borda_elemento(new_elemento, this->cores_borda[RADIO_BASE]);
@@ -545,26 +530,24 @@ int executar_proximo_comando(Controlador c) {
     case QRY_BUSCA_RECT:
       saida = calloc(5, sizeof(char));
       if (tipo == QRY_BUSCA_RECT) {
-        x = strtof(params[0], NULL);
-        y = strtof(params[1], NULL);
-        w = strtof(params[2], NULL);
-        h = strtof(params[3], NULL);
+        pos  = Ponto2D_t.new(strtod(params[0], NULL), strtod(params[1], NULL));
+        size = Ponto2D_t.new(strtod(params[2], NULL), strtod(params[3], NULL));
 
-        figAtual = cria_retangulo(x, y, w, h, "transparent", "black");
+        figAtual =
+          cria_retangulo(pos.x, pos.y, size.x, size.y, "transparent", "black");
 
-        this->max_width_qry  = max(this->max_width_qry, x + w + 4);
-        this->max_height_qry = max(this->max_height_qry, y + h + 4);
+        this->max_qry.x = max(this->max_qry.x, pos.x + size.x + 4);
+        this->max_qry.y = max(this->max_qry.y, pos.y + size.y + 4);
 
         strcpy(saida, "q?:\n");
       } else {
-        r = strtof(params[0], NULL);
-        x = strtof(params[1], NULL);
-        y = strtof(params[2], NULL);
+        r   = strtof(params[0], NULL);
+        pos = Ponto2D_t.new(strtod(params[1], NULL), strtod(params[2], NULL));
 
-        figAtual = cria_circulo(x, y, r, "transparent", "black");
+        figAtual = cria_circulo(pos.x, pos.y, r, "transparent", "black");
 
-        this->max_width_qry  = max(this->max_width_qry, x + r + 4);
-        this->max_height_qry = max(this->max_height_qry, y + r + 4);
+        this->max_qry.x = max(this->max_qry.x, pos.x + r + 4);
+        this->max_qry.y = max(this->max_qry.y, pos.y + r + 4);
 
         strcpy(saida, "Q?:\n");
       }
@@ -600,32 +583,30 @@ int executar_proximo_comando(Controlador c) {
     case QRY_DELETE_QUADRA_RECT:
     case QRY_DELETE_QUADRA_CIRC:
       if (tipo == QRY_DELETE_QUADRA_RECT) {
-        x = strtof(params[0], NULL);
-        y = strtof(params[1], NULL);
-        w = strtof(params[2], NULL);
-        h = strtof(params[3], NULL);
+        pos  = Ponto2D_t.new(strtod(params[0], NULL), strtod(params[1], NULL));
+        size = Ponto2D_t.new(strtod(params[2], NULL), strtod(params[3], NULL));
 
-        figAtual = cria_retangulo(x, y, w, h, "transparent", "black");
+        figAtual =
+          cria_retangulo(pos.x, pos.y, size.x, size.y, "transparent", "black");
 
-        this->max_width_qry  = max(this->max_width_qry, x + w + 4);
-        this->max_height_qry = max(this->max_height_qry, y + h + 4);
+        this->max_qry.x = max(this->max_qry.x, pos.x + size.x + 4);
+        this->max_qry.y = max(this->max_qry.y, pos.y + size.y + 4);
       } else {
-        r = strtof(params[0], NULL);
-        x = strtof(params[1], NULL);
-        y = strtof(params[2], NULL);
+        r   = strtof(params[0], NULL);
+        pos = Ponto2D_t.new(strtod(params[1], NULL), strtod(params[2], NULL));
 
-        figAtual = cria_circulo(x, y, r, "transparent", "black");
+        figAtual = cria_circulo(pos.x, pos.y, r, "transparent", "black");
 
-        this->max_width_qry  = max(this->max_width_qry, x + r + 4);
-        this->max_height_qry = max(this->max_height_qry, y + r + 4);
+        this->max_qry.x = max(this->max_qry.x, pos.x + r + 4);
+        this->max_qry.y = max(this->max_qry.y, pos.y + r + 4);
       }
 
       Lista lista_atual = this->elementos[QUADRA];
       iterator          = Lista_t.get_first(lista_atual);
       Posic next_it;
 
-      iterator = Lista_t.search(
-        lista_atual, iterator, figAtual, elemento_dentro_figura);
+      iterator =
+        Lista_t.search(lista_atual, iterator, figAtual, elemento_dentro_figura);
 
       while (iterator) {
         next_it = Lista_t.get_next(lista_atual, iterator);
@@ -651,24 +632,21 @@ int executar_proximo_comando(Controlador c) {
     case QRY_DELETE_ALL_RECT:
     case QRY_DELETE_ALL_CIRC:
       if (tipo == QRY_DELETE_ALL_RECT) {
-        x = strtof(params[1], NULL);
-        y = strtof(params[2], NULL);
-        w = strtof(params[3], NULL);
-        h = strtof(params[4], NULL);
+        pos  = Ponto2D_t.new(strtof(params[1], NULL), strtof(params[2], NULL));
+        size = Ponto2D_t.new(strtof(params[3], NULL), strtof(params[4], NULL));
 
-        figAtual = cria_retangulo(x, y, w, h, "transparent", "black");
+        figAtual = cria_retangulo(pos.x, pos.y, size.x, size.y, "transparent", "black");
 
-        this->max_width_qry  = max(this->max_width_qry, x + w + 4);
-        this->max_height_qry = max(this->max_height_qry, y + h + 4);
+        this->max_qry.x = max(this->max_qry.x, pos.x + size.x + 4);
+        this->max_qry.y = max(this->max_qry.y, pos.y + size.y + 4);
       } else {
-        x = strtof(params[1], NULL);
-        y = strtof(params[2], NULL);
+        pos  = Ponto2D_t.new(strtof(params[1], NULL), strtof(params[2], NULL));
         r = strtof(params[3], NULL);
 
-        figAtual = cria_circulo(x, y, r, "transparent", "black");
+        figAtual = cria_circulo(pos.x, pos.y, r, "transparent", "black");
 
-        this->max_width_qry  = max(this->max_width_qry, x + r + 4);
-        this->max_height_qry = max(this->max_height_qry, y + r + 4);
+        this->max_qry.x = max(this->max_qry.x, pos.x + r + 4);
+        this->max_qry.y = max(this->max_qry.y, pos.y + r + 4);
       }
 
       // Parsear params[0] para pegar variaveis
@@ -802,25 +780,21 @@ int executar_proximo_comando(Controlador c) {
 
       Lista_t.insert(this->saida, saida);
 
-      x = get_x(radio1);
-      y = get_y(radio1);
+      pos = get_pos(radio1);
       Lista_t.insert(
         this->saida_svg_qry,
-        cria_circulo(x, y, RAIO_RADIOS_PROXIMOS, "transparent", "purple"));
+        cria_circulo(pos.x, pos.y, RAIO_RADIOS_PROXIMOS, "transparent", "purple"));
 
-      this->max_width_qry = max(this->max_width_qry, x + RAIO_RADIOS_PROXIMOS);
-      this->max_height_qry =
-        max(this->max_height_qry, y + RAIO_RADIOS_PROXIMOS);
+      this->max_qry.x = max(this->max_qry.x, pos.x + RAIO_RADIOS_PROXIMOS);
+      this->max_qry.y = max(this->max_qry.y, pos.y + RAIO_RADIOS_PROXIMOS);
 
-      x = get_x(radio2);
-      y = get_y(radio2);
+      pos = get_pos(radio2);
       Lista_t.insert(
         this->saida_svg_qry,
-        cria_circulo(x, y, RAIO_RADIOS_PROXIMOS, "transparent", "purple"));
+        cria_circulo(pos.x, pos.y, RAIO_RADIOS_PROXIMOS, "transparent", "purple"));
 
-      this->max_width_qry = max(this->max_width_qry, x + RAIO_RADIOS_PROXIMOS);
-      this->max_height_qry =
-        max(this->max_height_qry, y + RAIO_RADIOS_PROXIMOS);
+      this->max_qry.x = max(this->max_qry.x, pos.x + RAIO_RADIOS_PROXIMOS);
+      this->max_qry.y = max(this->max_qry.y, pos.y + RAIO_RADIOS_PROXIMOS);
 
       free(radios_base);
       break;
@@ -929,7 +903,7 @@ void finalizar_arquivos(Controlador c) {
   full_path = calloc(length, sizeof(char));
   sprintf(full_path, "%s%s-%s.svg", this->dir_saida, geo_file, qry_file);
 
-  s = cria_SVG(full_path, this->max_width_qry, this->max_height_qry);
+  s = cria_SVG(full_path, this->max_qry.x, this->max_qry.y);
 
   desenhar_elementos(c, s);
 
@@ -1033,8 +1007,9 @@ static void desenhar_sobreposicoes(Controlador c, SVG s) {
     figDash = (Figura) Lista_t.get(this->sobreposicoes, iterator);
 
     desenha_figura(s, figDash, 1.0, SVG_BORDA_TRACEJADA);
-    escreve_texto(
-      s, "sobrepoe", get_x(figDash), get_y(figDash) - 5, 15, "purple");
+    Ponto2D pos = get_pos(figDash);
+    pos.y -= 5;
+    escreve_texto(s, "sobrepoe", pos, 15, "purple");
 
     iterator = Lista_t.get_next(this->sobreposicoes, iterator);
   }
@@ -1116,8 +1091,9 @@ static int elemento_dentro_figura(const Item _elemento, const void *_figura) {
   }
 
   // Se nao for quadra, comparar como ponto
-  else
-    contem = contem_ponto(figura, get_x(elemento), get_y(elemento));
+  else {
+    contem = contem_ponto(figura, get_pos(elemento));
+  }
 
   return !contem;
 }

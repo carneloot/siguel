@@ -47,7 +47,7 @@ void log_print(char *filename, int line, int stdout_print, char *fmt, ...) {
     fputc('\n', stdout);
   }
 
-  #ifdef DEBUG
+#ifdef DEBUG
 
   char *time_string;
 
@@ -72,5 +72,5 @@ void log_print(char *filename, int line, int stdout_print, char *fmt, ...) {
 
   fclose(fp);
 
-  #endif
+#endif
 }

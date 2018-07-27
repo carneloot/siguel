@@ -8,12 +8,15 @@
 
 #define STROKE_SIZE 2
 
+#define x(a) ((a)->pos.x)
+#define y(a) ((a)->pos.y)
+
 #define w(f) ((f)->data.rect.w)
 #define h(f) ((f)->data.rect.h)
 #define r(f) ((f)->data.circ.r)
 
 struct Figura {
-  float x, y;
+  Ponto2D pos;
   char *cor, *cor_borda;
 
   int id;
@@ -24,49 +27,45 @@ struct Figura {
   union {
     /** DADOS CIRCULO */
     struct {
-      float r;
+      double r;
     } circ;
 
     /** DADOS RETANGULO */
     struct {
-      float h, w;
+      double h, w;
     } rect;
   } data;
 };
 
-Figura cria_retangulo(
-  float x, float y, float w, float h, char *cor, char *cor_borda) {
-  struct Figura *this;
-  this = (struct Figura *) malloc(sizeof(struct Figura));
+static struct Figura *__cria_figura(
+  double x, double y, char *cor, char *cor_borda) {
+  struct Figura *this = (struct Figura *) malloc(sizeof(struct Figura));
 
-  this->tipo        = RETANGULO;
-  this->x           = x;
-  this->y           = y;
-  this->data.rect.w = w;
-  this->data.rect.h = h;
-
-  this->id = -1;
+  this->pos = Ponto2D_t.new(x, y);
+  this->id  = -1;
 
   this->cor       = trim(cor);
   this->cor_borda = trim(cor_borda);
+
+  return this;
+}
+
+Figura cria_retangulo(
+  double x, double y, double w, double h, char *cor, char *cor_borda) {
+  struct Figura *this = __cria_figura(x, y, cor, cor_borda);
+
+  this->tipo = RETANGULO;
+  w(this)    = w;
+  h(this)    = h;
 
   return (Figura) this;
 }
 
-Figura cria_circulo(float x, float y, float r, char *cor, char *cor_borda) {
-  struct Figura *this;
+Figura cria_circulo(double x, double y, double r, char *cor, char *cor_borda) {
+  struct Figura *this = __cria_figura(x, y, cor, cor_borda);
 
-  this = (struct Figura *) malloc(sizeof(struct Figura));
-
-  this->tipo        = CIRCULO;
-  this->x           = x;
-  this->y           = y;
-  this->data.circ.r = r;
-
-  this->id = -1;
-
-  this->cor       = trim(cor);
-  this->cor_borda = trim(cor_borda);
+  this->tipo = CIRCULO;
+  r(this)    = r;
 
   return (Figura) this;
 }
@@ -75,20 +74,16 @@ int sobrepoe_figura(Figura f, Figura f2) {
   struct Figura *this  = (struct Figura *) f;
   struct Figura *other = (struct Figura *) f2;
   struct Figura *circ, *rect;
-  float x_perto, y_perto;
 
   if (this->tipo == CIRCULO && other->tipo == CIRCULO) {
     return (
-      dist_squared(this->x, this->y, other->x, other->y) <=
-      pow(this->data.circ.r + other->data.circ.r, 2));
+      Ponto2D_t.dist_squared(this->pos, other->pos) <= sqr(r(this) + r(other)));
   }
 
   if (this->tipo == RETANGULO && other->tipo == RETANGULO) {
     return !(
-      this->x > other->x + other->data.rect.w ||
-      this->x + this->data.rect.w < other->x ||
-      this->y > other->y + other->data.rect.h ||
-      this->y + this->data.rect.h < other->y);
+      x(this) > x(other) + w(other) || x(this) + w(this) < x(other) ||
+      y(this) > y(other) + h(other) || y(this) + h(this) < y(other));
   }
 
   if (this->tipo == CIRCULO) {
@@ -99,64 +94,68 @@ int sobrepoe_figura(Figura f, Figura f2) {
     rect = this;
   }
 
-  x_perto = max(rect->x, min(circ->x, rect->x + rect->data.rect.w));
-  y_perto = max(rect->y, min(circ->y, rect->y + rect->data.rect.h));
+  Ponto2D perto = Ponto2D_t.new(
+    max(x(rect), min(x(circ), x(rect) + w(rect))),
+    max(y(rect), min(y(circ), y(rect) + h(rect))));
 
-  return (
-    dist_squared(circ->x, circ->y, x_perto, y_perto) <=
-    pow(circ->data.circ.r, 2));
+  return (Ponto2D_t.dist_squared(circ->pos, perto) <= sqr(r(circ)));
 }
 
-int contem_ponto(Figura f, double x, double y) {
+int contem_ponto(Figura f, Ponto2D p) {
   struct Figura *this;
   this = (struct Figura *) f;
 
   if (this->tipo == CIRCULO) {
-    return (dist_squared(this->x, this->y, x, y) < pow(this->data.circ.r, 2));
+    return (Ponto2D_t.dist_squared(this->pos, p) < sqr(r(this)));
   }
 
   if (this->tipo == RETANGULO) {
     return !(
-      x < this->x || x > this->x + this->data.rect.w || y < this->y ||
-      y > this->y + this->data.rect.h);
+      p.x < x(this) || p.x > x(this) + w(this) ||  //
+      p.y < y(this) || p.y > y(this) + h(this));
   }
 
   return 0;
 }
 
-void get_centro_massa(Figura f, float *x, float *y) {
+Ponto2D get_centro_massa(Figura f) {
   struct Figura *this;
   this = (struct Figura *) f;
 
-  *x = this->x;
-  *y = this->y;
+  Ponto2D result = Ponto2D_t.new(x(this), y(this));
 
   if (this->tipo == RETANGULO) {
-    *x += this->data.rect.w / 2;
-    *y += this->data.rect.h / 2;
+    result.x += w(this) / 2;
+    result.y += h(this) / 2;
   }
+
+  return result;
 }
 
 Figura get_rect_sobreposicao(Figura f1, Figura f2) {
   struct Figura *this  = (struct Figura *) f1;
   struct Figura *other = (struct Figura *) f2;
 
-  float x, y, h, w;
+  Ponto2D pos, size;
 
   if (this->tipo == CIRCULO && other->tipo == CIRCULO) {
-    x = min(this->x - this->data.circ.r, other->x - other->data.circ.r);
-    y = min(this->y - this->data.circ.r, other->y - other->data.circ.r);
+    pos = Ponto2D_t.new(
+      min(x(this) - r(this), x(other) - r(other)),
+      min(y(this) - r(this), y(other) - r(other)));
 
-    w = max(this->x + this->data.circ.r, other->x + other->data.circ.r);
-    h = max(this->y + this->data.circ.r, other->y + other->data.circ.r);
+    size = Ponto2D_t.new(
+      max(x(this) + r(this), x(other) + r(other)),
+      max(y(this) + r(this), y(other) + r(other)));
   }
 
   else if (this->tipo == RETANGULO && other->tipo == RETANGULO) {
-    x = min(this->x, other->x);
-    y = min(this->y, other->y);
+    pos = Ponto2D_t.new(  //
+      min(x(this), x(other)),
+      min(y(this), y(other)));
 
-    w = max(this->x + this->data.rect.w, other->x + other->data.rect.w);
-    h = max(this->y + this->data.rect.h, other->y + other->data.rect.h);
+    size = Ponto2D_t.new(
+      max(x(this) + w(this), x(other) + w(other)),
+      max(y(this) + h(this), y(other) + h(other)));
   }
 
   else {
@@ -169,36 +168,25 @@ Figura get_rect_sobreposicao(Figura f1, Figura f2) {
       circ = other;
       rect = this;
     }
+    pos = Ponto2D_t.new(  //
+      min(x(rect), x(circ) - r(circ)),
+      min(y(rect), y(circ) - r(circ)));
 
-    x = min(rect->x, circ->x - circ->data.circ.r);
-    y = min(rect->y, circ->y - circ->data.circ.r);
-
-    w = max(rect->x + rect->data.rect.w, circ->x + circ->data.circ.r);
-    h = max(rect->y + rect->data.rect.h, circ->y + circ->data.circ.r);
+    size = Ponto2D_t.new(
+      max(x(rect) + w(rect), x(circ) + r(circ)),
+      max(y(rect) + h(rect), y(circ) + r(circ)));
   }
 
-  w -= x;
-  h -= y;
+  size = Ponto2D_t.sub(size, pos);
 
-  x -= STROKE_SIZE;
-  y -= STROKE_SIZE;
-  w += 2 * STROKE_SIZE;
-  h += 2 * STROKE_SIZE;
+  pos  = Ponto2D_t.sub_scalar(pos, STROKE_SIZE);
+  size = Ponto2D_t.add_scalar(size, 2 * STROKE_SIZE);
 
-  return cria_retangulo(x, y, w, h, "transparent", "purple");
+  return cria_retangulo(pos.x, pos.y, size.x, size.y, "transparent", "purple");
 }
 
-float distancia_figuras(Figura f, Figura f2) {
-  float distancia;
-  float x1, y1, x2, y2;
-
-  get_centro_massa(f, &x1, &y1);
-
-  get_centro_massa(f2, &x2, &y2);
-
-  distancia = dist(x1, y1, x2, y2);
-
-  return distancia;
+double distancia_figuras(Figura this, Figura other) {
+  return Ponto2D_t.dist(get_centro_massa(this), get_centro_massa(other));
 }
 
 void destruir_figura(Figura f) {
@@ -217,73 +205,74 @@ int dentro_figura(Figura _this, Figura _other) {
 
   if (this->tipo == CIRCULO && other->tipo == RETANGULO) {
     int result;
-    float x, y;
+    Ponto2D pos_other = other->pos;
 
-    x = other->x;
-    y = other->y;
+    result = contem_ponto(this, pos_other);
 
-    result = contem_ponto(this, x, y);
+    pos_other.x += w(other);
+    result &= contem_ponto(this, pos_other);
 
-    x += w(other);
-    result &= contem_ponto(this, x, y);
+    pos_other.x = x(other);
+    pos_other.y += h(other);
+    result &= contem_ponto(this, pos_other);
 
-    x = other->x;
-    y += h(other);
-    result &= contem_ponto(this, x, y);
-
-    x += w(other);
-    result &= contem_ponto(this, x, y);
+    pos_other.x += w(other);
+    result &= contem_ponto(this, pos_other);
 
     return result;
   }
 
   if (this->tipo == RETANGULO && other->tipo == RETANGULO)
     return (
-      other->x >= this->x && other->y >= this->y &&
-      other->x + w(other) <= this->x + w(this) &&
-      other->y + h(other) <= this->y + h(this));
+      x(other) >= x(this) && y(other) >= y(this) &&
+      x(other) + w(other) <= x(this) + w(this) &&
+      y(other) + h(other) <= y(this) + h(this));
 
   return -1;
 }
 
 /** Getters */
 
-float get_x(Figura f) {
-  return ((struct Figura *) f)->x;
+Ponto2D get_pos(Figura f) {
+  return ((struct Figura *) f)->pos;
 }
 
-float get_y(Figura f) {
-  return ((struct Figura *) f)->y;
+double get_x(Figura f) {
+  return x((struct Figura *) f);
 }
 
-float get_r(Figura f) {
+double get_y(Figura f) {
+  return y((struct Figura *) f);
+}
+
+double get_r(Figura f) {
   struct Figura *this;
   this = (struct Figura *) f;
 
   if (this->tipo != CIRCULO)
     return 0;
 
-  return this->data.circ.r;
+  return r(this);
 }
 
-float get_w(Figura f) {
+double get_w(Figura f) {
   struct Figura *this;
   this = (struct Figura *) f;
 
   if (this->tipo != RETANGULO)
     return 0;
 
-  return this->data.rect.w;
+  return w(this);
 }
 
-float get_h(Figura f) {
+double get_h(Figura f) {
   struct Figura *this;
   this = (struct Figura *) f;
 
   if (this->tipo != RETANGULO)
     return 0;
 
-  return this->data.rect.h;
+  return h(this);
 }
 
 char *get_cor(Figura f) {

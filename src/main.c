@@ -25,7 +25,8 @@ int main(int argc, const char *argv[]) {
   finalizar_arquivos(controlador);
 
   if (eh_erro) {
-    LOG_PRINT(LOG_STDOUT, "Arquivo  \"%s.geo\" finalizado com erro.", nome_base);
+    LOG_PRINT(
+      LOG_STDOUT, "Arquivo  \"%s.geo\" finalizado com erro.", nome_base);
   } else {
     char *nome_query = get_nome_query(controlador);
     if (nome_query)

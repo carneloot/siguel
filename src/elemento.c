@@ -1,11 +1,18 @@
 #include "elemento.h"
 
-#include <stdlib.h>
+#include <modules/ponto2d.h>
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 
+#define x(a) ((a)->pos.x)
+#define y(a) ((a)->pos.y)
+
+#define largura(a) ((a)->data.quadra.largura)
+#define altura(a) ((a)->data.quadra.altura)
+
 struct Elemento {
-  float x, y;
+  Ponto2D pos;
   char *cor, *cor_borda;
 
   char *cep;
@@ -15,7 +22,7 @@ struct Elemento {
   union {
     // ===== QUADRA =====
     struct {
-      float largura, altura;
+      double largura, altura;
     } quadra;
 
     // ===== HIDRANTE =====
@@ -33,15 +40,14 @@ struct Elemento {
   } data;
 };
 
-static struct Elemento *cria_elemento(float x, float y, char *cep) {
+static struct Elemento *cria_elemento(double x, double y, char *cep) {
   struct Elemento *this = (struct Elemento *) malloc(sizeof(struct Elemento));
 
   this->cor       = NULL;
   this->cor_borda = NULL;
 
   this->cep = calloc(strlen(cep) + 1, sizeof(char));
-  this->x   = x;
-  this->y   = y;
+  this->pos = Ponto2D_t.new(x, y);
 
   strcpy(this->cep, cep);
 
@@ -50,18 +56,18 @@ static struct Elemento *cria_elemento(float x, float y, char *cep) {
 
 // ===== Metodos publicos =====
 
-Elemento cria_quadra(float x, float y, char *cep, float largura, float altura) {
+Elemento cria_quadra(double x, double y, char *cep, double largura, double altura) {
   struct Elemento *this = cria_elemento(x, y, cep);
 
   this->tipo = QUADRA;
 
-  this->data.quadra.largura = largura;
-  this->data.quadra.altura  = altura;
+  largura(this) = largura;
+  altura(this)  = altura;
 
   return (Elemento) this;
 }
 
-Elemento cria_hidrante(float x, float y, char *id) {
+Elemento cria_hidrante(double x, double y, char *id) {
   struct Elemento *this = cria_elemento(x, y, id);
 
   this->tipo = HIDRANTE;
@@ -69,7 +75,7 @@ Elemento cria_hidrante(float x, float y, char *id) {
   return (Elemento) this;
 }
 
-Elemento cria_semaforo(float x, float y, char *id) {
+Elemento cria_semaforo(double x, double y, char *id) {
   struct Elemento *this = cria_elemento(x, y, id);
 
   this->tipo = HIDRANTE;
@@ -77,7 +83,7 @@ Elemento cria_semaforo(float x, float y, char *id) {
   return (Elemento) this;
 }
 
-Elemento cria_radio_base(float x, float y, char *id) {
+Elemento cria_radio_base(double x, double y, char *id) {
   struct Elemento *this = cria_elemento(x, y, id);
 
   this->tipo = RADIO_BASE;
@@ -112,10 +118,10 @@ Figura get_figura_elemento(Elemento e) {
   switch (this->tipo) {
     case QUADRA:
       figura = cria_retangulo(
-        this->x,
-        this->y,
-        this->data.quadra.largura,
-        this->data.quadra.altura,
+        x(this),
+        y(this),
+        largura(this),
+        altura(this),
         this->cor,
         this->cor_borda);
       break;
@@ -123,7 +129,7 @@ Figura get_figura_elemento(Elemento e) {
     case RADIO_BASE:
     case SEMAFORO:
       figura = cria_circulo(
-        this->x, this->y, RAIO_EQUIPAMENTOS, this->cor, this->cor_borda);
+        x(this), y(this), RAIO_EQUIPAMENTOS, this->cor, this->cor_borda);
       break;
   }
 
@@ -153,43 +159,36 @@ char *get_info_elemento(Elemento e) {
   switch (this->tipo) {
     case QUADRA:
       length = 28 + strlen(this->cep) + 4 * 8;
-      saida = (char *) calloc(length, sizeof(char));
-      sprintf(saida,
+      saida  = (char *) calloc(length, sizeof(char));
+      sprintf(
+        saida,
         "Quadra: %s em (%5.2f,%5.2f) tamanho (%5.2f,%5.2f)",
         this->cep,
-        this->x, this->y,
-        this->data.quadra.largura, this->data.quadra.altura
-      );
+        x(this),
+        y(this),
+        largura(this),
+        altura(this));
       break;
 
     case HIDRANTE:
       length = 18 + strlen(this->cep) + 2 * 8;
-      saida = (char *) calloc(length, sizeof(char));
-      sprintf(saida,
-        "Hidrante: %s em (%5.2f,%5.2f)",
-        this->cep,
-        this->x, this->y
-      );
+      saida  = (char *) calloc(length, sizeof(char));
+      sprintf(
+        saida, "Hidrante: %s em (%5.2f,%5.2f)", this->cep, x(this), y(this));
       break;
 
     case RADIO_BASE:
       length = 20 + strlen(this->cep) + 2 * 8;
-      saida = (char *) calloc(length, sizeof(char));
-      sprintf(saida,
-        "Radio Base: %s em (%5.2f,%5.2f)",
-        this->cep,
-        this->x, this->y
-      );
+      saida  = (char *) calloc(length, sizeof(char));
+      sprintf(
+        saida, "Radio Base: %s em (%5.2f,%5.2f)", this->cep, x(this), y(this));
       break;
 
     case SEMAFORO:
       length = 18 + strlen(this->cep) + 2 * 8;
-      saida = (char *) calloc(length, sizeof(char));
-      sprintf(saida,
-        "Semaforo: %s em (%5.2f,%5.2f)",
-        this->cep,
-        this->x, this->y
-      );
+      saida  = (char *) calloc(length, sizeof(char));
+      sprintf(
+        saida, "Semaforo: %s em (%5.2f,%5.2f)", this->cep, x(this), y(this));
       break;
   }
 
@@ -202,12 +201,12 @@ char *get_info_elemento(Elemento e) {
 
 // get_x e get_y são os mesmos da figura;
 
-float get_largura(Elemento e) {
-  return ((struct Elemento *) e)->data.quadra.largura;
+double get_largura(Elemento e) {
+  return largura((struct Elemento *) e);
 }
 
-float get_altura(Elemento e) {
-  return ((struct Elemento *) e)->data.quadra.altura;
+double get_altura(Elemento e) {
+  return altura((struct Elemento *) e);
 }
 
 char *get_id_elemento(Elemento e) {

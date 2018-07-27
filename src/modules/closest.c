@@ -6,7 +6,7 @@
 #include "utils.h"
 
 struct Point {
-  float x, y;
+  double x, y;
 };
 
 static int compareX(const void *a, const void *b) {
@@ -21,10 +21,10 @@ static int compareY(const void *a, const void *b) {
   return (p1->y - p2->y);
 }
 
-static float distance(struct Point *p1, struct Point *p2) {
+static double distance(struct Point *p1, struct Point *p2) {
   if (p1 == p2)
     return INFINITY;
-  float dx, dy;
+  double dx, dy;
   dx = p1->x - p2->x;
   dy = p1->y - p2->y;
   return sqrt(dx * dx + dy * dy);
@@ -48,9 +48,8 @@ static ClosestPair bruteForce(struct Point **p, int n) {
 }
 
 static ClosestPair stripClosest(struct Point **strip, int size, ClosestPair d) {
-
   ClosestPair min = d;
-  float dist;
+  double dist;
   int i, j;
 
   heap_sort((void **) strip, size, compareY);

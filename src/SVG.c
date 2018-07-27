@@ -12,7 +12,7 @@ struct SVG {
   Arquivo saida;
 };
 
-SVG cria_SVG(char *path, float max_width, float max_height) {
+SVG cria_SVG(char *path, double max_width, double max_height) {
   struct SVG *this;
 
   this = (struct SVG *) malloc(sizeof(struct SVG));
@@ -32,7 +32,7 @@ SVG cria_SVG(char *path, float max_width, float max_height) {
 void desenha_figura(SVG s, Figura f, float opacity, int is_dashed) {
   struct SVG *this;
 
-  float x, y, r, h, w;
+  double x, y, r, h, w;
   char *cor, *cor_borda;
 
   this = (struct SVG *) s;
@@ -84,23 +84,22 @@ void desenha_elemento(SVG this, Elemento e) {
 
   // Se for quadra, desenhar o CEP no meio
   if (get_tipo_elemento(e) == QUADRA) {
-    float x, y;
+    Ponto2D pos;
     char *cep;
 
-    x = get_x(e) + 5;
-    y = get_y(e) + get_altura(e) - 5;
+    pos = get_pos(e);
+    pos.x += 5;
+    pos.y += get_altura(e) - 5;
 
     cep = get_cep_elemento(e);
 
-    escreve_texto(this, cep, x, y, 10, get_cor_borda(e));
+    escreve_texto(this, cep, pos, 10, get_cor_borda(e));
   }
 
   destruir_figura(figura);
-
 }
 
-void escreve_texto(
-  SVG s, char *texto, float x, float y, float tamanho, char *cor) {
+void escreve_texto(SVG s, char *texto, Ponto2D pos, float tamanho, char *cor) {
   struct SVG *this;
 
   this = (struct SVG *) s;
@@ -109,14 +108,14 @@ void escreve_texto(
     this->saida,
     "<text x=\"%.1f\" y=\"%.1f\" "
     "style=\"fill:%s;font-size:%.1fpx;font-family:sans-serif\">%s</text>\n",
-    x,
-    y,
+    pos.x,
+    pos.y,
     cor,
     tamanho,
     texto);
 }
 
-void desenha_linha(SVG s, float x1, float y1, float x2, float y2, char *cor) {
+void desenha_linha(SVG s, Ponto2D a, Ponto2D b, char *cor) {
   struct SVG *this;
 
   this = (struct SVG *) s;
@@ -125,10 +124,10 @@ void desenha_linha(SVG s, float x1, float y1, float x2, float y2, char *cor) {
     this->saida,
     "<line x1=\"%.1f\" y1=\"%.1f\" x2=\"%.1f\" y2=\"%.1f\" "
     "style=\"stroke:%s;stroke-width:1\" />\n",
-    x1,
-    y1,
-    x2,
-    y2,
+    a.x,
+    a.y,
+    b.x,
+    b.y,
     (!!cor) ? cor : "black");
 }
 

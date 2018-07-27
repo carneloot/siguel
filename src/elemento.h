@@ -9,13 +9,14 @@ typedef void *Elemento;
 
 enum TipoElemento { QUADRA, HIDRANTE, RADIO_BASE, SEMAFORO };
 
-Elemento cria_quadra(float x, float y, char *cep, float largura, float altura);
+Elemento cria_quadra(
+  double x, double y, char *cep, double largura, double altura);
 
-Elemento cria_hidrante(float x, float y, char *id);
+Elemento cria_hidrante(double x, double y, char *id);
 
-Elemento cria_semaforo(float x, float y, char *id);
+Elemento cria_semaforo(double x, double y, char *id);
 
-Elemento cria_radio_base(float x, float y, char *id);
+Elemento cria_radio_base(double x, double y, char *id);
 
 void set_cor_elemento(Elemento e, char *cor);
 
@@ -31,11 +32,11 @@ char *get_info_elemento(Elemento e);
  * Getters
  */
 
-// get_x e get_y são os mesmos da figura;
+// get_pos, get_x e get_y são os mesmos da figura;
 
-float get_largura(Elemento e);
+double get_largura(Elemento e);
 
-float get_altura(Elemento e);
+double get_altura(Elemento e);
 
 char *get_id_elemento(Elemento e);
 

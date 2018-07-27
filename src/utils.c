@@ -29,14 +29,6 @@ char *trim(char *entrada) {
   return saida;
 }
 
-float dist_squared(float x1, float y1, float x2, float y2) {
-  return pow(x1 - x2, 2) + pow(y1 - y2, 2);
-}
-
-float dist(float x1, float y1, float x2, float y2) {
-  return sqrt(dist_squared(x1, y1, x2, y2));
-}
-
 char *get_nome(char *path) {
   char *filename;
   int i, tam, count, start;
@@ -47,7 +39,6 @@ char *get_nome(char *path) {
 
   // Vai de tras para frente até achar a primeira barra
   while (i >= 0 && path[i] != '/') {
-
     // Se achar o ponto, quer dizer que começa a contagem do tamanho do arquivo
     if (path[i] == '.')
       count = -1;

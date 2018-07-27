@@ -3,9 +3,10 @@
 
 #include <string.h>
 
-enum LOGGER_STDOUT_OPTION {LOG_FILE, LOG_STDOUT};
+enum LOGGER_STDOUT_OPTION { LOG_FILE, LOG_STDOUT };
 
-#define __FILENAME__ (strrchr(__FILE__, '/') ? strrchr(__FILE__, '/') + 1 : __FILE__)
+#define __FILENAME__ \
+  (strrchr(__FILE__, '/') ? strrchr(__FILE__, '/') + 1 : __FILE__)
 
 void log_print(char *filename, int line, int stdout_print, char *fmt, ...);
 

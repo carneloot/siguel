@@ -7,11 +7,9 @@
 
 #define mod(a) ((a < 0) ? (-a) : (a))
 
+#define sqr(a) ((a) * (a))
+
 char *trim(char *);
-
-float dist_squared(float x1, float y1, float x2, float y2);
-
-float dist(float x1, float y1, float x2, float y2);
 
 char *get_nome(char *path);
 

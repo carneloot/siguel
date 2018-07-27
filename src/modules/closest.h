@@ -2,7 +2,7 @@
 #define __CLOSEST_H__
 
 struct ClosestPair {
-  float dist;
+  double dist;
   void *point1;
   void *point2;
 };

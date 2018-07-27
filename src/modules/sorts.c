@@ -108,7 +108,7 @@ void merge(
 
   // Junta as arrays temporarias de volta no vetorzao
   i = j = 0;
-  k = ini;
+  k     = ini;
   while (i < n1 && j < n2) {
     if (compare(L[i], R[j]) < 0)
       arr[k] = L[i++];
