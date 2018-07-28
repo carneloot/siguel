@@ -1,6 +1,7 @@
 #include "controlador.h"
 
 #include <math.h>
+#include <stdarg.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -8,6 +9,7 @@
 #include "elemento.h"
 #include "figura.h"
 #include "modules/closest.h"
+#include "modules/kdtree.h"
 #include "modules/lista.h"
 #include "modules/logger.h"
 #include "modules/ponto2d.h"
@@ -30,7 +32,7 @@ struct Controlador {
 
   Lista sobreposicoes;
 
-  Lista elementos[4];
+  KDTree elementos[4];
   char *cores[4];
   char *cores_borda[4];
 
@@ -51,7 +53,112 @@ static int elemento_dentro_figura(const Item _elemento, const void *_figura);
 
 static int checar_id_figura(const Item _figura, const void *_id);
 
-static int checar_id_elemento(const Item _elemento, const void *_id);
+/** ===== FUNCOES DA ARVORE ===== */
+
+int equalElements(const void *_a, const void *_b) {
+  const Elemento a = (const Elemento) _a;
+  const Elemento b = (const Elemento) _b;
+
+  double dist = Ponto2D_t.dist_squared(get_pos(a), get_pos(b));
+  return (!dist && !strcmp(get_id_elemento(a), get_id_elemento(b)));
+}
+
+int compareX(const void *_a, const void *_b) {
+  Elemento a = (Elemento) _a;
+  Elemento b = (Elemento) _b;
+
+  Ponto2D posA = get_pos(a);
+  Ponto2D posB = get_pos(b);
+
+  return (posA.x - posB.x);
+}
+
+int compareY(const void *_a, const void *_b) {
+  Elemento a = (Elemento) _a;
+  Elemento b = (Elemento) _b;
+
+  Ponto2D posA = get_pos(a);
+  Ponto2D posB = get_pos(b);
+
+  return (posA.y - posB.y);
+}
+
+void compararCEP(const Item _ele, unsigned prof, va_list _list) {
+  va_list list;
+  va_copy(list, _list);
+
+  // CEP, *RESULT
+  char *cep          = va_arg(list, char *);
+  Elemento *result   = va_arg(list, Elemento *);
+  const Elemento ele = _ele;
+
+  if (*result)
+    return;
+
+  if (!strcmp(get_id_elemento(ele), cep))
+    *result = ele;
+}
+
+void desenharElementoSVG(const Item _ele, unsigned prof, va_list _list) {
+  va_list list;
+  va_copy(list, _list);
+  const Elemento ele = (const Elemento) _ele;
+
+  SVG svg = va_arg(list, SVG);
+
+  desenha_elemento(svg, ele);
+}
+
+double distanciaElementos(const Item _this, const Item _other, int dim) {
+  struct Elemento *this  = (struct Elemento *) _this;
+  struct Elemento *other = (struct Elemento *) _other;
+
+  double result;
+
+  switch (dim) {
+    case -1:
+      result = Ponto2D_t.dist_squared(get_pos(this), get_pos(other));
+      break;
+    case 0: result = sqr(get_x(this) - get_x(other)); break;
+    case 1: result = sqr(get_y(this) - get_y(other)); break;
+  }
+
+  return result;
+}
+
+int elementoDentro(Item _this, int dim, Item rect[]) {
+  Elemento this = (Elemento) _this;
+
+  int result;
+
+  Ponto2D pos = get_pos(this);
+  Ponto2D *a  = (Ponto2D *) rect[0];
+  Ponto2D *b  = (Ponto2D *) rect[1];
+
+  result = 0;
+
+  switch (dim) {
+    case -1:
+      result =
+        !(pos.x < a->x || pos.x > b->x ||  //
+          pos.y < a->y || pos.y > b->y);
+      break;
+    case 0:
+      if (pos.x < a->x)
+        result = -1;
+      else if (pos.x > b->x)
+        result = 1;
+      break;
+    case 1:
+      if (pos.y < a->y)
+        result = -1;
+      else if (pos.y > b->y)
+        result = 1;
+      break;
+  }
+
+  return result;
+}
 
 /** METODOS PUBLICOS */
 
@@ -75,12 +182,9 @@ Controlador cria_controlador() {
 
   this->sobreposicoes = Lista_t.create();
 
-  this->elementos[QUADRA]     = Lista_t.create();
-  this->elementos[HIDRANTE]   = Lista_t.create();
-  this->elementos[SEMAFORO]   = Lista_t.create();
-  this->elementos[RADIO_BASE] = Lista_t.create();
-
   for (i = 0; i < 4; i++) {
+    this->elementos[i] = KDTree_t.create(2, equalElements, compareX, compareY);
+
     this->cores[i]       = NULL;
     this->cores_borda[i] = NULL;
   }
@@ -451,7 +555,7 @@ int executar_proximo_comando(Controlador c) {
       set_cor_elemento(new_elemento, this->cores[QUADRA]);
       set_cor_borda_elemento(new_elemento, this->cores_borda[QUADRA]);
 
-      Lista_t.insert(this->elementos[QUADRA], (Item) new_elemento);
+      KDTree_t.insert(this->elementos[QUADRA], new_elemento);
 
       break;
     case GEO_INSERE_HIDRANTE:
@@ -469,7 +573,7 @@ int executar_proximo_comando(Controlador c) {
       set_cor_elemento(new_elemento, this->cores[HIDRANTE]);
       set_cor_borda_elemento(new_elemento, this->cores_borda[HIDRANTE]);
 
-      Lista_t.insert(this->elementos[HIDRANTE], (Item) new_elemento);
+      KDTree_t.insert(this->elementos[HIDRANTE], new_elemento);
       break;
     case GEO_INSERE_SEMAFORO:
       cep = params[0];
@@ -486,7 +590,7 @@ int executar_proximo_comando(Controlador c) {
       set_cor_elemento(new_elemento, this->cores[SEMAFORO]);
       set_cor_borda_elemento(new_elemento, this->cores_borda[SEMAFORO]);
 
-      Lista_t.insert(this->elementos[SEMAFORO], (Item) new_elemento);
+      KDTree_t.insert(this->elementos[SEMAFORO], new_elemento);
       break;
     case GEO_INSERE_RADIO_BASE:
       cep = params[0];
@@ -503,7 +607,7 @@ int executar_proximo_comando(Controlador c) {
       set_cor_elemento(new_elemento, this->cores[RADIO_BASE]);
       set_cor_borda_elemento(new_elemento, this->cores_borda[RADIO_BASE]);
 
-      Lista_t.insert(this->elementos[RADIO_BASE], (Item) new_elemento);
+      KDTree_t.insert(this->elementos[RADIO_BASE], new_elemento);
       break;
     case GEO_COR_QUADRA:
     case GEO_COR_HIDRANTE:
@@ -526,6 +630,7 @@ int executar_proximo_comando(Controlador c) {
       break;
 
     // Comandos .qry
+    // TODO: Implementar QRY_BUSCA_*
     case QRY_BUSCA_CIRC:
     case QRY_BUSCA_RECT:
       saida = calloc(5, sizeof(char));
@@ -580,6 +685,7 @@ int executar_proximo_comando(Controlador c) {
       Lista_t.insert(this->saida_svg_qry, (Item) figAtual);
 
       break;
+    // TODO: Implementar QRY_DELETE_QUADRA_*
     case QRY_DELETE_QUADRA_RECT:
     case QRY_DELETE_QUADRA_CIRC:
       if (tipo == QRY_DELETE_QUADRA_RECT) {
@@ -629,19 +735,21 @@ int executar_proximo_comando(Controlador c) {
       Lista_t.insert(this->saida_svg_qry, (Item) figAtual);
 
       break;
+    // TODO: Implementar QRY_DELETE_ALL_*
     case QRY_DELETE_ALL_RECT:
     case QRY_DELETE_ALL_CIRC:
       if (tipo == QRY_DELETE_ALL_RECT) {
         pos  = Ponto2D_t.new(strtof(params[1], NULL), strtof(params[2], NULL));
         size = Ponto2D_t.new(strtof(params[3], NULL), strtof(params[4], NULL));
 
-        figAtual = cria_retangulo(pos.x, pos.y, size.x, size.y, "transparent", "black");
+        figAtual =
+          cria_retangulo(pos.x, pos.y, size.x, size.y, "transparent", "black");
 
         this->max_qry.x = max(this->max_qry.x, pos.x + size.x + 4);
         this->max_qry.y = max(this->max_qry.y, pos.y + size.y + 4);
       } else {
-        pos  = Ponto2D_t.new(strtof(params[1], NULL), strtof(params[2], NULL));
-        r = strtof(params[3], NULL);
+        pos = Ponto2D_t.new(strtof(params[1], NULL), strtof(params[2], NULL));
+        r   = strtof(params[3], NULL);
 
         figAtual = cria_circulo(pos.x, pos.y, r, "transparent", "black");
 
@@ -702,19 +810,16 @@ int executar_proximo_comando(Controlador c) {
       cor       = params[2];
 
       for (int i = 0; i < 4; i++) {
-        Lista lista_atual = this->elementos[i];
+        KDTree arvore_atual = this->elementos[i];
+        Elemento result     = NULL;
 
-        Posic posic_elemento = Lista_t.get_first(lista_atual);
-        posic_elemento =
-          Lista_t.search(lista_atual, posic_elemento, cep, checar_id_elemento);
+        KDTree_t.passe_simetrico(arvore_atual, compararCEP, cep, &result);
 
-        if (!posic_elemento)
+        if (!result)
           continue;
 
-        new_elemento = Lista_t.get(lista_atual, posic_elemento);
-
-        set_cor_elemento(new_elemento, cor);
-        set_cor_borda_elemento(new_elemento, cor_borda);
+        set_cor_elemento(result, cor);
+        set_cor_borda_elemento(result, cor_borda);
       }
 
       break;
@@ -722,27 +827,24 @@ int executar_proximo_comando(Controlador c) {
       cep = params[0];
 
       for (int i = 0; i < 4; i++) {
-        Lista lista_atual = this->elementos[i];
+        KDTree arvore_atual = this->elementos[i];
+        Elemento result     = NULL;
 
-        Posic posic_elemento = Lista_t.get_first(lista_atual);
-        posic_elemento =
-          Lista_t.search(lista_atual, posic_elemento, cep, checar_id_elemento);
+        KDTree_t.passe_simetrico(arvore_atual, compararCEP, cep, &result);
 
-        if (!posic_elemento)
+        if (!result)
           continue;
 
-        new_elemento = Lista_t.get(lista_atual, posic_elemento);
-        saida        = get_info_elemento(new_elemento);
+        saida = get_info_elemento(result);
         strcat(saida, "\n");
         Lista_t.insert(this->saida, saida);
       }
 
       break;
-    case QRY_CHECA_RADIO_BASE_PROXIMA:;
-      int tam = Lista_t.length(this->elementos[RADIO_BASE]);
+    case QRY_CHECA_RADIO_BASE_PROXIMA:
 
-      // Quer dizer que nao há Tores de Celular
-      if (tam <= 1) {
+      // Quer dizer que nao há Torres de Celular
+      if (KDTree_t.is_empty(this->elementos[RADIO_BASE])) {
         length = 63;
         saida  = calloc(length, sizeof(char));
         sprintf(
@@ -753,15 +855,14 @@ int executar_proximo_comando(Controlador c) {
         break;
       }
 
-      Elemento *radios_base = Lista_t.to_array(this->elementos[RADIO_BASE]);
-
-      ClosestPair pair = closest_pair(radios_base, tam);
+      Pair pair =
+        KDTree_t.closest_pair(this->elementos[RADIO_BASE], distanciaElementos);
 
       Elemento radio1, radio2;
 
       radio1    = pair.point1;
       radio2    = pair.point2;
-      distancia = pair.dist;
+      distancia = sqrt(pair.distance);
 
       // Reportar as id das torres
       cor = get_id_elemento(radio1);
@@ -783,7 +884,8 @@ int executar_proximo_comando(Controlador c) {
       pos = get_pos(radio1);
       Lista_t.insert(
         this->saida_svg_qry,
-        cria_circulo(pos.x, pos.y, RAIO_RADIOS_PROXIMOS, "transparent", "purple"));
+        cria_circulo(
+          pos.x, pos.y, RAIO_RADIOS_PROXIMOS, "transparent", "purple"));
 
       this->max_qry.x = max(this->max_qry.x, pos.x + RAIO_RADIOS_PROXIMOS);
       this->max_qry.y = max(this->max_qry.y, pos.y + RAIO_RADIOS_PROXIMOS);
@@ -791,12 +893,12 @@ int executar_proximo_comando(Controlador c) {
       pos = get_pos(radio2);
       Lista_t.insert(
         this->saida_svg_qry,
-        cria_circulo(pos.x, pos.y, RAIO_RADIOS_PROXIMOS, "transparent", "purple"));
+        cria_circulo(
+          pos.x, pos.y, RAIO_RADIOS_PROXIMOS, "transparent", "purple"));
 
       this->max_qry.x = max(this->max_qry.x, pos.x + RAIO_RADIOS_PROXIMOS);
       this->max_qry.y = max(this->max_qry.y, pos.y + RAIO_RADIOS_PROXIMOS);
 
-      free(radios_base);
       break;
 
     case COMENTARIO:
@@ -938,12 +1040,8 @@ void destruir_controlador(Controlador c) {
   Lista_t.destruir(this->sobreposicoes, &destruir_figura);
 
   // Elementos
-  Lista_t.destruir(this->elementos[QUADRA], &destruir_elemento);
-  Lista_t.destruir(this->elementos[HIDRANTE], &destruir_elemento);
-  Lista_t.destruir(this->elementos[SEMAFORO], &destruir_elemento);
-  Lista_t.destruir(this->elementos[RADIO_BASE], &destruir_elemento);
-
   for (i = 0; i < 4; i++) {
+    KDTree_t.destroy(this->elementos[i], &destruir_elemento);
     if (!this->cores[i])
       continue;
 
@@ -1047,24 +1145,11 @@ static void escrever_txt_final(Controlador c) {
 
 static void desenhar_elementos(Controlador _this, SVG svg) {
   struct Controlador *this = (struct Controlador *) _this;
-  int i;
-  Lista lista_atual;
-  Posic iterator;
-  Elemento elemento_atual;
 
-  // Para cada tipo de elemento
-  for (i = 0; i < 4; i++) {
-    lista_atual = this->elementos[i];
+  for (int i = 0; i < 4; i++) {
+    KDTree arvore_atual = this->elementos[i];
 
-    // Itera pela lista e desesenha no SVG os elementos
-    iterator = Lista_t.get_first(lista_atual);
-    while (iterator) {
-      elemento_atual = (Elemento) Lista_t.get(lista_atual, iterator);
-
-      desenha_elemento(svg, elemento_atual);
-
-      iterator = Lista_t.get_next(lista_atual, iterator);
-    }
+    KDTree_t.passe_simetrico(arvore_atual, desenharElementoSVG, svg);
   }
 }
 
@@ -1096,13 +1181,4 @@ static int elemento_dentro_figura(const Item _elemento, const void *_figura) {
   }
 
   return !contem;
-}
-
-static int checar_id_elemento(const Item _elemento, const void *_id) {
-  const Elemento elemento = (const Elemento) _elemento;
-  const char *id          = (const char *) _id;
-
-  char *id_elemento = get_id_elemento(elemento);
-
-  return strcmp(id_elemento, id);
 }

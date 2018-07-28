@@ -17,7 +17,10 @@ typedef void *Posic;
 /**
  * Item da lista.
  */
+#ifndef ITEM_TYPE
 typedef void *Item;
+#define ITEM_TYPE
+#endif
 
 struct Lista_t {
   /**

@@ -56,7 +56,8 @@ static struct Elemento *cria_elemento(double x, double y, char *cep) {
 
 // ===== Metodos publicos =====
 
-Elemento cria_quadra(double x, double y, char *cep, double largura, double altura) {
+Elemento cria_quadra(
+  double x, double y, char *cep, double largura, double altura) {
   struct Elemento *this = cria_elemento(x, y, cep);
 
   this->tipo = QUADRA;
@@ -192,6 +193,13 @@ char *get_info_elemento(Elemento e) {
       break;
   }
 
+  return saida;
+}
+
+char *to_string_elemento(Elemento _this) {
+  struct Elemento *this = (struct Elemento *) _this;
+  char *saida = malloc(strlen(this->cep) + 1);
+  strcpy(saida, this->cep);
   return saida;
 }
 

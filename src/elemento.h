@@ -28,6 +28,8 @@ Figura get_figura_elemento(Elemento e);
 
 char *get_info_elemento(Elemento e);
 
+char *to_string_elemento(Elemento e);
+
 /**
  * Getters
  */
