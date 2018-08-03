@@ -1149,6 +1149,9 @@ static void desenhar_elementos(Controlador _this, SVG svg) {
   for (int i = 0; i < 4; i++) {
     KDTree arvore_atual = this->elementos[i];
 
+    if (KDTree_t.is_empty(arvore_atual))
+      continue;
+
     KDTree_t.passe_simetrico(arvore_atual, desenharElementoSVG, svg);
   }
 }

@@ -102,9 +102,13 @@ void desenha_elemento(SVG this, Elemento e) {
 void desenha_asset(SVG _this, Ponto2D pos, Ponto2D size, char *path) {
   struct SVG *this = (struct SVG *) _this;
 
-  Arquivo arq_asset  = abrir_arquivo(path, LEITURA);
+  char *fullpath = malloc(strlen(ASSETS_FOLDER) + strlen(path) + 1);
+  sprintf(fullpath, "%s/%s", ASSETS_FOLDER, path);
+
+  Arquivo arq_asset  = abrir_arquivo(fullpath, LEITURA);
   char *asset_string = ler_arquivo_inteiro(arq_asset);
   fechar_arquivo(arq_asset);
+  free(fullpath);
 
   escrever_linha(
     this->saida,

@@ -412,30 +412,25 @@ static void __generate_dot_rec_kdtree(
   struct KDTree *this = (struct KDTree *) _this;
 
   char *strA = to_string(this->value);
-  fprintf(fp, "\"%s\" [label=\"%d\n%s\"];\n", strA, prof % this->dim, strA);
+  fprintf(
+    fp, "\"%p\" [label=\"%d\\n%s\"];\n", this->value, prof % this->dim, strA);
 
-  if (this->left) {
-    char *strB = to_string(this->left->value);
+  struct KDTree *other = this->left;
 
-    fprintf(fp, "\"%s\" -> \"%s\";\n", strA, strB);
-    __generate_dot_rec_kdtree(this->left, fp, to_string, prof + 1);
+  for (int i = 0; i < 2; i++) {
+    if (other) {
+      char *strB = to_string(other->value);
 
-    free(strB);
-  } else {
-    fprintf(fp, "\"n%s\" [label=\"nil\",style=invis];\n", strA);
-    fprintf(fp, "\"%s\" -> \"n%s\"[style=invis];\n", strA, strA);
-  }
+      fprintf(fp, "\"%p\" -> \"%p\";\n", this->value, other->value);
+      __generate_dot_rec_kdtree(other, fp, to_string, prof + 1);
 
-  if (this->right) {
-    char *strB = to_string(this->right->value);
-
-    fprintf(fp, "\"%s\" -> \"%s\";\n", strA, strB);
-    __generate_dot_rec_kdtree(this->right, fp, to_string, prof + 1);
-
-    free(strB);
-  } else {
-    fprintf(fp, "\"n%s\" [label=\"nil\",style=invis];\n", strA);
-    fprintf(fp, "\"%s\" -> \"n%s\"[style=invis];\n", strA, strA);
+      free(strB);
+    } else {
+      fprintf(fp, "\"n%p\" [label=\"nil\",style=invis];\n", this->value);
+      fprintf(
+        fp, "\"%p\" -> \"n%p\"[style=invis];\n", this->value, this->value);
+    }
+    other = this->right;
   }
 
   free(strA);
