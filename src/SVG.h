@@ -7,20 +7,25 @@
 
 enum FiguraTracejada { SVG_BORDA_SOLIDA, SVG_BORDA_TRACEJADA };
 
+#define ASSETS_FOLDER "./assets" 
+
 typedef void *SVG;
 
 SVG cria_SVG(char *path, double max_width, double max_height);
 
-void desenha_figura(SVG s, Figura f, float opacity, int is_dashed);
+void desenha_figura(SVG this, Figura f, float opacity, int is_dashed);
 
 void desenha_elemento(SVG this, Elemento e);
 
-void escreve_texto(SVG s, char *texto, Ponto2D pos, float tamanho, char *cor);
+void desenha_asset(SVG this, Ponto2D pos, Ponto2D size, char *path);
 
-void desenha_linha(SVG s, Ponto2D a, Ponto2D b, char *cor);
+void escreve_texto(
+  SVG this, char *texto, Ponto2D pos, float tamanho, char *cor);
 
-void salva_SVG(SVG s);
+void desenha_linha(SVG this, Ponto2D a, Ponto2D b, char *cor);
 
-void destruir_SVG(SVG s);
+void salva_SVG(SVG this);
+
+void destruir_SVG(SVG this);
 
 #endif /* __SVG_H__ */

@@ -82,6 +82,27 @@ char *ler_proxima_linha(Arquivo a) {
   return linha_trimmed;
 }
 
+char *ler_arquivo_inteiro(Arquivo _this) {
+  struct Arquivo *this = (struct Arquivo *) _this;
+  if (this->modo != LEITURA)
+    return NULL;
+
+  // Conta todos os caracteres do arquivo
+  int count = 0;
+  char c;
+  while ((c = fgetc(this->arq)) && !feof(this->arq))
+    count++;
+  rewind(this->arq);
+
+  char *result = malloc(count + 1);
+  for (int i = 0; i <= count; i++)
+    result[i] = fgetc(this->arq);
+  result[count] = 0;
+  rewind(this->arq);
+
+  return result;
+}
+
 void escrever_linha(Arquivo a, const char *entrada, ...) {
   struct Arquivo *this;
   va_list args;

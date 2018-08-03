@@ -22,6 +22,12 @@ Arquivo abrir_arquivo(char *path, enum TipoArquivo modo);
 char *ler_proxima_linha(Arquivo a);
 
 /**
+ * 'this' deve der de modo leitura.
+ * Retorna todo o arquivo em uma uma unica string
+ */
+char *ler_arquivo_inteiro(Arquivo this);
+
+/**
  * 'a' deve ser do modo escrita ou alteracao
  * Escreve em 'a' a string 'entrada'
  */

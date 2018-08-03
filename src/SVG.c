@@ -99,6 +99,25 @@ void desenha_elemento(SVG this, Elemento e) {
   destruir_figura(figura);
 }
 
+void desenha_asset(SVG _this, Ponto2D pos, Ponto2D size, char *path) {
+  struct SVG *this = (struct SVG *) _this;
+
+  Arquivo arq_asset  = abrir_arquivo(path, LEITURA);
+  char *asset_string = ler_arquivo_inteiro(arq_asset);
+  fechar_arquivo(arq_asset);
+
+  escrever_linha(
+    this->saida,
+    "<svg width=\"%.2lf\" height=\"%.2lf\" x=\"%.2lf\" y=\"%.2lf\">\n%s</svg>\n",
+    size.x,
+    size.y,
+    pos.x,
+    pos.y,
+    asset_string);
+
+  free(asset_string);
+}
+
 void escreve_texto(SVG s, char *texto, Ponto2D pos, float tamanho, char *cor) {
   struct SVG *this;
 

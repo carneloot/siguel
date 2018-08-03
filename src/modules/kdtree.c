@@ -221,7 +221,8 @@ static void __passe_simetrico_rec_kdtree(
   if (this->left)
     __passe_simetrico_rec_kdtree(this->left, executar, prof + 1, list);
 
-  executar(this->value, prof, list);
+  if (this->value)
+    executar(this->value, prof, list);
 
   if (this->right)
     __passe_simetrico_rec_kdtree(this->right, executar, prof + 1, list);
