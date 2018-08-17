@@ -1,45 +1,52 @@
 #include "comando.h"
 
+#include <stdint.h>
 #include <stdlib.h>
 #include <string.h>
 
-struct Comando {
-  enum TipoComando tipo;
-  int num_param;
-  char **params;
-};
+#include "comando.r"
 
-/* Comandos definidos numa constante para procurar automaticamente */
+#define EXPAND_AS_DECLARATION(a, b, c) extern int __##b(void *this, void *controlador);
+#define EXPAND_AS_JUMPTABLE(a, b, c) {c, __##b},
+#define EXPAND_AS_SIZE_STRUCT(a, b, c) uint8_t b;
+#define COMMAND_TABLE(ENTRY)            \
+  ENTRY(     C,      comando_c,    "c") \
+  ENTRY(     R,      comando_r,    "r") \
+  ENTRY(     O,      comando_o,    "o") \
+  ENTRY(     I,      comando_i,    "i") \
+  ENTRY(     D,      comando_d,    "d") \
+  ENTRY(     A,      comando_a,    "a") \
+  ENTRY(  HASH,   comando_hash,    "#") \
+  ENTRY(     Q,      comando_q,    "q") \
+  ENTRY(     H,      comando_h,    "h") \
+  ENTRY(     S,      comando_s,    "s") \
+  ENTRY(     T,      comando_t,    "t") \
+  ENTRY(    CQ,     comando_cq,   "cq") \
+  ENTRY(    CH,     comando_ch,   "ch") \
+  ENTRY(    CS,     comando_cs,   "cs") \
+  ENTRY(    CT,     comando_ct,   "ct") \
+  ENTRY(  QZIN,   comando_qzin,   "q?") \
+  ENTRY(  QZAO,   comando_qzao,   "Q?") \
+  ENTRY(  DZIN,   comando_dzin,   "dq") \
+  ENTRY(  DZAO,   comando_dzao,   "Dq") \
+  ENTRY(DLEZIN, comando_dlezin,  "dle") \
+  ENTRY(DLEZAO, comando_dlezao,  "Dle") \
+  ENTRY(    CC,     comando_cc,   "cc") \
+  ENTRY(   CRD,    comando_crd, "crd?") \
+  ENTRY(   CRB,    comando_crb, "crb?")
+
+COMMAND_TABLE(EXPAND_AS_DECLARATION)
+
+typedef struct {
+  COMMAND_TABLE(EXPAND_AS_SIZE_STRUCT)
+} size_struct_t;
+#define NUM_COMANDOS sizeof(size_struct_t)
+
 const struct {
   char *id;
-  enum TipoComando tipo;
+  int (*executar)(void *this, void *controlador);
 } comandos[] = {
-  {"nx", GEO_MUDAR_NUM_FIGURAS},
-  {"c", GEO_DESENHA_CIRCULO},
-  {"r", GEO_DESENHA_RETANGULO},
-  {"o", GEO_CHECA_SOBREPOSICAO},
-  {"i", GEO_CHECA_PONTO},
-  {"d", GEO_DISTANCIA_FIGURAS},
-  {"a", GEO_CRIAR_SVG},
-  {"#", GEO_FIM_DO_ARQUIVO},
-  {"q", GEO_INSERE_QUADRA},
-  {"h", GEO_INSERE_HIDRANTE},
-  {"s", GEO_INSERE_SEMAFORO},
-  {"t", GEO_INSERE_RADIO_BASE},
-  {"cq", GEO_COR_QUADRA},
-  {"ch", GEO_COR_HIDRANTE},
-  {"ct", GEO_COR_RADIO_BASE},
-  {"cs", GEO_COR_SEMAFORO},
-  {"q?", QRY_BUSCA_RECT},
-  {"Q?", QRY_BUSCA_CIRC},
-  {"dq", QRY_DELETE_QUADRA_RECT},
-  {"dle", QRY_DELETE_ALL_RECT},
-  {"Dq", QRY_DELETE_QUADRA_CIRC},
-  {"Dle", QRY_DELETE_ALL_CIRC},
-  {"cc", QRY_MUDA_COR_QUADRA},
-  {"crd?", QRY_PRINT_EQUIPAMENTO},
-  {"crb?", QRY_CHECA_RADIO_BASE_PROXIMA},
-  {"//", COMENTARIO},
+  COMMAND_TABLE(EXPAND_AS_JUMPTABLE)
 };
 
 static int conta_params(char *entrada);
@@ -51,7 +58,6 @@ Comando cria_comando(char *entrada) {
   struct Comando *this;
   this = (struct Comando *) malloc(sizeof(struct Comando));
 
-  this->tipo      = NONE;
   this->num_param = conta_params(entrada);
 
   linha = (char *) malloc((strlen(entrada) + 1) * sizeof(char));
@@ -63,26 +69,27 @@ Comando cria_comando(char *entrada) {
   h = 0;
 
   item = strtok(linha, " ");
+
+  for (i = 0; i < NUM_COMANDOS; i++) {
+    if (!strcmp(item, comandos[i].id)) {
+      this->executar = comandos[i].executar;
+      break;
+    }
+  }
+
+  // Se nao achar o comando, quer dizer que ele nao faz nada, então retorna nulo
+  if (i == NUM_COMANDOS) {
+    free(linha);
+    return NULL;
+  }
+
+  item = strtok(NULL, " ");
+
   while (item) {
-    /* Tipo */
-    if (this->tipo == NONE) {
-      int total_comandos = sizeof(comandos) / sizeof(comandos[0]);
-
-      for (i = 0; i < total_comandos; i++) {
-        if (!strcmp(item, comandos[i].id)) {
-          this->tipo = comandos[i].tipo;
-          break;
-        }
-      }
-    }
-
     /* Parametros */
-    else {
-      this->params[h] = (char *) malloc((strlen(item) + 1) * sizeof(char));
-      strcpy(this->params[h], item);
-
-      h++;
-    }
+    this->params[h] = (char *) malloc((strlen(item) + 1) * sizeof(char));
+    strcpy(this->params[h], item);
+    h++;
 
     item = strtok(NULL, " ");
   }
@@ -90,18 +97,6 @@ Comando cria_comando(char *entrada) {
   free(linha);
 
   return (void *) this;
-}
-
-int get_numero_parametros(Comando c) {
-  return ((struct Comando *) c)->num_param;
-}
-
-char **get_parametros(Comando c) {
-  return ((struct Comando *) c)->params;
-}
-
-enum TipoComando get_tipo(Comando c) {
-  return ((struct Comando *) c)->tipo;
 }
 
 void destruir_comando(Comando c) {

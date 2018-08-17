@@ -7,7 +7,7 @@
 
 enum FiguraTracejada { SVG_BORDA_SOLIDA, SVG_BORDA_TRACEJADA };
 
-#define ASSETS_FOLDER "./assets" 
+#define ASSETS_FOLDER "./assets/" 
 
 typedef void *SVG;
 
