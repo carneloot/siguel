@@ -35,6 +35,9 @@
   ENTRY(   CRD,    comando_crd, "crd?") \
   ENTRY(   CRB,    comando_crb, "crb?")
 
+  // ENTRY(  NX,          NULL,   "nx")
+  // ENTRY(COMM,          NULL,   "//")
+
 COMMAND_TABLE(EXPAND_AS_DECLARATION)
 
 typedef struct {
@@ -80,6 +83,8 @@ Comando cria_comando(char *entrada) {
   // Se nao achar o comando, quer dizer que ele nao faz nada, então retorna nulo
   if (i == NUM_COMANDOS) {
     free(linha);
+    free(this->params);
+    free(this);
     return NULL;
   }
 

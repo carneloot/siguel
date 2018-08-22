@@ -31,8 +31,8 @@ LINKER   = gcc
 # linking flags here
 LFLAGS   = -Wall -I $(INCDIR) -lm -g
 
-SOURCES  := $(wildcard $(SRCDIR)/*.c $(SRCDIR)/**/*.c)
-INCLUDES := $(wildcard $(SRCDIR)/*.h $(SRCDIR)/**/*.h)
+SOURCES  := $(shell find $(SRCDIR) -type f -name "*.c")
+INCLUDES := $(shell find $(SRCDIR) -type f -name "*.h")
 OBJECTS  := $(SOURCES:$(SRCDIR)/%.c=$(OBJDIR)/%.o)
 rm       = rm -rf
 

@@ -1,12 +1,12 @@
-#include "../comando.r"
-#include "../controlador.r"
+#include <comando.r>
+#include <controlador.r>
 
 #include <elemento.h>
 #include <figura.h>
 #include <stdlib.h>
 #include <string.h>
 #include <utils.h>
-#include "funcoes_checagem.h"
+#include "../funcoes_checagem.h"
 
 // TODO: Implementar para KDTree
 static int __comando_dle_all(

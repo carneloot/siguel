@@ -1,5 +1,5 @@
-#include "../comando.r"
-#include "../controlador.r"
+#include <comando.r>
+#include <controlador.r>
 
 #include <elemento.h>
 #include <utils.h>

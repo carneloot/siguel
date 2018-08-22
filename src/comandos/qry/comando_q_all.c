@@ -1,45 +1,51 @@
-#include "../comando.r"
-#include "../controlador.r"
+#include <comando.r>
+#include <controlador.r>
 
 #include <elemento.h>
 #include <figura.h>
 #include <stdlib.h>
 #include <string.h>
 #include <utils.h>
-#include "funcoes_checagem.h"
+#include "../funcoes_checagem.h"
 
 // TODO: Implementar para KDTree
-static int __comando_dq_all(
-  struct Comando *this, struct Controlador *controlador, Figura figura) {
-  return 1;
-  Lista lista    = controlador->elementos[QUADRA];
-  Posic iterator = Lista_t.get_first(lista);
-  Posic next_it;
+static int __comando_q_all(
+  struct Comando *this,
+  struct Controlador *controlador,
+  Figura figura,
+  const char *prefixo) {
+    return 1;
+  Lista_t.insert(controlador->saida, (Item) prefixo);
 
-  iterator = Lista_t.search(lista, iterator, figura, elemento_dentro_figura);
-  while (iterator) {
-    next_it = Lista_t.get_next(lista, iterator);
+  for (int i = 0; i < 4; i++) {
+    Lista lista_atual = controlador->elementos[i];
 
-    Elemento elemento = Lista_t.get(lista, iterator);
+    Posic iterator = Lista_t.get_first(lista_atual);
 
-    Lista_t.remove(lista, iterator);
+    iterator =
+      Lista_t.search(lista_atual, iterator, figura, elemento_dentro_figura);
 
-    char *cep   = get_cep_elemento(elemento);
-    char *saida = malloc(20 + strlen(cep));
-    sprintf(saida, "Quadra: %s deletada.\n", cep);
-    Lista_t.insert(controlador->saida, saida);
+    while (iterator) {
+      Elemento elemento = (Elemento) Lista_t.get(lista_atual, iterator);
 
-    destruir_elemento(elemento);
+      char *saida = get_info_elemento(elemento);
+      strcat(saida, "\n");
+      Lista_t.insert(controlador->saida, (Item) saida);
 
-    iterator = Lista_t.search(lista, next_it, figura, elemento_dentro_figura);
+      iterator = Lista_t.search(
+        lista_atual,
+        Lista_t.get_next(lista_atual, iterator),
+        figura,
+        elemento_dentro_figura);
+    }
   }
 
-  Lista_t.insert(controlador->saida_svg_qry, figura);
+  Lista_t.insert(controlador->saida_svg_qry, (Item) figura);
 
   return 1;
 }
 
-int __comando_dzin(void *_this, void *_controlador) {
+int __comando_qzin(void *_this, void *_controlador) {
   struct Comando *this            = (struct Comando *) _this;
   struct Controlador *controlador = (struct Controlador *) _controlador;
 
@@ -59,10 +65,13 @@ int __comando_dzin(void *_this, void *_controlador) {
   controlador->max_qry.x = max(controlador->max_qry.x, new_max.x);
   controlador->max_qry.y = max(controlador->max_qry.y, new_max.y);
 
-  return __comando_dq_all(this, controlador, figura);
+  char *prefixo = calloc(5, sizeof(char));
+  strcpy(prefixo, "q?:\n");
+
+  return __comando_q_all(this, controlador, figura, prefixo);
 }
 
-int __comando_dzao(void *_this, void *_controlador) {
+int __comando_qzao(void *_this, void *_controlador) {
   struct Comando *this            = (struct Comando *) _this;
   struct Controlador *controlador = (struct Controlador *) _controlador;
 
@@ -78,5 +87,8 @@ int __comando_dzao(void *_this, void *_controlador) {
   controlador->max_qry.x = max(controlador->max_qry.x, new_max.x);
   controlador->max_qry.y = max(controlador->max_qry.y, new_max.y);
 
-  return __comando_dq_all(this, controlador, figura);
+  char *prefixo = calloc(5, sizeof(char));
+  strcpy(prefixo, "Q?:\n");
+
+  return __comando_q_all(this, controlador, figura, prefixo);
 }

@@ -1,19 +1,17 @@
-#include "../comando.r"
-#include "../controlador.r"
+#include <comando.r>
+#include <controlador.r>
 
 #include <elemento.h>
-#include "funcoes_checagem.h"
+#include <string.h>
+#include "../funcoes_checagem.h"
 
-int __comando_cc(void *_this, void *_controlador) {
+int __comando_crd(void *_this, void *_controlador) {
   struct Comando *this            = (struct Comando *) _this;
   struct Controlador *controlador = (struct Controlador *) _controlador;
 
   char **params = this->params;
 
   char *cep = params[0];
-
-  char *cor_borda = params[1];
-  char *cor       = params[2];
 
   for (int i = 0; i < 4; i++) {
     KDTree arvore   = controlador->elementos[i];
@@ -24,8 +22,9 @@ int __comando_cc(void *_this, void *_controlador) {
     if (!result)
       continue;
 
-    set_cor_elemento(result, cor);
-    set_cor_borda_elemento(result, cor_borda);
+    char *saida = get_info_elemento(result);
+    strcat(saida, "\n");
+    Lista_t.insert(controlador->saida, saida);
   }
 
   return 1;

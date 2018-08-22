@@ -1,12 +1,12 @@
-#include "../comando.r"
-#include "../controlador.r"
+#include <comando.r>
+#include <controlador.r>
 
 #include <elemento.h>
 #include <string.h>
 #include <stdlib.h>
 #include <utils.h>
 
-int __comando_h(void *_this, void *_controlador) {
+int __comando_s(void *_this, void *_controlador) {
   struct Comando *this            = (struct Comando *) _this;
   struct Controlador *controlador = (struct Controlador *) _controlador;
 
@@ -15,12 +15,12 @@ int __comando_h(void *_this, void *_controlador) {
   char *cep   = params[0];
   Ponto2D pos = Ponto2D_t.new(strtod(params[1], NULL), strtod(params[2], NULL));
 
-  Elemento elemento = cria_hidrante(pos.x, pos.y, cep);
+  Elemento elemento = cria_semaforo(pos.x, pos.y, cep);
 
-  set_cor_elemento(elemento, controlador->cores[HIDRANTE]);
-  set_cor_borda_elemento(elemento, controlador->cores_borda[HIDRANTE]);
+  set_cor_elemento(elemento, controlador->cores[SEMAFORO]);
+  set_cor_borda_elemento(elemento, controlador->cores_borda[SEMAFORO]);
 
-  KDTree_t.insert(controlador->elementos[HIDRANTE], elemento);
+  KDTree_t.insert(controlador->elementos[SEMAFORO], elemento);
 
   Ponto2D new_max = Ponto2D_t.add_scalar(pos, RAIO_EQUIPAMENTOS + 4);
 

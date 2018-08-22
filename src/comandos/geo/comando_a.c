@@ -1,11 +1,11 @@
-#include "../comando.r"
-#include "../controlador.r"
+#include <comando.r>
+#include <controlador.r>
 
 #include <SVG.h>
 #include <modules/logger.h>
 #include <stdlib.h>
 #include <string.h>
-#include "funcoes_checagem.h"
+#include "../funcoes_checagem.h"
 
 int __comando_a(void *_this, void *_controlador) {
   struct Comando *this            = (struct Comando *) _this;
