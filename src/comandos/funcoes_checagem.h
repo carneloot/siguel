@@ -10,4 +10,6 @@ int elemento_dentro_figura(const Item _elemento, const void *_figura);
 
 void compararCEP(const Item _ele, unsigned prof, va_list _list);
 
+int elemento_dentro_rect(void *_elemento, int dim, void **rect);
+
 #endif /* __FUNCOES_CHECAGEM_H__ */

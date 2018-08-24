@@ -19,6 +19,8 @@ int main(int argc, const char *argv[]) {
   while (ha_comandos(controlador) && !eh_erro) {
     eh_erro = !executar_proximo_comando(controlador);
   }
+  
+  LOG_PRINT(LOG_FILE, "Todos comandos executados. Finalizando arquivos");
 
   nome_base = get_nome_base(controlador);
 

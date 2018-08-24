@@ -53,7 +53,8 @@ void desenharElementoSVG(const Item _ele, unsigned prof, va_list _list) {
   const Elemento ele = (const Elemento) _ele;
 
   SVG svg = va_arg(list, SVG);
-
+  
+  LOG_PRINT(LOG_FILE, "Desenhando %p -> \"%s\".", ele, get_cep_elemento(ele));
   desenha_elemento(svg, ele);
 }
 
@@ -239,6 +240,8 @@ void gerar_fila_execucao(Controlador c) {
       free(linha);
       continue;
     }
+    
+    LOG_PRINT(LOG_FILE, "Comando inserido: \"%s\"", linha);
 
     Lista_t.insert(this->fila_execucao, (Item) comando);
 
@@ -262,7 +265,17 @@ void gerar_fila_execucao(Controlador c) {
   arq = abrir_arquivo(path, LEITURA);
 
   while ((linha = ler_proxima_linha(arq))) {
-    Lista_t.insert(this->fila_execucao, (Item) cria_comando(linha));
+    comando = cria_comando(linha);
+    
+    // Comentarios nao sao inseridos na fila de execução
+    if (!comando) {
+      free(linha);
+      continue;
+    }
+    
+    LOG_PRINT(LOG_FILE, "Comando inserido: \"%s\"", linha);
+    
+    Lista_t.insert(this->fila_execucao, (Item) comando);
 
     free(linha);
   }
@@ -270,8 +283,6 @@ void gerar_fila_execucao(Controlador c) {
   free(path);
 
   fechar_arquivo(arq);
-
-  LOG_PRINT(LOG_FILE, "Fila de execução gerada com sucesso.");
 }
 
 /**
@@ -421,6 +432,8 @@ static void escrever_txt_final(void *c) {
 
   if (!this->nome_base)
     return;
+    
+  LOG_PRINT(LOG_FILE, "Escrevendo txt final.");
 
   tamanho_total = strlen(this->dir_saida) + strlen(this->nome_base) + 1 + 4;
   full_path     = (char *) malloc(tamanho_total * sizeof(char));
@@ -443,9 +456,13 @@ static void escrever_txt_final(void *c) {
 
 void desenhar_elementos(void *_this, void *svg) {
   struct Controlador *this = (struct Controlador *) _this;
+  
+  LOG_PRINT(LOG_FILE, "Desenhando elementos.");
 
   for (int i = 0; i < 4; i++) {
     KDTree arvore_atual = this->elementos[i];
+    
+    LOG_PRINT(LOG_FILE, "Desenhando [%d]", i);
 
     if (KDTree_t.is_empty(arvore_atual))
       continue;
