@@ -9,7 +9,6 @@
 #include "../funcoes_checagem.h"
 #include <modules/logger.h>
 
-// TODO: Implementar para KDTree
 static Lista *__comando_dle_all(
   struct Comando *this,
   struct Controlador *controlador,
@@ -45,25 +44,29 @@ static Lista *__comando_dle_all(
 }
 
 static void remover_elementos(
+  struct Comando *this,
   struct Controlador *controlador,
   Lista *elementos) {
   
-  int h = 1;
-  while (elementos[h]) {
-    if (!elementos[h]) { h++; continue; }
+  for (int h = 1; h < 4; h++) {
+    if (!elementos[h]) continue;
     
     Posic it = Lista_t.get_first(elementos[h]);
     while (it) {
-      Elemento ele = Lista_t.get(elementos[h], it);
+      Elemento elemento = Lista_t.get(elementos[h], it);
       
-      KDTree_t.delete(controlador->elementos[h], ele);
-      
+      KDTree_t.delete(controlador->elementos[h], elemento);
+
+      char *cep   = get_cep_elemento(elemento);
+      const char *tipo_elemento = get_tipo_string_elemento(h);
+      char *saida = malloc(14 + strlen(tipo_elemento) + strlen(cep));
+      sprintf(saida, "%s: %s deletada.\n", tipo_elemento, cep);
+      Lista_t.insert(controlador->saida, saida);
+
       it = Lista_t.get_next(elementos[h], it);
     }
     
-    Lista_t.destruir(elementos[h], NULL);
-    
-    h++;
+    Lista_t.destruir(elementos[h], destruir_elemento);
   }
   
 }
@@ -90,7 +93,7 @@ int __comando_dlezin(void *_this, void *_controlador) {
 
   Lista *elementos = __comando_dle_all(this, controlador, pos, size, params[0]);
   
-  remover_elementos(controlador, elementos);
+  remover_elementos(this, controlador, elementos);
   
   free(elementos);
   
@@ -120,9 +123,8 @@ int __comando_dlezao(void *_this, void *_controlador) {
   Lista *elementos = __comando_dle_all(this, controlador, pA, pB, params[0]);
   
   // Como eh no circulo, tem que remover os que nao estao no circulo
-  /*int h = 1;
-  while (elementos[h]) {
-    if (!elementos[h]) { h++; continue; }
+  for (int h = 1; h < 4; h++) {
+    if (!elementos[h]) continue;
     
     Posic it = Lista_t.get_first(elementos[h]);
     while (it) {
@@ -130,17 +132,16 @@ int __comando_dlezao(void *_this, void *_controlador) {
       Ponto2D posicao_elemento = get_pos(Lista_t.get(elementos[h], it));
       
       // Se a figura estiver fora do circulo remover da lista
-      if (Ponto2D_t.dist_squared(pos, posicao_elemento) > r * r) {
+      if (Ponto2D_t.dist_squared(pos, posicao_elemento) > sqr(r)) {
         Lista_t.remove(elementos[h], it);
       }
       
       it = next_it;
     }
     
-    h++;
-  }*/
+  }
   
-  remover_elementos(controlador, elementos);
+  remover_elementos(this, controlador, elementos);
   
   free(elementos);
   

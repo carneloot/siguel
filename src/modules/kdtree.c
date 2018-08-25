@@ -147,7 +147,10 @@ static KDTree __delete_rec_kdtree(KDTree _this, Item value, unsigned prof) {
 
   // Se estiver nesse node
   if (__is_leaf_kdtree(this)) {
-    free(this);
+    if (prof)
+      free(this);
+    else
+      this->value = NULL;
     return NULL;
   }
 
@@ -174,8 +177,8 @@ static KDTree __delete_rec_kdtree(KDTree _this, Item value, unsigned prof) {
   return this;
 }
 
-static KDTree __delete_kdtree(KDTree this, Item value) {
-  return __delete_rec_kdtree(this, value, 0);
+static void __delete_kdtree(KDTree this, Item value) {
+  __delete_rec_kdtree(this, value, 0);
 }
 
 static KDTree __search_rec_kdtree(
@@ -270,7 +273,7 @@ static void __range_search_rec_kdtree(
     __range_search_rec_kdtree(this->right, saida, rect, dentro, prof + 1);
   }
 
-  if (dentro(this->value, -1, rect))  // Se o valor esta dentro do ponto
+  if (dentro(this->value, -1, rect))  // Se o valor esta dentro do retangulo
     Lista_t.insert(saida, this->value);
 }
 
@@ -408,12 +411,14 @@ static Pair __closest_pair_kdtree(
 }
 
 static void __generate_dot_rec_kdtree(
-  KDTree _this, FILE *fp, char *(*to_string)(const Item item), int prof) {
-  struct KDTree *this = (struct KDTree *) _this;
+  struct KDTree *this, FILE *fp, char *(*to_string)(const Item item), int prof) {
 
-  char *strA = to_string(this->value);
-  fprintf(
-    fp, "\"%p\" [label=\"%d\\n%s\"];\n", this->value, prof % this->dim, strA);
+  if (this->value) {
+    char *strA = to_string(this->value);
+    fprintf(
+      fp, "\"%p\" [label=\"%d\\n%s\"];\n", this->value, prof % this->dim, strA);
+    free(strA);
+  }
 
   struct KDTree *other = this->left;
 
@@ -433,13 +438,14 @@ static void __generate_dot_rec_kdtree(
     other = this->right;
   }
 
-  free(strA);
 }
 
 static void __generate_dot_kdtree(
-  KDTree this, FILE *fp, char *(*to_string)(const Item item)) {
+  KDTree _this, FILE *fp, char *(*to_string)(const Item item)) {
+  struct KDTree *this = (struct KDTree *) _this;
   fprintf(fp, "digraph T {\n");
   fprintf(fp, "node [fontname=\"Arial\"];\n");
+  fprintf(fp, "\"root\" -> \"%p\";\n", (this->value) ? this->value : "");
   __generate_dot_rec_kdtree(this, fp, to_string, 0);
   fprintf(fp, "}\n");
 }

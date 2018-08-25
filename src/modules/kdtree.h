@@ -38,7 +38,7 @@ struct KDTree_t {
   /**
    * Delete recursivamente o nó de valor 'value' da arvore 'this'
    */
-  KDTree (*delete)(KDTree this, Item value);
+  void (*delete)(KDTree this, Item value);
 
   /**
    * Procura na arvore 'this' o nó com valor 'value'. Usa a funcao check para

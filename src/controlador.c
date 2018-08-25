@@ -54,7 +54,7 @@ void desenharElementoSVG(const Item _ele, unsigned prof, va_list _list) {
 
   SVG svg = va_arg(list, SVG);
   
-  LOG_PRINT(LOG_FILE, "Desenhando %p -> \"%s\".", ele, get_cep_elemento(ele));
+  LOG_PRINT(LOG_FILE, "Desenhando \"%s\".", get_cep_elemento(ele));
   desenha_elemento(svg, ele);
 }
 

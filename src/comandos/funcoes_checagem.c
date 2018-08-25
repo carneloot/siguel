@@ -77,13 +77,13 @@ int elemento_dentro_rect(void *_elemento, int dim, void **rect) {
       );
       
     case 0: 
-      if (pos.x < min.x) return -1;
-      else if (pos.x > max.x) return 1;
+      if (pos.x < min.x)      return -1;
+      else if (pos.x > max.x) return  1;
       return 0;
       
     case 1: 
-      if (pos.y < min.y) return -1;
-      else if(pos.y > max.y) return 1;
+      if (pos.y < min.y)     return -1;
+      else if(pos.y > max.y) return  1;
       return 0;
   }
   

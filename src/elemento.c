@@ -228,3 +228,14 @@ char *get_cep_elemento(Elemento e) {
 enum TipoElemento get_tipo_elemento(Elemento e) {
   return ((struct Elemento *) e)->tipo;
 }
+
+const char *get_tipo_string_elemento(enum TipoElemento tipo) {
+  const char *elementos[] = {
+    [QUADRA]     = "Quadra",
+    [HIDRANTE]   = "Hidrante",
+    [SEMAFORO]   = "Semaforo",
+    [RADIO_BASE] = "Radio Base"
+  };
+
+  return elementos[(int) tipo];
+}

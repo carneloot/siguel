@@ -46,4 +46,6 @@ char *get_cep_elemento(Elemento e);
 
 enum TipoElemento get_tipo_elemento(Elemento e);
 
+const char *get_tipo_string_elemento(enum TipoElemento tipo);
+
 #endif /* __ELEMENTO_H__ */
