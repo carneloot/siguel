@@ -241,11 +241,13 @@ static void __passe_simetrico_kdtree(
   va_end(list);
 }
 
+typedef int (*__range_search_dentro)(Item value, int dim, Item ponto_a, Item ponto_b);
+
 static void __range_search_rec_kdtree(
   KDTree _this,
   Lista saida,
-  Item rect[],
-  int (*dentro)(Item value, int dim, Item rect[]),
+  Item ponto_a, Item ponto_b,
+  __range_search_dentro dentro,
   unsigned prof) {
   struct KDTree *this = (struct KDTree *) _this;
 
@@ -257,48 +259,35 @@ static void __range_search_rec_kdtree(
 
   // Checa a posicao do atributo 'cd' em relacao com a area
   cd    = prof % this->dim;
-  local = dentro(this->value, cd, rect);
+  local = dentro(this->value, cd, ponto_a, ponto_b);
 
   // Esquerda
   if (local < 0)
-    __range_search_rec_kdtree(this->right, saida, rect, dentro, prof + 1);
+    __range_search_rec_kdtree(this->right, saida, ponto_a, ponto_b, dentro, prof + 1);
 
   // Direita
   else if (local > 0)
-    __range_search_rec_kdtree(this->left, saida, rect, dentro, prof + 1);
+    __range_search_rec_kdtree(this->left, saida, ponto_a, ponto_b, dentro, prof + 1);
 
   // Dentro
   else {
-    __range_search_rec_kdtree(this->left, saida, rect, dentro, prof + 1);
-    __range_search_rec_kdtree(this->right, saida, rect, dentro, prof + 1);
+    __range_search_rec_kdtree(this->left, saida, ponto_a, ponto_b, dentro, prof + 1);
+    __range_search_rec_kdtree(this->right, saida, ponto_a, ponto_b, dentro, prof + 1);
   }
 
-  if (dentro(this->value, -1, rect))  // Se o valor esta dentro do retangulo
+  if (dentro(this->value, -1, ponto_a, ponto_b))  // Se o valor esta dentro do retangulo
     Lista_t.insert(saida, this->value);
 }
 
 static Lista __range_search_kdtree(
-  KDTree _this, int (*dentro)(Item value, int dim, Item rect[]), ...) {
+  KDTree _this, __range_search_dentro dentro, Item ponto_a, Item ponto_b) {
   struct KDTree *this = (struct KDTree *) _this;
 
   Lista saida;
-  Item *rect;
-  va_list list;
 
   saida = Lista_t.create();
 
-  rect = calloc(this->dim, sizeof(Item));
-
-  va_start(list, dentro);
-
-  for (int i = 0; i < this->dim; i++)
-    rect[i] = va_arg(list, Item);
-
-  va_end(list);
-
-  __range_search_rec_kdtree(this, saida, rect, dentro, 0);
-
-  free(rect);
+  __range_search_rec_kdtree(this, saida, ponto_a, ponto_b, dentro, 0);
 
   return saida;
 }

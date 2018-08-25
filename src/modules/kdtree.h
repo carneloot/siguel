@@ -84,7 +84,7 @@ struct KDTree_t {
    * intervalo
    */
   Lista (*range_search)(
-    KDTree this, int (*dentro)(Item value, int dim, Item rect[]), ...);
+    KDTree this, int (*dentro)(Item value, int dim, Item ponto_a, Item ponto_b), Item ponto_a, Item ponto_b);
 
   /**
    * Acha o ponto mais proximo do valor value

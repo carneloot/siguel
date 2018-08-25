@@ -51,11 +51,11 @@ void compararCEP(const Item _ele, unsigned prof, va_list _list) {
     *result = ele;
 }
 
-int elemento_dentro_rect(void *_elemento, int dim, void **rect) {
+int elemento_dentro_rect(void *_elemento, int dim, void *_pA, void *_pB) {
   Elemento elemento = (Elemento) _elemento;
   
-  Ponto2D *pA = (Ponto2D *) rect[0];
-  Ponto2D *pB = (Ponto2D *) rect[1];
+  Ponto2D *pA = _pA;
+  Ponto2D *pB = _pB;
   
   Ponto2D min = Ponto2D_t.new(
     min(pA->x, pB->x),
