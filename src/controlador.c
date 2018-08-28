@@ -216,73 +216,62 @@ int ha_comandos(Controlador c) {
   return !!Lista_t.length(this->fila_execucao);
 }
 
-void gerar_fila_execucao(Controlador c) {
-  // Lê os arquivos de entrada e coloca os comandos numa fila de comandos
-  struct Controlador *this = (struct Controlador *) c;
-  Arquivo arq;
+void gerar_fila_execucao(Controlador _this) {
+  struct Controlador *this = (struct Controlador *) _this;
+
+  // Adicionar os arquivos a serem verificados na lista
+  Lista arquivos = Lista_t.create();
+
   size_t length;
-  char *path, *linha;
-  Comando comando;
+  char *path;
 
   length = strlen(this->nome_base) + strlen(this->dir_entrada) + 6;
-
-  path = (char *) malloc(length * sizeof(char));
-
+  path   = (char *) malloc(length * sizeof(char));
   sprintf(path, "%s/%s.geo", this->dir_entrada, this->nome_base);
+  Lista_t.insert(arquivos, path);
 
-  arq = abrir_arquivo(path, LEITURA);
-
-  while ((linha = ler_proxima_linha(arq))) {
-    comando = cria_comando(linha);
-
-    // Comentarios nao sao inseridos na fila de execução
-    if (!comando) {
-      free(linha);
-      continue;
-    }
-    
-    LOG_PRINT(LOG_FILE, "Comando inserido: \"%s\"", linha);
-
-    Lista_t.insert(this->fila_execucao, (Item) comando);
-
-    free(linha);
+  // Se o arquivo de qry foi especificado
+  if (this->arq_query) {
+    length = strlen(this->arq_query) + strlen(this->dir_entrada) + 6;
+    path   = (char *) malloc(length * sizeof(char));
+    sprintf(path, "%s/%s.qry", this->dir_entrada, this->arq_query);
+    Lista_t.insert(arquivos, path);
   }
 
-  free(path);
+  // Adicionando comandos a fila de execução
+  Posic iterator = Lista_t.get_first(arquivos);
 
-  fechar_arquivo(arq);
+  while (iterator) {
+    path        = Lista_t.get(arquivos, iterator);
+    Arquivo arq = abrir_arquivo(path, LEITURA);
 
-  // Caso exista um arquivo .qry
-  if (!this->arq_query)
-    return;
+    char *linha;
 
-  length = strlen(this->arq_query) + strlen(this->dir_entrada) + 2 + 4;
+    while ((linha = ler_proxima_linha(arq))) {
+      Comando comando = cria_comando(linha);
 
-  path = (char *) malloc(length * sizeof(char));
+      // Comentarios nao sao inseridos na fila de execução
+      if (!comando) {
+        char *codigo_comando = strtok(linha, " ");
+        LOG_PRINT(LOG_STDOUT, "ERRO: Comando inexistente \"%s\"", codigo_comando);
 
-  sprintf(path, "%s/%s.qry", this->dir_entrada, this->arq_query);
+        free(linha);
+        continue;
+      }
+      
+      LOG_PRINT(LOG_FILE, "Comando inserido: \"%s\"", linha);
 
-  arq = abrir_arquivo(path, LEITURA);
+      Lista_t.insert(this->fila_execucao, (Item) comando);
 
-  while ((linha = ler_proxima_linha(arq))) {
-    comando = cria_comando(linha);
-    
-    // Comentarios nao sao inseridos na fila de execução
-    if (!comando) {
       free(linha);
-      continue;
     }
-    
-    LOG_PRINT(LOG_FILE, "Comando inserido: \"%s\"", linha);
-    
-    Lista_t.insert(this->fila_execucao, (Item) comando);
 
-    free(linha);
+    fechar_arquivo(arq);
+
+    iterator = Lista_t.get_next(arquivos, iterator);
   }
 
-  free(path);
-
-  fechar_arquivo(arq);
+  Lista_t.destruir(arquivos, free);
 }
 
 /**
