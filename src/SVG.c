@@ -1,5 +1,6 @@
 #include "SVG.h"
 
+#include <modules/ponto2d.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -10,7 +11,32 @@
 
 struct SVG {
   Arquivo saida;
+  Ponto2D max;
 };
+
+#ifdef DEBUG
+
+#define OFFSET 100
+
+static void desenhar_grid(SVG _this) {
+  struct SVG *this = (struct SVG *) _this;
+  Ponto2D start, end;
+
+
+  for (float x = 0; x < this->max.x; x += OFFSET) {
+    start = Ponto2D_t.new(x, 0);
+    end   = Ponto2D_t.new(x, this->max.y);
+    desenha_linha(this, start, end, 0.4, "black");
+  }
+
+  for (float y = 0; y < this->max.y; y += OFFSET) {
+    start = Ponto2D_t.new(0, y);
+    end   = Ponto2D_t.new(this->max.x, y);
+    desenha_linha(this, start, end, 0.4, "black");
+  }
+}
+
+#endif
 
 SVG cria_SVG(char *path, double max_width, double max_height) {
   struct SVG *this;
@@ -18,6 +44,7 @@ SVG cria_SVG(char *path, double max_width, double max_height) {
   this = (struct SVG *) malloc(sizeof(struct SVG));
 
   this->saida = abrir_arquivo(path, ESCRITA);
+  this->max   = Ponto2D_t.new(max_width, max_height);
 
   escrever_linha(
     this->saida,
@@ -112,7 +139,8 @@ void desenha_asset(SVG _this, Ponto2D pos, Ponto2D size, char *nome) {
 
   escrever_linha(
     this->saida,
-    "<svg width=\"%.2lf\" height=\"%.2lf\" x=\"%.2lf\" y=\"%.2lf\">\n%s</svg>\n",
+    "<svg width=\"%.2lf\" height=\"%.2lf\" x=\"%.2lf\" "
+    "y=\"%.2lf\">\n%s</svg>\n",
     size.x,
     size.y,
     pos.x,
@@ -138,7 +166,7 @@ void escreve_texto(SVG s, char *texto, Ponto2D pos, float tamanho, char *cor) {
     texto);
 }
 
-void desenha_linha(SVG s, Ponto2D a, Ponto2D b, char *cor) {
+void desenha_linha(SVG s, Ponto2D a, Ponto2D b, float opacity, char *cor) {
   struct SVG *this;
 
   this = (struct SVG *) s;
@@ -146,17 +174,22 @@ void desenha_linha(SVG s, Ponto2D a, Ponto2D b, char *cor) {
   escrever_linha(
     this->saida,
     "<line x1=\"%.1f\" y1=\"%.1f\" x2=\"%.1f\" y2=\"%.1f\" "
-    "style=\"stroke:%s;stroke-width:1\" />\n",
+    "style=\"stroke:%s;stroke-width:;opacity:%.1f\" />\n",
     a.x,
     a.y,
     b.x,
     b.y,
-    (!!cor) ? cor : "black");
+    (!!cor) ? cor : "black",
+    opacity);
 }
 
 void salva_SVG(SVG s) {
-  struct SVG *this;
-  this = (struct SVG *) s;
+  struct SVG *this = (struct SVG *) s;
+
+  #ifdef DEBUG
+  desenhar_grid(this);
+  #endif
+
   escrever_linha(this->saida, "</svg>\n");
 
   fechar_arquivo(this->saida);
