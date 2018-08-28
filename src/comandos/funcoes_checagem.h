@@ -6,8 +6,6 @@
 
 int checar_id_figura(const Item _figura, const void *_id);
 
-int elemento_dentro_figura(const Item _elemento, const void *_figura);
-
 void compararCEP(const Item _ele, unsigned prof, va_list _list);
 
 int elemento_dentro_rect(void *_elemento, int dim, void *_pA, void *_pB);

@@ -6,24 +6,60 @@
 #include <stdlib.h>
 #include <string.h>
 #include <utils.h>
+#include <modules/kdtree.h>
 #include "../funcoes_checagem.h"
 
-// TODO: Implementar para KDTree
-static int __comando_q_all(
+static int elemento_dentro_figura(const void *_elemento, const void *_figura) {
+  const Elemento elemento = (const Elemento) _elemento;
+  const Figura figura     = (const Figura) _figura;
+
+  int contem;
+
+  // Se for quadra, checar a figura
+  if (get_tipo_elemento(elemento) == QUADRA) {
+    Figura figura_temp = get_figura_elemento(elemento);
+
+    contem = dentro_figura(figura, figura_temp);
+
+    destruir_figura(figura_temp);
+  }
+
+  // Se nao for quadra, comparar como ponto
+  else {
+    contem = contem_ponto(figura, get_pos(elemento));
+  }
+
+  return contem;
+}
+
+static Lista *__comando_q_all(
   struct Comando *this,
   struct Controlador *controlador,
-  Figura figura,
-  const char *prefixo) {
-    return 1;
-  Lista_t.insert(controlador->saida, (Item) prefixo);
+  Ponto2D pA, Ponto2D pB) {
+  
+  Lista *saida = calloc(4, sizeof(*saida));
 
   for (int i = 0; i < 4; i++) {
-    Lista lista_atual = controlador->elementos[i];
+    KDTree arvore = controlador->elementos[i];
+
+    if (KDTree_t.is_empty(arvore)) continue;
+
+    Lista elementos = KDTree_t.range_search(arvore, elemento_dentro_rect, &pA, &pB);
+
+    saida[i] = elementos;
+  }
+
+  return saida;
+}
+
+static void reportar_elementos(
+  struct Comando *this, struct Controlador *controlador, Lista *elementos) {
+  for (int i = 0; i < 4; i++) {
+    Lista lista_atual = elementos[i];
+
+    if (!lista_atual) continue;
 
     Posic iterator = Lista_t.get_first(lista_atual);
-
-    iterator =
-      Lista_t.search(lista_atual, iterator, figura, elemento_dentro_figura);
 
     while (iterator) {
       Elemento elemento = (Elemento) Lista_t.get(lista_atual, iterator);
@@ -32,17 +68,11 @@ static int __comando_q_all(
       strcat(saida, "\n");
       Lista_t.insert(controlador->saida, (Item) saida);
 
-      iterator = Lista_t.search(
-        lista_atual,
-        Lista_t.get_next(lista_atual, iterator),
-        figura,
-        elemento_dentro_figura);
+      iterator = Lista_t.get_next(lista_atual, iterator);
     }
+
+    Lista_t.destruir(lista_atual, NULL);
   }
-
-  Lista_t.insert(controlador->saida_svg_qry, (Item) figura);
-
-  return 1;
 }
 
 int __comando_qzin(void *_this, void *_controlador) {
@@ -58,6 +88,7 @@ int __comando_qzin(void *_this, void *_controlador) {
   size = Ponto2D_t.new(strtod(params[2], NULL), strtod(params[3], NULL));
 
   figura = cria_retangulo(pos.x, pos.y, size.x, size.y, "transparent", "black");
+  Lista_t.insert(controlador->saida_svg_qry, figura);
 
   Ponto2D new_max = Ponto2D_t.add(pos, size);
   new_max         = Ponto2D_t.add_scalar(new_max, 4);
@@ -67,8 +98,36 @@ int __comando_qzin(void *_this, void *_controlador) {
 
   char *prefixo = calloc(5, sizeof(char));
   strcpy(prefixo, "q?:\n");
+  Lista_t.insert(controlador->saida, prefixo);
 
-  return __comando_q_all(this, controlador, figura, prefixo);
+  Ponto2D pA = pos;
+  Ponto2D pB = Ponto2D_t.add(pos, size);
+
+  Lista *elementos = __comando_q_all(this, controlador, pA, pB);
+
+  // Checar se os elementos estão dentro da figura mesmo
+  for (int i = 0; i < 4; i++) {
+    Lista lista_atual = elementos[i];
+
+    if (!lista_atual) continue;
+
+    Posic iterator = Lista_t.get_first(lista_atual);
+
+    while (iterator) {
+      Posic next_iterator = Lista_t.get_next(lista_atual, iterator);
+      Elemento elemento   = Lista_t.get(lista_atual, iterator);
+
+      if (!elemento_dentro_figura(elemento, figura)) {
+        Lista_t.remove(lista_atual, iterator);
+      }
+
+      iterator = next_iterator;
+    }
+  }
+
+  reportar_elementos(this, controlador, elementos);
+
+  return 1;
 }
 
 int __comando_qzao(void *_this, void *_controlador) {
@@ -81,6 +140,7 @@ int __comando_qzao(void *_this, void *_controlador) {
   Ponto2D pos = Ponto2D_t.new(strtod(params[1], NULL), strtod(params[2], NULL));
 
   Figura figura = cria_circulo(pos.x, pos.y, r, "transparent", "black");
+  Lista_t.insert(controlador->saida_svg_qry, figura);
 
   Ponto2D new_max = Ponto2D_t.add_scalar(pos, r + 4);
 
@@ -89,6 +149,34 @@ int __comando_qzao(void *_this, void *_controlador) {
 
   char *prefixo = calloc(5, sizeof(char));
   strcpy(prefixo, "Q?:\n");
+  Lista_t.insert(controlador->saida, prefixo);
 
-  return __comando_q_all(this, controlador, figura, prefixo);
+  Ponto2D pA = Ponto2D_t.sub_scalar(pos, r);
+  Ponto2D pB = Ponto2D_t.add_scalar(pos, r);
+
+  Lista *elementos = __comando_q_all(this, controlador, pA, pB);
+
+  // Checar se os elementos estão dentro da figura mesmo
+  for (int i = 0; i < 4; i++) {
+    Lista lista_atual = elementos[i];
+
+    if (!lista_atual) continue;
+
+    Posic iterator = Lista_t.get_first(lista_atual);
+
+    while (iterator) {
+      Posic next_iterator = Lista_t.get_next(lista_atual, iterator);
+      Elemento elemento   = Lista_t.get(lista_atual, iterator);
+
+      if (!elemento_dentro_figura(elemento, figura)) {
+        Lista_t.remove(lista_atual, iterator);
+      }
+
+      iterator = next_iterator;
+    }
+  }
+
+  reportar_elementos(this, controlador, elementos);
+
+  return 1;
 }
