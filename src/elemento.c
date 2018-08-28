@@ -79,7 +79,7 @@ Elemento cria_hidrante(double x, double y, char *id) {
 Elemento cria_semaforo(double x, double y, char *id) {
   struct Elemento *this = cria_elemento(x, y, id);
 
-  this->tipo = HIDRANTE;
+  this->tipo = SEMAFORO;
 
   return (Elemento) this;
 }
