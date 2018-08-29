@@ -36,6 +36,7 @@ int __comando_crb(void *_this, void *_controlador) {
     saida = malloc(63);
     sprintf(
       saida, "Nao ha torres de celular suficientes para checar a distancia.\n");
+    Lista_t.insert(controlador->saida, saida);
     return 1;
   }
 

@@ -127,6 +127,8 @@ int __comando_qzin(void *_this, void *_controlador) {
 
   reportar_elementos(this, controlador, elementos);
 
+  free(elementos);
+
   return 1;
 }
 
@@ -177,6 +179,8 @@ int __comando_qzao(void *_this, void *_controlador) {
   }
 
   reportar_elementos(this, controlador, elementos);
+
+  free(elementos);
 
   return 1;
 }
