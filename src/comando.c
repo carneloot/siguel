@@ -10,6 +10,7 @@
 #define EXPAND_AS_JUMPTABLE(a, b) {b, __##a},
 #define EXPAND_AS_SIZE_STRUCT(a, b) uint8_t a;
 #define COMMAND_TABLE(ENTRY)    \
+  ENTRY(    comando_nx,   "nx") \
   ENTRY(     comando_c,    "c") \
   ENTRY(     comando_r,    "r") \
   ENTRY(     comando_o,    "o") \
@@ -34,9 +35,6 @@
   ENTRY(    comando_cc,   "cc") \
   ENTRY(   comando_crd, "crd?") \
   ENTRY(   comando_crb, "crb?")
-
-  // ENTRY(  NX,          NULL,   "nx")
-  // ENTRY(COMM,          NULL,   "//")
 
 COMMAND_TABLE(EXPAND_AS_DECLARATION)
 
