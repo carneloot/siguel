@@ -6,34 +6,34 @@
 
 #include "comando.r"
 
-#define EXPAND_AS_DECLARATION(a, b, c) extern int __##b(void *this, void *controlador);
-#define EXPAND_AS_JUMPTABLE(a, b, c) {c, __##b},
-#define EXPAND_AS_SIZE_STRUCT(a, b, c) uint8_t b;
-#define COMMAND_TABLE(ENTRY)            \
-  ENTRY(     C,      comando_c,    "c") \
-  ENTRY(     R,      comando_r,    "r") \
-  ENTRY(     O,      comando_o,    "o") \
-  ENTRY(     I,      comando_i,    "i") \
-  ENTRY(     D,      comando_d,    "d") \
-  ENTRY(     A,      comando_a,    "a") \
-  ENTRY(  HASH,   comando_hash,    "#") \
-  ENTRY(     Q,      comando_q,    "q") \
-  ENTRY(     H,      comando_h,    "h") \
-  ENTRY(     S,      comando_s,    "s") \
-  ENTRY(     T,      comando_t,    "t") \
-  ENTRY(    CQ,     comando_cq,   "cq") \
-  ENTRY(    CH,     comando_ch,   "ch") \
-  ENTRY(    CS,     comando_cs,   "cs") \
-  ENTRY(    CT,     comando_ct,   "ct") \
-  ENTRY(  QZIN,   comando_qzin,   "q?") \
-  ENTRY(  QZAO,   comando_qzao,   "Q?") \
-  ENTRY(  DZIN,   comando_dzin,   "dq") \
-  ENTRY(  DZAO,   comando_dzao,   "Dq") \
-  ENTRY(DLEZIN, comando_dlezin,  "dle") \
-  ENTRY(DLEZAO, comando_dlezao,  "Dle") \
-  ENTRY(    CC,     comando_cc,   "cc") \
-  ENTRY(   CRD,    comando_crd, "crd?") \
-  ENTRY(   CRB,    comando_crb, "crb?")
+#define EXPAND_AS_DECLARATION(a, b) extern int __##a(void *this, void *controlador);
+#define EXPAND_AS_JUMPTABLE(a, b) {b, __##a},
+#define EXPAND_AS_SIZE_STRUCT(a, b) uint8_t a;
+#define COMMAND_TABLE(ENTRY)    \
+  ENTRY(     comando_c,    "c") \
+  ENTRY(     comando_r,    "r") \
+  ENTRY(     comando_o,    "o") \
+  ENTRY(     comando_i,    "i") \
+  ENTRY(     comando_d,    "d") \
+  ENTRY(     comando_a,    "a") \
+  ENTRY(  comando_hash,    "#") \
+  ENTRY(     comando_q,    "q") \
+  ENTRY(     comando_h,    "h") \
+  ENTRY(     comando_s,    "s") \
+  ENTRY(     comando_t,    "t") \
+  ENTRY(    comando_cq,   "cq") \
+  ENTRY(    comando_ch,   "ch") \
+  ENTRY(    comando_cs,   "cs") \
+  ENTRY(    comando_ct,   "ct") \
+  ENTRY(  comando_qzin,   "q?") \
+  ENTRY(  comando_qzao,   "Q?") \
+  ENTRY(  comando_dzin,   "dq") \
+  ENTRY(  comando_dzao,   "Dq") \
+  ENTRY(comando_dlezin,  "dle") \
+  ENTRY(comando_dlezao,  "Dle") \
+  ENTRY(    comando_cc,   "cc") \
+  ENTRY(   comando_crd, "crd?") \
+  ENTRY(   comando_crb, "crb?")
 
   // ENTRY(  NX,          NULL,   "nx")
   // ENTRY(COMM,          NULL,   "//")
