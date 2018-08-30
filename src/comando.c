@@ -1,5 +1,6 @@
 #include "comando.h"
 
+#include <stdio.h>
 #include <stdint.h>
 #include <stdlib.h>
 #include <string.h>
@@ -10,31 +11,31 @@
 #define EXPAND_AS_JUMPTABLE(a, b) {b, __##a},
 #define EXPAND_AS_SIZE_STRUCT(a, b) uint8_t a;
 #define COMMAND_TABLE(ENTRY)    \
-  ENTRY(    comando_nx,   "nx") \
-  ENTRY(     comando_c,    "c") \
-  ENTRY(     comando_r,    "r") \
-  ENTRY(     comando_o,    "o") \
-  ENTRY(     comando_i,    "i") \
-  ENTRY(     comando_d,    "d") \
-  ENTRY(     comando_a,    "a") \
-  ENTRY(  comando_hash,    "#") \
-  ENTRY(     comando_q,    "q") \
-  ENTRY(     comando_h,    "h") \
-  ENTRY(     comando_s,    "s") \
-  ENTRY(     comando_t,    "t") \
-  ENTRY(    comando_cq,   "cq") \
-  ENTRY(    comando_ch,   "ch") \
-  ENTRY(    comando_cs,   "cs") \
-  ENTRY(    comando_ct,   "ct") \
-  ENTRY(  comando_qzin,   "q?") \
-  ENTRY(  comando_qzao,   "Q?") \
-  ENTRY(  comando_dzin,   "dq") \
-  ENTRY(  comando_dzao,   "Dq") \
-  ENTRY(comando_dlezin,  "dle") \
-  ENTRY(comando_dlezao,  "Dle") \
-  ENTRY(    comando_cc,   "cc") \
-  ENTRY(   comando_crd, "crd?") \
-  ENTRY(   comando_crb, "crb?")
+  ENTRY(    comando_nx,   "geo/nx") \
+  ENTRY(     comando_c,    "geo/c") \
+  ENTRY(     comando_r,    "geo/r") \
+  ENTRY(     comando_o,    "geo/o") \
+  ENTRY(     comando_i,    "geo/i") \
+  ENTRY(     comando_d,    "geo/d") \
+  ENTRY(     comando_a,    "geo/a") \
+  ENTRY(  comando_hash,    "geo/#") \
+  ENTRY(     comando_q,    "geo/q") \
+  ENTRY(     comando_h,    "geo/h") \
+  ENTRY(     comando_s,    "geo/s") \
+  ENTRY(     comando_t,    "geo/t") \
+  ENTRY(    comando_cq,   "geo/cq") \
+  ENTRY(    comando_ch,   "geo/ch") \
+  ENTRY(    comando_cs,   "geo/cs") \
+  ENTRY(    comando_ct,   "geo/ct") \
+  ENTRY(  comando_qzin,   "qry/q?") \
+  ENTRY(  comando_qzao,   "qry/Q?") \
+  ENTRY(  comando_dzin,   "qry/dq") \
+  ENTRY(  comando_dzao,   "qry/Dq") \
+  ENTRY(comando_dlezin,  "qry/dle") \
+  ENTRY(comando_dlezao,  "qry/Dle") \
+  ENTRY(    comando_cc,   "qry/cc") \
+  ENTRY(   comando_crd, "qry/crd?") \
+  ENTRY(   comando_crb, "qry/crb?")
 
 COMMAND_TABLE(EXPAND_AS_DECLARATION)
 
@@ -52,7 +53,7 @@ const struct {
 
 static int conta_params(char *entrada);
 
-Comando cria_comando(char *entrada) {
+Comando cria_comando(char *entrada, char *arq) {
   int h, i;
   char *linha, *item;
 
@@ -71,12 +72,17 @@ Comando cria_comando(char *entrada) {
 
   item = strtok(linha, " ");
 
+  char *cod = malloc(strlen(item) + strlen(arq) + 2);
+  sprintf(cod, "%s/%s", arq, item);
+
   for (i = 0; i < NUM_COMANDOS; i++) {
-    if (!strcmp(item, comandos[i].id)) {
+    if (!strcmp(cod, comandos[i].id)) {
       this->executar = comandos[i].executar;
       break;
     }
   }
+
+  free(cod);
 
   // Se nao achar o comando, quer dizer que ele nao faz nada, então retorna nulo
   if (i == NUM_COMANDOS) {

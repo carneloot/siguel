@@ -244,9 +244,11 @@ void gerar_fila_execucao(Controlador _this) {
     Arquivo arq = abrir_arquivo(path, LEITURA);
 
     char *linha;
+    char *extensao = get_extensao(path);
 
     while ((linha = ler_proxima_linha(arq))) {
-      Comando comando = cria_comando(linha);
+
+      Comando comando = cria_comando(linha, extensao);
 
       // Comentarios nao sao inseridos na fila de execução
       if (!comando) {
@@ -263,6 +265,8 @@ void gerar_fila_execucao(Controlador _this) {
 
       free(linha);
     }
+
+    free(extensao);
 
     fechar_arquivo(arq);
 
