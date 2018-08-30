@@ -51,25 +51,28 @@ static void remover_elementos(
   
   for (int h = 0; h < 4; h++) {
     if (!elementos[h]) continue;
-    
+
+    const char *tipo_elemento = get_tipo_string_elemento(h);
+
     Posic it = Lista_t.get_first(elementos[h]);
     while (it) {
       Elemento elemento = Lista_t.get(elementos[h], it);
-      
-      KDTree_t.delete(controlador->elementos[h], elemento);
 
-      char *cep   = get_cep_elemento(elemento);
-      const char *tipo_elemento = get_tipo_string_elemento(h);
-      char *saida = malloc(14 + strlen(tipo_elemento) + strlen(cep));
-      sprintf(saida, "%s: %s deletada.\n", tipo_elemento, cep);
+      KDTree_t.delete(controlador->elementos[h], elemento);
+      char *cep                 = get_cep_elemento(elemento);
+      char *saida = malloc(18 + strlen(tipo_elemento) + strlen(cep));
+      sprintf(saida, "%s: %s deletado (a).\n", tipo_elemento, cep);
       Lista_t.insert(controlador->saida, saida);
+
+      // FIXME: Quando o elemento é deletado, ele nao funciona para equs.qry e para quads.qrys
+      // destruir_elemento(elemento);
 
       it = Lista_t.get_next(elementos[h], it);
     }
     
-    Lista_t.destruir(elementos[h], destruir_elemento);
+    Lista_t.destruir(elementos[h], NULL);
   }
-  
+
 }
 
 int __comando_dlezin(void *_this, void *_controlador) {
@@ -112,7 +115,7 @@ int __comando_dlezao(void *_this, void *_controlador) {
   Ponto2D pos = Ponto2D_t.new(strtod(params[1], NULL), strtod(params[2], NULL));
   double r    = strtod(params[3], NULL);
 
-  Lista_t.insert(controlador->saida_svg_qry, 
+  Lista_t.insert(controlador->saida_svg_qry,
     cria_circulo(pos.x, pos.y, r, "transparent", "black"));
     
   Ponto2D pA = Ponto2D_t.sub_scalar(pos, r);
@@ -141,7 +144,7 @@ int __comando_dlezao(void *_this, void *_controlador) {
       
       it = next_it;
     }
-    
+
   }
   
   remover_elementos(this, controlador, elementos);
@@ -178,7 +181,7 @@ int __comando_dzin(void *_this, void *_controlador) {
 
   // Checar se a quadra está inteiramente dentro da figura
   Lista quadras = elementos[0];
-  Posic it = Lista_t.get_first(quadras);
+  Posic it      = (quadras) ? Lista_t.get_first(quadras) : NULL;
   while (it) {
     Posic next_it   = Lista_t.get_next(quadras, it);
     Elemento quadra = Lista_t.get(quadras, it);
@@ -209,8 +212,8 @@ int __comando_dzao(void *_this, void *_controlador) {
   Ponto2D pos;
   double r;
   
-  r    = strtod(params[0], NULL);
-  pos  = Ponto2D_t.new(strtod(params[1], NULL), strtod(params[2], NULL));
+  r   = strtod(params[0], NULL);
+  pos = Ponto2D_t.new(strtod(params[1], NULL), strtod(params[2], NULL));
 
   Figura figura = cria_circulo(pos.x, pos.y, r, "transparent", "black");
 
@@ -228,7 +231,7 @@ int __comando_dzao(void *_this, void *_controlador) {
 
   // Checar se a quadra está inteiramente dentro da figura
   Lista quadras = elementos[0];
-  Posic it = Lista_t.get_first(quadras);
+  Posic it      = (quadras) ? Lista_t.get_first(quadras) : NULL;
   while (it) {
     Posic next_it   = Lista_t.get_next(quadras, it);
     Elemento quadra = Lista_t.get(quadras, it);

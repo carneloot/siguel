@@ -23,8 +23,7 @@ int equalElements(const void *_a, const void *_b) {
   const Elemento a = (const Elemento) _a;
   const Elemento b = (const Elemento) _b;
 
-  double dist = Ponto2D_t.dist_squared(get_pos(a), get_pos(b));
-  return (!dist && !strcmp(get_id_elemento(a), get_id_elemento(b)));
+  return (Ponto2D_t.equal(get_pos(a), get_pos(b)) && !strcmp(get_id_elemento(a), get_id_elemento(b)));
 }
 
 int compareX(const void *_a, const void *_b) {
@@ -54,7 +53,6 @@ void desenharElementoSVG(const Item _ele, unsigned prof, va_list _list) {
 
   SVG svg = va_arg(list, SVG);
   
-  LOG_PRINT(LOG_FILE, "Desenhando \"%s\".", get_cep_elemento(ele));
   desenha_elemento(svg, ele);
 }
 
@@ -203,11 +201,11 @@ int executar_proximo_comando(Controlador c) {
 
   this->linha_atual++;
 
-  comando->executar(comando, c);
+  int result = comando->executar(comando, c);
   
   destruir_comando(comando);
 
-  return 1;
+  return result;
 }
 
 int ha_comandos(Controlador c) {
@@ -451,8 +449,6 @@ void desenhar_elementos(void *_this, void *svg) {
   for (int i = 0; i < 4; i++) {
     KDTree arvore_atual = this->elementos[i];
     
-    LOG_PRINT(LOG_FILE, "Desenhando [%d]", i);
-
     if (KDTree_t.is_empty(arvore_atual))
       continue;
 

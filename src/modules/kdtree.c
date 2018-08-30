@@ -136,6 +136,9 @@ static KDTree __insert_kdtree(KDTree this, Item value) {
 static KDTree __delete_rec_kdtree(KDTree _this, Item value, unsigned prof) {
   struct KDTree *this = (struct KDTree *) _this;
 
+  if (!this)
+    return NULL;
+
   // Se nao estiver nesse node
   if (!this->check_equal(this->value, value)) {
     if (this->funcs[prof % this->dim](value, this->value) < 0)
@@ -169,8 +172,7 @@ static KDTree __delete_rec_kdtree(KDTree _this, Item value, unsigned prof) {
   else if (this->left) {
     min         = __find_min_kdtree(this->left, cd);
     this->value = min->value;
-    this->left  = __delete_rec_kdtree(this->left, min->value, prof + 1);
-    this->right = this->left;
+    this->right = __delete_rec_kdtree(this->left, min->value, prof + 1);
     this->left  = NULL;
   }
 

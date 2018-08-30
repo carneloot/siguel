@@ -8,6 +8,10 @@ static Ponto2D __new_ponto2d(double x, double y) {
   return this;
 }
 
+int __equal_ponto2d(Ponto2D this, Ponto2D other) {
+  return (this.x == other.x && this.y == other.y);
+}
+
 static double __dist_squared_ponto2d(Ponto2D this, Ponto2D other) {
   return (sqr(this.x - other.x) + sqr(this.y - other.y));
 }
@@ -38,6 +42,7 @@ static Ponto2D __sub_scalar_ponto2d(Ponto2D this, double scalar) {
 
 const struct Ponto2D_t Ponto2D_t = {
   .new          = &__new_ponto2d,
+  .equal        = &__equal_ponto2d,
   .dist         = &__dist_ponto2d,
   .dist_squared = &__dist_squared_ponto2d,
   .mult         = &__mult_ponto2d,

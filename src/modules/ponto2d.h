@@ -10,6 +10,8 @@ typedef struct Ponto2D Ponto2D;
 struct Ponto2D_t {
   Ponto2D (*new)(double x, double y);
 
+  int (*equal)(Ponto2D this, Ponto2D other);
+
   double (*dist_squared)(Ponto2D this, Ponto2D other);
 
   double (*dist)(Ponto2D this, Ponto2D other);

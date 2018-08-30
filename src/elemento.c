@@ -146,8 +146,7 @@ void destruir_elemento(Elemento e) {
   if (this->cor_borda)
     free(this->cor_borda);
 
-  if (this->cep)
-    free(this->cep);
+  free(this->cep);
 
   free(this);
 }
