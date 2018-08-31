@@ -1,0 +1,19 @@
+#ifndef __PESSOA_H__
+#define __PESSOA_H__
+
+typedef void *Pessoa;
+
+enum Face { FACE_NORTE, FACE_LESTE, FACE_SUL, FACE_OESTE };
+
+enum Sexo { SEXO_MASCULINO, SEXO_FEMININO };
+
+/**
+ * Retorna uma pessoa de acordo com as informacoes passadas
+ */
+Pessoa cria_pessoa(char *cpf, char *nome, char *sobrenome, int sexo, char *nasc);
+
+void pessoa_set_endereco(Pessoa this, char *cep, int face, int num, int complemento);
+
+void pessoa_destruir(Pessoa this);
+
+#endif /* __PESSOA_H__ */
