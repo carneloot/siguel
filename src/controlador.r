@@ -5,6 +5,18 @@
 #include <modules/kdtree.h>
 #include <modules/ponto2d.h>
 
+#define LISTA_EXTRAS \
+  X(qry,  "-q") \
+  X( ec, "-ec") \
+  X( pm, "-pm") 
+
+enum TipoExtras {
+  #define X(a, b) e_##a,
+  LISTA_EXTRAS
+  #undef X
+  EXTRAS_TOTAL
+};
+
 struct Controlador {
   Lista saida;
   Lista saida_svg_qry;
@@ -12,7 +24,8 @@ struct Controlador {
   char *nome_base;
   char *dir_saida;
   char *dir_entrada;
-  char *arq_query;
+
+  char *extras[EXTRAS_TOTAL];
 
   Lista figuras;
 

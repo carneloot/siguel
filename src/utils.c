@@ -125,7 +125,14 @@ char *remover_extensao(const char *path) {
   char *saida;
   int j;
 
-  length = strlen(path) - 4;
+  int tamanho_extensao = 0;
+
+  char *iterador = (char *) path + strlen(path) - 1;
+
+  while (*iterador-- != '.')
+    tamanho_extensao++;
+
+  length = strlen(path) - 1 - tamanho_extensao;
   saida  = (char *) malloc((length + 1) * sizeof(char));
   for (j = 0; j < length; j++)
     saida[j] = path[j];

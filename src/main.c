@@ -12,7 +12,7 @@ int main(int argc, const char *argv[]) {
   controlador = cria_controlador();
   lidar_parametros(controlador, argc, argv);
   gerar_fila_execucao(controlador);
-
+  
   eh_erro = 0;
 
   /* Main loop */

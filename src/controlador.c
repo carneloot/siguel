@@ -7,13 +7,22 @@
 #include "SVG.h"
 #include "elemento.h"
 #include "figura.h"
-#include "modules/kdtree.h"
-#include "modules/lista.h"
 #include "modules/logger.h"
-#include "modules/ponto2d.h"
 #include "utils.h"
 
 #include "controlador.r"
+
+const char *extra_extensao[EXTRAS_TOTAL] = {
+  #define X(a, b) [e_##a] = #a,
+  LISTA_EXTRAS
+  #undef X
+};
+
+const char *extra_flag[EXTRAS_TOTAL] = {
+  #define X(a, b) [e_##a] = b,
+  LISTA_EXTRAS
+  #undef X
+};
 
 static void escrever_txt_final(void *c);
 
@@ -102,9 +111,12 @@ Controlador cria_controlador() {
 
   this->nome_base   = NULL;
   this->dir_saida   = NULL;
-  this->arq_query   = NULL;
+
   this->dir_entrada = (char *) malloc(3 * sizeof(char));
   strcpy(this->dir_entrada, "./");
+
+  for (i = 0; i < EXTRAS_TOTAL; i++)
+    this->extras[i] = NULL;
 
   this->figuras = Lista_t.create();
 
@@ -161,10 +173,14 @@ void lidar_parametros(Controlador c, int argc, const char *argv[]) {
       free(texto_auxiliar);
     }
 
-    else if (!strcmp(argv[i], "-q")) {
-      i++;
-
-      this->arq_query = remover_extensao(argv[i]);
+    else  {
+      for (int k = 0; k < EXTRAS_TOTAL; k++) {
+        if (!strcmp(argv[i], extra_flag[k])) {
+          i++;
+          this->extras[k] = remover_extensao(argv[i]);
+          break;
+        }
+      }
     }
 
     i++;
@@ -180,14 +196,11 @@ void lidar_parametros(Controlador c, int argc, const char *argv[]) {
     exit(EXIT_FAILURE);
   }
 
-  if (!this->arq_query)
-    LOG_PRINT(LOG_FILE, "Arquivo  \"%s.geo\" iniciado.", this->nome_base);
-  else
-    LOG_PRINT(
-      LOG_FILE,
-      "Arquivos \"%s.geo\" e \"%s.qry\" iniciados.",
-      this->nome_base,
-      this->arq_query);
+  LOG_PRINT(LOG_FILE, "Arquivo \"%s.geo\" iniciado.", this->nome_base);
+  for (i = 0; i < EXTRAS_TOTAL; i++) {
+    if (!this->extras[i]) continue;
+    LOG_PRINT(LOG_FILE, "Arquivo \"%s.%s\" iniciado.", this->extras[i], extra_extensao[i]);
+  }
 }
 
 int executar_proximo_comando(Controlador c) {
@@ -229,10 +242,12 @@ void gerar_fila_execucao(Controlador _this) {
   Lista_t.insert(arquivos, path);
 
   // Se o arquivo de qry foi especificado
-  if (this->arq_query) {
-    length = strlen(this->arq_query) + strlen(this->dir_entrada) + 6;
+  for (int i = 0; i < EXTRAS_TOTAL; i++) {
+    if (!this->extras[i]) continue;
+
+    length = strlen(this->extras[i]) + strlen(this->dir_entrada) + 3 + strlen(extra_extensao[i]);
     path   = (char *) malloc(length * sizeof(char));
-    sprintf(path, "%s/%s.qry", this->dir_entrada, this->arq_query);
+    sprintf(path, "%s/%s.%s", this->dir_entrada, this->extras[i], extra_extensao[i]);
     Lista_t.insert(arquivos, path);
   }
 
@@ -292,10 +307,10 @@ void finalizar_arquivos(Controlador c) {
 
   char *qry_file, *geo_file;
 
-  if (!this->arq_query)
+  if (!this->extras[e_qry])
     return;
 
-  qry_file = get_nome(this->arq_query);
+  qry_file = get_nome(this->extras[e_qry]);
   geo_file = get_nome(this->nome_base);
 
   // Arquivo [nome_base]-[nome_qry].svg
@@ -355,8 +370,10 @@ void destruir_controlador(Controlador c) {
     free(this->dir_saida);
   if (this->dir_entrada)
     free(this->dir_entrada);
-  if (this->arq_query)
-    free(this->arq_query);
+  
+  for (i = 0; i < EXTRAS_TOTAL; i++)
+    if (this->extras[i])
+      free(this->extras[i]);
 
   Lista_t.destruir(this->fila_execucao, NULL);
 
@@ -368,7 +385,7 @@ char *get_nome_base(Controlador c) {
 }
 
 char *get_nome_query(Controlador c) {
-  return ((struct Controlador *) c)->arq_query;
+  return ((struct Controlador *) c)->extras[e_qry];
 }
 
 /** METODOS PRIVADOS */
