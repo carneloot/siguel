@@ -3,8 +3,6 @@
 
 typedef void *Pessoa;
 
-enum Face { FACE_NORTE, FACE_LESTE, FACE_SUL, FACE_OESTE };
-
 enum Sexo { SEXO_MASCULINO, SEXO_FEMININO };
 
 /**

@@ -3,12 +3,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-struct Endereco {
-  char *cep;
-  enum Face face;
-  int numero;
-  int complemento; // Nao sei se é int ou string
-};
+#include <endereco.h>
 
 struct Pessoa {
   char *cpf;
@@ -16,21 +11,10 @@ struct Pessoa {
   char *sobrenome;
   enum Sexo sexo;
   char *nasc;
+  int complemento; // Nao sei se é int ou string
 
-  struct Endereco *endereco;
+  struct Endereco endereco;
 };
-
-static struct Endereco *__criar_endereco(
-  char *cep, enum Face face, int numero, int complemento) {
-  struct Endereco *this = malloc(sizeof(*this));
-
-  this->cep         = cep;
-  this->face        = face;
-  this->numero      = numero;
-  this->complemento = complemento;
-
-  return this;
-}
 
 Pessoa cria_pessoa(char *cpf, char *nome, char *sobrenome, int sexo, char *nasc) {
   struct Pessoa *this = malloc(sizeof(*this));
@@ -45,7 +29,6 @@ Pessoa cria_pessoa(char *cpf, char *nome, char *sobrenome, int sexo, char *nasc)
   strcpy(this->nasc, nasc);
 
   this->sexo     = sexo;
-  this->endereco = NULL;
 
   return this;
 }
@@ -53,15 +36,13 @@ Pessoa cria_pessoa(char *cpf, char *nome, char *sobrenome, int sexo, char *nasc)
 void pessoa_set_endereco(Pessoa _this, char *cep, int face, int num, int complemento) {
   struct Pessoa *this = (struct Pessoa *) _this;
 
-  this->endereco = __criar_endereco(
-    cep, face, num, complemento);
+  this->complemento = complemento;
+
+  this->endereco = cria_endereco(cep, face, num);
 }
 
 void pessoa_destruir(Pessoa _this) {
   struct Pessoa *this = (struct Pessoa *) _this;
-
-  if (this->endereco)
-    free(this->endereco);
 
   free(this->cpf);
   free(this->nome);

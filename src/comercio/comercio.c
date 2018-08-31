@@ -2,13 +2,14 @@
 
 #include <stdlib.h>
 #include <string.h>
+#include <endereco.h>
 
 struct Comercio {
   char *cnpj;
   char *tipo;
   char *nome;
 
-  struct Endereco *endereco;
+  struct Endereco endereco;
 };
 
 Comercio cria_comercio(char *cnpj, char *tipo, char *cep, int face, int num, char *nome) {
@@ -32,8 +33,6 @@ void comercio_destruir(Comercio _this) {
   free(this->tipo);
   free(this->cnpj);
   free(this->nome);
-
-  free(this->endereco);
 
   free(this);
 }
