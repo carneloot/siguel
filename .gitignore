@@ -90,7 +90,7 @@ lib/*
 bin
 
 # Ignorar PDFs
-*.pdf
+# *.pdf
 
 # Nao enviar o link para o git
 .clang-format
