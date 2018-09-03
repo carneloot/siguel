@@ -10,7 +10,7 @@ enum Sexo { SEXO_MASCULINO, SEXO_FEMININO };
  */
 Pessoa cria_pessoa(char *cpf, char *nome, char *sobrenome, int sexo, char *nasc);
 
-void pessoa_set_endereco(Pessoa this, char *cep, int face, int num, int complemento);
+void pessoa_set_endereco(Pessoa this, char *cep, int face, int num, char *complemento);
 
 void pessoa_destruir(Pessoa this);
 

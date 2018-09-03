@@ -11,7 +11,7 @@ struct Pessoa {
   char *sobrenome;
   enum Sexo sexo;
   char *nasc;
-  int complemento; // Nao sei se é int ou string
+  char *complemento;
 
   struct Endereco endereco;
 };
@@ -33,10 +33,11 @@ Pessoa cria_pessoa(char *cpf, char *nome, char *sobrenome, int sexo, char *nasc)
   return this;
 }
 
-void pessoa_set_endereco(Pessoa _this, char *cep, int face, int num, int complemento) {
+void pessoa_set_endereco(Pessoa _this, char *cep, int face, int num, char *complemento) {
   struct Pessoa *this = (struct Pessoa *) _this;
 
-  this->complemento = complemento;
+  this->complemento = malloc(strlen(complemento) + 1);
+  strcpy(this->complemento, complemento);
 
   this->endereco = cria_endereco(cep, face, num);
 }

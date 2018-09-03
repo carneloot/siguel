@@ -1,5 +1,8 @@
 #include "tipo_comercio.h"
 
+#include <stdlib.h>
+#include <string.h>
+
 struct TipoComercio {
   char *identificacao;
   char *descricao;
