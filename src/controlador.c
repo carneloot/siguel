@@ -9,7 +9,9 @@
 #include "figura.h"
 #include "modules/logger.h"
 #include "utils.h"
+
 #include <comercio/tipo_comercio.h>
+#include <comercio/comercio.h>
 
 #include "controlador.r"
 
@@ -136,6 +138,8 @@ Controlador cria_controlador() {
   this->max_qry = Ponto2D_t.new(0, 0);
 
   this->fila_execucao = Lista_t.create();
+
+  this->comercios = Lista_t.create();
 
   this->tipos_comercio = Lista_t.create();
   for (i = 0; i < TABELAS_TOTAL; i++)
@@ -381,6 +385,8 @@ void destruir_controlador(Controlador c) {
       free(this->extras[i]);
 
   Lista_t.destruir(this->fila_execucao, NULL);
+
+  Lista_t.destruir(this->comercios, comercio_destruir);
 
   Lista_t.destruir(this->tipos_comercio, tipo_comercio_destruir);
   for (i = 0; i < TABELAS_TOTAL; i++)

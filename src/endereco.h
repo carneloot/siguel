@@ -13,4 +13,6 @@ typedef struct Endereco Endereco;
 
 Endereco cria_endereco(char *cep, enum Face face, int numero);
 
+int char_to_face(char indicador);
+
 #endif /* __ENDERECO_H__ */
