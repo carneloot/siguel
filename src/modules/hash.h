@@ -21,7 +21,7 @@ struct HashTable_t {
   /**
    * Destroi a HashTable this;
    */
-  void (*destroy)(HashTable this, void (*destruir_item)(void *item));
+  void (*destroy)(HashTable this, void (*destruir_item)(void *item), int destruir_chave);
 
   /**
    * Insere valor na hashtable de acordo com a chave

@@ -17,7 +17,7 @@ HashTable __create_hashtable(unsigned tamanho) {
   return this;
 }
 
-void __destroy_hashtable(HashTable _this, void (*destruir_item)(void *item)) {
+void __destroy_hashtable(HashTable _this, void (*destruir_item)(void *item), int destruir_chave) {
   struct HashTable *this = (struct HashTable *) _this;
 
   if (destruir_item) {
@@ -25,6 +25,16 @@ void __destroy_hashtable(HashTable _this, void (*destruir_item)(void *item)) {
       if (!this->table[i].valor) continue;
 
       destruir_item(this->table[i].valor);
+      this->table[i].valor = NULL;
+    }
+  }
+
+  if (destruir_chave) {
+    for (int i = 0; i < this->size; i++) {
+      if (!this->table[i].chave) continue;
+
+      free(this->table[i].chave);
+      this->table[i].chave = NULL;
     }
   }
 

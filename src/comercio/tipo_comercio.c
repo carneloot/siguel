@@ -20,6 +20,16 @@ TipoComercio cria_tipo_comercio(char *identificacao, char *descricao) {
   return this;
 }
 
+char *tipo_comercio_identificacao(TipoComercio _this) {
+  struct TipoComercio * this = (struct TipoComercio *) _this;
+  return this->identificacao;
+}
+
+char *tipo_comercio_descricao(TipoComercio _this) {
+  struct TipoComercio * this = (struct TipoComercio *) _this;
+  return this->descricao;
+}
+
 void tipo_comercio_destruir(TipoComercio _this) {
   struct TipoComercio * this = (struct TipoComercio *) _this;
 

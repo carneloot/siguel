@@ -35,7 +35,9 @@
   ENTRY(comando_dlezao,  "qry/Dle") \
   ENTRY(    comando_cc,   "qry/cc") \
   ENTRY(   comando_crd, "qry/crd?") \
-  ENTRY(   comando_crb, "qry/crb?")
+  ENTRY(   comando_crb, "qry/crb?") \
+  ENTRY(  comando_ec_t,     "ec/t") \
+  ENTRY(  comando_ec_e,     "ec/e") 
 
 COMMAND_TABLE(EXPAND_AS_DECLARATION)
 

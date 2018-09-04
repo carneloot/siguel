@@ -9,6 +9,7 @@
 #include "figura.h"
 #include "modules/logger.h"
 #include "utils.h"
+#include <comercio/tipo_comercio.h>
 
 #include "controlador.r"
 
@@ -135,6 +136,8 @@ Controlador cria_controlador() {
   this->max_qry = Ponto2D_t.new(0, 0);
 
   this->fila_execucao = Lista_t.create();
+
+  this->tipos_comercios = HashTable_t.create(199);
 
   return (void *) this;
 }
@@ -376,6 +379,8 @@ void destruir_controlador(Controlador c) {
       free(this->extras[i]);
 
   Lista_t.destruir(this->fila_execucao, NULL);
+
+  HashTable_t.destroy(this->tipos_comercios, tipo_comercio_destruir, 1);
 
   free(c);
 }

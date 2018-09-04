@@ -3,6 +3,7 @@
 
 #include <modules/lista.h>
 #include <modules/kdtree.h>
+#include <modules/hash.h>
 #include <modules/ponto2d.h>
 
 #define LISTA_EXTRAS \
@@ -26,6 +27,8 @@ struct Controlador {
   char *dir_entrada;
 
   char *extras[EXTRAS_TOTAL];
+
+  HashTable tipos_comercios;
 
   Lista figuras;
 
