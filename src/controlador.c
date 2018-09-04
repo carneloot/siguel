@@ -137,7 +137,9 @@ Controlador cria_controlador() {
 
   this->fila_execucao = Lista_t.create();
 
-  this->tipos_comercios = HashTable_t.create(199);
+  this->tipos_comercio = Lista_t.create();
+  for (i = 0; i < TABELAS_TOTAL; i++)
+    this->tabelas[i] = HashTable_t.create(199);
 
   return (void *) this;
 }
@@ -380,7 +382,9 @@ void destruir_controlador(Controlador c) {
 
   Lista_t.destruir(this->fila_execucao, NULL);
 
-  HashTable_t.destroy(this->tipos_comercios, tipo_comercio_destruir, 1);
+  Lista_t.destruir(this->tipos_comercio, tipo_comercio_destruir);
+  for (i = 0; i < TABELAS_TOTAL; i++)
+    HashTable_t.destroy(this->tabelas[i], NULL, 0);
 
   free(c);
 }

@@ -18,6 +18,11 @@ enum TipoExtras {
   EXTRAS_TOTAL
 };
 
+enum Tabelas {
+  TIPO_X_DESCRICAO,
+  TABELAS_TOTAL
+};
+
 struct Controlador {
   Lista saida;
   Lista saida_svg_qry;
@@ -28,7 +33,8 @@ struct Controlador {
 
   char *extras[EXTRAS_TOTAL];
 
-  HashTable tipos_comercios;
+  Lista tipos_comercio;
+  HashTable tabelas[TABELAS_TOTAL];
 
   Lista figuras;
 
