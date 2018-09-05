@@ -14,6 +14,7 @@
 # project name (generate executable with this name)
 TARGET   = siguel
 
+
 # change these to proper directories where each file should be
 SRCDIR   = src
 OBJDIR   = build
@@ -21,15 +22,23 @@ BINDIR   = bin
 OUTDIR   = out
 INCDIR   = $(SRCDIR)
 
-PFLAGS   = -pedantic -std=c99 -fstack-protector-all -D DEBUG
+# debug mode: Coloque o valor para 1 para habilitar o modo debug
+DEBUG = 0
+
+PFLAGS   = -pedantic -std=c99 -fstack-protector-all
 
 CC       = gcc
 # compiling flags here
-CFLAGS   = -lm -Wall -I $(INCDIR) -g $(PFLAGS)
+CFLAGS   = -lm -I $(INCDIR) $(PFLAGS)
 
 LINKER   = gcc
 # linking flags here
-LFLAGS   = -Wall -I $(INCDIR) -lm -g
+LFLAGS   = -I $(INCDIR) -lm
+
+ifeq ($(DEBUG), 1)
+	CFLAGS += -g -Wall -D DEBUG
+	LFLAGS += -g -Wall
+endif
 
 SOURCES  := $(shell find $(SRCDIR) -type f -name "*.c")
 INCLUDES := $(shell find $(SRCDIR) -type f -name "*.h")
