@@ -3,8 +3,11 @@
 #include <stdlib.h>
 #include <string.h>
 
+#define PORC_TOTALIDADE 0.7
+
 struct HashTable {
   unsigned size;
+  unsigned count;
   HashInfo *table;
 };
 
@@ -12,6 +15,7 @@ HashTable __create_hashtable(unsigned tamanho) {
   struct HashTable *this = calloc(1, sizeof(*this));
 
   this->size  = tamanho;
+  this->count = 0;
   this->table = calloc(tamanho, sizeof(*this->table));
 
   return this;
@@ -66,6 +70,35 @@ static unsigned char_to_unsigned(const char chave[]) {
   return soma;
 }
 
+static void __realocar_hashtable(struct HashTable *this) {
+  unsigned new_size = this->size * 2;
+  HashInfo *nova_tabela = calloc(new_size, sizeof(*nova_tabela));
+
+  for (int i = 0; i < this->size; i++) {
+    HashInfo info_atual = this->table[i];
+    if (!info_atual.chave || !info_atual.valor) continue;
+
+    for (int j = 0; j < new_size; j++) {
+      unsigned chave_em_numero = char_to_unsigned(info_atual.chave);
+      unsigned posicao = hash(chave_em_numero, j, new_size);
+
+      if (!nova_tabela[posicao].valor) {
+        nova_tabela[posicao] = info_atual;
+        break;
+      }
+    }
+  }
+
+  free(this->table);
+  this->table = nova_tabela;
+  this->size  = new_size;
+}
+
+static int __passou_limite_hashtable(struct HashTable *this) {
+  double porcentagem = ((double) this->count) / ((double) this->size);
+  return (porcentagem >= PORC_TOTALIDADE);
+}
+
 void __insert_hashtable(HashTable _this, HashInfo info) {
   struct HashTable *this = (struct HashTable *) _this;
 
@@ -76,9 +109,14 @@ void __insert_hashtable(HashTable _this, HashInfo info) {
 
     if (!this->table[posicao_table].valor) {
       this->table[posicao_table] = info;
+      this->count++;
       break;
     }
   }
+
+  // Checar se passou do limite determinado e realocar
+  if (__passou_limite_hashtable(this))
+    __realocar_hashtable(this);
 }
 
 int __exists_hashtable(HashTable _this, const char chave[]) {
