@@ -13,7 +13,7 @@ struct Pessoa {
   char *nasc;
   char *complemento;
 
-  struct Endereco endereco;
+  Endereco endereco;
 };
 
 Pessoa cria_pessoa(char *cpf, char *nome, char *sobrenome, int sexo, char *nasc) {
@@ -40,6 +40,16 @@ void pessoa_set_endereco(Pessoa _this, char *cep, int face, int num, char *compl
   strcpy(this->complemento, complemento);
 
   this->endereco = cria_endereco(cep, face, num);
+}
+
+char *pessoa_get_cpf(Pessoa _this) {
+  struct Pessoa * this = (struct Pessoa *) _this;
+  return this->cpf;
+}
+
+char *pessoa_get_nome(Pessoa _this) {
+  struct Pessoa * this = (struct Pessoa *) _this;
+  return this->nome;
 }
 
 void pessoa_destruir(Pessoa _this) {

@@ -3,7 +3,10 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include "logger.h"
+
 #define PORC_TOTALIDADE 0.7
+#define SOMA_REALLOC 5
 
 struct HashTable {
   unsigned size;
@@ -11,7 +14,7 @@ struct HashTable {
   HashInfo *table;
 };
 
-HashTable __create_hashtable(unsigned tamanho) {
+static HashTable __create_hashtable(unsigned tamanho) {
   struct HashTable *this = calloc(1, sizeof(*this));
 
   this->size  = tamanho;
@@ -21,7 +24,7 @@ HashTable __create_hashtable(unsigned tamanho) {
   return this;
 }
 
-void __destroy_hashtable(HashTable _this, void (*destruir_item)(void *item), int destruir_chave) {
+static void __destroy_hashtable(HashTable _this, void (*destruir_item)(void *item), int destruir_chave) {
   struct HashTable *this = (struct HashTable *) _this;
 
   if (destruir_item) {
@@ -70,8 +73,7 @@ static unsigned char_to_unsigned(const char chave[]) {
   return soma;
 }
 
-static void __realocar_hashtable(struct HashTable *this) {
-  unsigned new_size = this->size * 2;
+static void __realocar_hashtable(struct HashTable *this, size_t new_size) {
   HashInfo *nova_tabela = calloc(new_size, sizeof(*nova_tabela));
 
   for (int i = 0; i < this->size; i++) {
@@ -99,27 +101,39 @@ static int __passou_limite_hashtable(struct HashTable *this) {
   return (porcentagem >= PORC_TOTALIDADE);
 }
 
-void __insert_hashtable(HashTable _this, HashInfo info) {
+static void __insert_hashtable(HashTable _this, HashInfo info) {
   struct HashTable *this = (struct HashTable *) _this;
 
-  for (int i = 0; i < this->size; i++) {
-    unsigned chave_em_numero = char_to_unsigned(info.chave);
 
-    int posicao_table = hash(chave_em_numero, i, this->size);
+  while (1) {
+    int i;
+    for (i = 0; i < this->size; i++) {
+      unsigned chave_em_numero = char_to_unsigned(info.chave);
 
-    if (!this->table[posicao_table].valor) {
-      this->table[posicao_table] = info;
-      this->count++;
-      break;
+      int posicao_table = hash(chave_em_numero, i, this->size);
+
+      if (!this->table[posicao_table].valor) {
+        this->table[posicao_table] = info;
+        this->count++;
+        break;
+      }
     }
+
+    // Nao inseriu
+    if (i == this->size) {
+      __realocar_hashtable(this, this->size + SOMA_REALLOC);
+      continue;
+    }
+
+    break;
   }
 
   // Checar se passou do limite determinado e realocar
   if (__passou_limite_hashtable(this))
-    __realocar_hashtable(this);
+    __realocar_hashtable(this, this->size * 2);
 }
 
-int __exists_hashtable(HashTable _this, const char chave[]) {
+static int __exists_hashtable(HashTable _this, const char chave[]) {
   struct HashTable *this = (struct HashTable *) _this;
 
   for (int i = 0; i < this->size; i++) {
@@ -137,7 +151,7 @@ int __exists_hashtable(HashTable _this, const char chave[]) {
   return 0;
 }
 
-HashInfo __get_hashtable(HashTable _this, const char chave[]) {
+static HashInfo __get_hashtable(HashTable _this, const char chave[]) {
   struct HashTable *this = (struct HashTable *) _this;
 
   for (int i = 0; i < this->size; i++) {
@@ -159,7 +173,7 @@ HashInfo __get_hashtable(HashTable _this, const char chave[]) {
   return retorno;
 }
 
-void __remove_hashtable(HashTable _this, const char chave[]) {
+static void __remove_hashtable(HashTable _this, const char chave[]) {
   struct HashTable *this = (struct HashTable *) _this;
 
   for (int i = 0; i < this->size; i++) {
@@ -178,7 +192,7 @@ void __remove_hashtable(HashTable _this, const char chave[]) {
   }
 }
 
-void __print_hashtable(
+static void __print_hashtable(
   HashTable _this, char *(*to_string)(void *valor), FILE *fp) {
   struct HashTable *this = (struct HashTable *) _this;
 

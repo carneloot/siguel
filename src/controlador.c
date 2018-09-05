@@ -4,14 +4,15 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include "SVG.h"
-#include "elemento.h"
-#include "figura.h"
-#include "modules/logger.h"
-#include "utils.h"
+#include <SVG.h>
+#include <elemento.h>
+#include <figura.h>
+#include <modules/logger.h>
+#include <utils.h>
 #include <comercio.h>
+#include <pessoa.h>
 
-#include "controlador.r"
+#include <controlador.r>
 
 const char *extra_extensao[EXTRAS_TOTAL] = {
   #define X(a, b) [e_##a] = #a,
@@ -415,8 +416,9 @@ void destruir_controlador(Controlador c) {
 
   Lista_t.destruir(this->comercios, comercio_destruir);
 
-  HashTable_t.destroy(this->tabelas[TIPO_X_DESCRICAO], free, 0);
+  HashTable_t.destroy(this->tabelas[TIPO_X_DESCRICAO], free, 1);
   HashTable_t.destroy(this->tabelas[CEP_X_QUADRA], NULL, 0);
+  HashTable_t.destroy(this->tabelas[CPF_X_PESSOA], pessoa_destruir, 0);
 
   free(c);
 }

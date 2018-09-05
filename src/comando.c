@@ -37,7 +37,9 @@
   ENTRY(   comando_crd, "qry/crd?") \
   ENTRY(   comando_crb, "qry/crb?") \
   ENTRY(  comando_ec_t,     "ec/t") \
-  ENTRY(  comando_ec_e,     "ec/e") 
+  ENTRY(  comando_ec_e,     "ec/e") \
+  ENTRY(  comando_pm_p,     "pm/p") \
+  ENTRY(  comando_pm_m,     "pm/m")
 
 COMMAND_TABLE(EXPAND_AS_DECLARATION)
 
