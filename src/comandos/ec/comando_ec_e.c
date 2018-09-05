@@ -2,7 +2,7 @@
 #include <controlador.r>
 
 #include <modules/logger.h>
-#include <comercio/comercio.h>
+#include <comercio.h>
 #include <endereco.h>
 
 #include <stdlib.h>

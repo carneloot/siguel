@@ -9,9 +9,7 @@
 #include "figura.h"
 #include "modules/logger.h"
 #include "utils.h"
-
-#include <comercio/tipo_comercio.h>
-#include <comercio/comercio.h>
+#include <comercio.h>
 
 #include "controlador.r"
 
@@ -141,7 +139,6 @@ Controlador cria_controlador() {
 
   this->comercios = Lista_t.create();
 
-  this->tipos_comercio = Lista_t.create();
   for (i = 0; i < TABELAS_TOTAL; i++)
     this->tabelas[i] = HashTable_t.create(73);
 
@@ -388,9 +385,8 @@ void destruir_controlador(Controlador c) {
 
   Lista_t.destruir(this->comercios, comercio_destruir);
 
-  Lista_t.destruir(this->tipos_comercio, tipo_comercio_destruir);
-  for (i = 0; i < TABELAS_TOTAL; i++)
-    HashTable_t.destroy(this->tabelas[i], NULL, 0);
+  HashTable_t.destroy(this->tabelas[TIPO_X_DESCRICAO], free, 0);
+  HashTable_t.destroy(this->tabelas[CEP_X_QUADRA], NULL, 0);
 
   free(c);
 }
