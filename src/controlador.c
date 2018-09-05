@@ -346,6 +346,36 @@ void finalizar_arquivos(Controlador c) {
   destruir_SVG(s);
 }
 
+void printar_mensagem_final(Controlador _this, int eh_erro) {
+  struct Controlador * this = (struct Controlador *) _this;
+
+  if (eh_erro) {
+    LOG_PRINT(
+      LOG_STDOUT, "Arquivo \"%s.geo\" finalizado com erro.", this->nome_base);
+    return;
+  }
+
+  LOG_PRINT(LOG_FILE, "Arquivo \"%s.geo\" finalizado.", this->nome_base);
+
+  int count = 0;
+
+  for (int i = 0; i < EXTRAS_TOTAL; i++)
+    count += !!this->extras[i];
+
+  if (!count) {
+    printf("Arquivo \"%s.geo\" finalizado com sucesso.\n", this->nome_base);
+    return;
+  }
+
+  printf("Arquivos \"%s.geo\"", this->nome_base);
+  for (int i = 0; i < EXTRAS_TOTAL; i++) {
+    if (!this->extras[i]) continue;
+    printf(" \"%s.%s\"", this->extras[i], extra_extensao[i]);
+  }
+  printf(" finalizados com sucesso.\n");
+
+}
+
 void destruir_controlador(Controlador c) {
   struct Controlador *this;
   int i;
@@ -389,14 +419,6 @@ void destruir_controlador(Controlador c) {
   HashTable_t.destroy(this->tabelas[CEP_X_QUADRA], NULL, 0);
 
   free(c);
-}
-
-char *get_nome_base(Controlador c) {
-  return ((struct Controlador *) c)->nome_base;
-}
-
-char *get_nome_query(Controlador c) {
-  return ((struct Controlador *) c)->extras[e_qry];
 }
 
 /** METODOS PRIVADOS */

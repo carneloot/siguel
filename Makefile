@@ -23,7 +23,7 @@ OUTDIR   = out
 INCDIR   = $(SRCDIR)
 
 # debug mode: Coloque o valor para 1 para habilitar o modo debug
-DEBUG = 0
+DEBUG = 1
 
 PFLAGS   = -pedantic -std=c99 -fstack-protector-all
 
