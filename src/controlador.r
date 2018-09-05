@@ -20,6 +20,7 @@ enum TipoExtras {
 
 enum Tabelas {
   TIPO_X_DESCRICAO,
+  CEP_X_QUADRA,
   TABELAS_TOTAL
 };
 

@@ -172,6 +172,7 @@ void __remove_hashtable(HashTable _this, const char chave[]) {
         continue;
       this->table[posicao_table].chave = NULL;
       this->table[posicao_table].valor = NULL;
+      this->count--;
       break;
     }
   }

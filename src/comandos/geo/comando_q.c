@@ -24,6 +24,13 @@ int __comando_q(void *_this, void *_controlador) {
 
   KDTree_t.insert(controlador->elementos[QUADRA], elemento);
 
+  // Inserir na HashTable a quadra
+  HashInfo info;
+  info.chave = get_cep_elemento(elemento);
+  info.valor = elemento;
+
+  HashTable_t.insert(controlador->tabelas[CEP_X_QUADRA], info);
+
   Ponto2D new_max = Ponto2D_t.add(size, pos);
   new_max         = Ponto2D_t.add_scalar(new_max, 4);
 

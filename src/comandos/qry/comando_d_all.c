@@ -48,6 +48,18 @@ static void remover_elementos(
   struct Comando *this,
   struct Controlador *controlador,
   Lista *elementos) {
+
+  // Remover quadras da HashTable
+  if (elementos[QUADRA]) {
+    Posic it = Lista_t.get_first(elementos[QUADRA]);
+    while (it) {
+      Elemento elemento = Lista_t.get(elementos[QUADRA], it);
+
+      HashTable_t.remove(controlador->tabelas[CEP_X_QUADRA], get_cep_elemento(elemento));
+
+      it = Lista_t.get_next(elementos[QUADRA], it);
+    }
+  }
   
   for (int h = 0; h < 4; h++) {
     if (!elementos[h]) continue;
@@ -59,7 +71,7 @@ static void remover_elementos(
       Elemento elemento = Lista_t.get(elementos[h], it);
 
       KDTree_t.delete(controlador->elementos[h], elemento);
-      char *cep                 = get_cep_elemento(elemento);
+      char *cep   = get_cep_elemento(elemento);
       char *saida = malloc(18 + strlen(tipo_elemento) + strlen(cep));
       sprintf(saida, "%s: %s deletado (a).\n", tipo_elemento, cep);
       Lista_t.insert(controlador->saida, saida);
