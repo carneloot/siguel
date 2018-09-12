@@ -47,6 +47,12 @@ Ponto2D endereco_get_coordenada(Endereco this, void *controlador) {
       break;
   }
 
+  if (this->face == FACE_OESTE)
+    pos.x += get_largura(quadra);
+
+  if (this->face == FACE_NORTE)
+    pos.y += get_altura(quadra);
+
   return pos;
 }
 
