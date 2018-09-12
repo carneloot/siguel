@@ -104,8 +104,7 @@ int __comando_dlezin(void *_this, void *_controlador) {
   Ponto2D new_max = Ponto2D_t.add(pos, size);
   new_max         = Ponto2D_t.add_scalar(new_max, 4);
 
-  controlador->max_qry.x = max(controlador->max_qry.x, new_max.x);
-  controlador->max_qry.y = max(controlador->max_qry.y, new_max.y);
+  controlador->max_qry = Ponto2D_t.maximo(controlador->max_qry, new_max);
 
   size = Ponto2D_t.add(pos, size);
 
@@ -135,8 +134,7 @@ int __comando_dlezao(void *_this, void *_controlador) {
 
   Ponto2D new_max = Ponto2D_t.add_scalar(pos, r + 4);
 
-  controlador->max_qry.x = max(controlador->max_qry.x, new_max.x);
-  controlador->max_qry.y = max(controlador->max_qry.y, new_max.y);
+  controlador->max_qry = Ponto2D_t.maximo(controlador->max_qry, new_max);
 
   Lista *elementos = __comando_d_all(this, controlador, pA, pB, params[0]);
   
@@ -184,8 +182,7 @@ int __comando_dzin(void *_this, void *_controlador) {
   Ponto2D new_max = Ponto2D_t.add(pos, size);
   new_max         = Ponto2D_t.add_scalar(new_max, 4);
 
-  controlador->max_qry.x = max(controlador->max_qry.x, new_max.x);
-  controlador->max_qry.y = max(controlador->max_qry.y, new_max.y);
+  controlador->max_qry = Ponto2D_t.maximo(controlador->max_qry, new_max);
 
   size = Ponto2D_t.add(pos, size);
 
@@ -233,8 +230,7 @@ int __comando_dzao(void *_this, void *_controlador) {
 
   Ponto2D new_max = Ponto2D_t.add_scalar(pos, r + 4);
 
-  controlador->max_qry.x = max(controlador->max_qry.x, new_max.x);
-  controlador->max_qry.y = max(controlador->max_qry.y, new_max.y);
+  controlador->max_qry = Ponto2D_t.maximo(controlador->max_qry, new_max);
 
   Ponto2D pA = Ponto2D_t.sub_scalar(pos, r);
   Ponto2D pB = Ponto2D_t.add_scalar(pos, r);

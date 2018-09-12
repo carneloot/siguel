@@ -67,7 +67,7 @@ int __comando_crb(void *_this, void *_controlador) {
   Lista_t.insert(controlador->saida, saida);
 
   // Desenhar os circulos nas torres mais proximas
-  Ponto2D pos, new_max;
+  Ponto2D pos;
 
   pos = get_pos(radio1);
 
@@ -77,9 +77,9 @@ int __comando_crb(void *_this, void *_controlador) {
       cria_circulo(
         pos.x, pos.y, RAIO_RADIOS_PROXIMOS, "transparent", "purple"));
 
-    new_max                = Ponto2D_t.add_scalar(pos, RAIO_RADIOS_PROXIMOS);
-    controlador->max_qry.x = max(controlador->max_qry.x, new_max.x);
-    controlador->max_qry.y = max(controlador->max_qry.y, new_max.y);
+    Ponto2D new_max = Ponto2D_t.add_scalar(pos, RAIO_RADIOS_PROXIMOS);
+    
+    controlador->max_qry = Ponto2D_t.maximo(controlador->max_qry, new_max);
 
     pos = get_pos(radio2);
   }

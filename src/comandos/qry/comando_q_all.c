@@ -93,8 +93,7 @@ int __comando_qzin(void *_this, void *_controlador) {
   Ponto2D new_max = Ponto2D_t.add(pos, size);
   new_max         = Ponto2D_t.add_scalar(new_max, 4);
 
-  controlador->max_qry.x = max(controlador->max_qry.x, new_max.x);
-  controlador->max_qry.y = max(controlador->max_qry.y, new_max.y);
+  controlador->max_qry = Ponto2D_t.maximo(controlador->max_qry, new_max);
 
   char *prefixo = calloc(5, sizeof(char));
   strcpy(prefixo, "q?:\n");
@@ -146,8 +145,7 @@ int __comando_qzao(void *_this, void *_controlador) {
 
   Ponto2D new_max = Ponto2D_t.add_scalar(pos, r + 4);
 
-  controlador->max_qry.x = max(controlador->max_qry.x, new_max.x);
-  controlador->max_qry.y = max(controlador->max_qry.y, new_max.y);
+  controlador->max_qry = Ponto2D_t.maximo(controlador->max_qry, new_max);
 
   char *prefixo = calloc(5, sizeof(char));
   strcpy(prefixo, "Q?:\n");
