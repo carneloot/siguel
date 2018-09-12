@@ -20,6 +20,8 @@ int __comando_pm_p(void *_this, void *_controlador) {
     params[0], params[1], params[2], sexo, params[4]
   );
 
+  Lista_t.insert(controlador->pessoas, pessoa);
+
   HashInfo info;
 
   info.chave = pessoa_get_cpf(pessoa);

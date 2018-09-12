@@ -38,6 +38,7 @@ struct Controlador {
   char *extras[EXTRAS_TOTAL];
 
   Lista comercios;
+  Lista pessoas;
   HashTable tabelas[TABELAS_TOTAL];
 
   Lista figuras;

@@ -139,6 +139,7 @@ Controlador cria_controlador() {
   this->fila_execucao = Lista_t.create();
 
   this->comercios = Lista_t.create();
+  this->pessoas   = Lista_t.create();
 
   for (i = 0; i < TABELAS_TOTAL; i++)
     this->tabelas[i] = HashTable_t.create(73);
@@ -420,12 +421,13 @@ void destruir_controlador(Controlador c) {
   Lista_t.destruir(this->fila_execucao, NULL);
 
   Lista_t.destruir(this->comercios, comercio_destruir);
+  Lista_t.destruir(this->pessoas,     pessoa_destruir);
 
-  HashTable_t.destroy(this->tabelas[CPF_X_CEP],               NULL, 0);
-  HashTable_t.destroy(this->tabelas[CEP_X_QUADRA],            NULL, 0);
-  HashTable_t.destroy(this->tabelas[TIPO_X_DESCRICAO],        free, 1);
-  HashTable_t.destroy(this->tabelas[CPF_X_PESSOA], pessoa_destruir, 0);
-  HashTable_t.destroy(this->tabelas[CNPJ_X_COMERCIO],         NULL, 0);
+  HashTable_t.destroy(this->tabelas[CPF_X_CEP],        NULL, 0);
+  HashTable_t.destroy(this->tabelas[CEP_X_QUADRA],     NULL, 0);
+  HashTable_t.destroy(this->tabelas[TIPO_X_DESCRICAO], free, 1);
+  HashTable_t.destroy(this->tabelas[CPF_X_PESSOA],     NULL, 0);
+  HashTable_t.destroy(this->tabelas[CNPJ_X_COMERCIO],  NULL, 0);
 
   free(c);
 }
