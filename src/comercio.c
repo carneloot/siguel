@@ -2,7 +2,7 @@
 
 #include <stdlib.h>
 #include <string.h>
-#include <endereco.h>
+#include <stdio.h>
 
 struct Comercio {
   char *cnpj;
@@ -36,4 +36,36 @@ void comercio_destruir(Comercio _this) {
   endereco_destruir(this->endereco);
 
   free(this);
+}
+
+char *comercio_get_cnpj(Comercio _this) {
+  struct Comercio *this = (struct Comercio *) _this;
+  return this->cnpj;  
+}
+
+char *comercio_get_tipo(Comercio _this) {
+  struct Comercio *this = (struct Comercio *) _this;
+  return this->tipo;  
+}
+
+char *comercio_get_info(Comercio _this, char *tipo_desc) {
+  struct Comercio * this = (struct Comercio *) _this;
+
+  char *endereco_info = endereco_get_info(this->endereco);
+
+  char *saida = malloc(21 + strlen(this->cnpj) + strlen(this->nome)
+    + strlen(tipo_desc) + strlen(endereco_info));
+
+  sprintf(saida, "Comercio %s:\n  %s\n  %s\n  %s",
+    this->nome, this->cnpj, tipo_desc, endereco_info
+  );
+
+  free(endereco_info);
+
+  return saida;
+}
+
+Endereco comercio_get_endereco(Comercio _this) {
+  struct Comercio *this = (struct Comercio *) _this;
+  return this->endereco;
 }

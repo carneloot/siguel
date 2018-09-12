@@ -425,6 +425,7 @@ void destruir_controlador(Controlador c) {
   HashTable_t.destroy(this->tabelas[CEP_X_QUADRA],            NULL, 0);
   HashTable_t.destroy(this->tabelas[TIPO_X_DESCRICAO],        free, 1);
   HashTable_t.destroy(this->tabelas[CPF_X_PESSOA], pessoa_destruir, 0);
+  HashTable_t.destroy(this->tabelas[CNPJ_X_COMERCIO],         NULL, 0);
 
   free(c);
 }

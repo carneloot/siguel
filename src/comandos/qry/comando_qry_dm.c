@@ -16,7 +16,7 @@ int __comando_qry_dm(void *_this, void *_controlador) {
   HashTable tabela = controlador->tabelas[CPF_X_PESSOA];
 
   if (!HashTable_t.exists(tabela, cpf)) {
-    LOG_ERRO("%s nao foi encontrado na tabela.", cpf);
+    LOG_ERRO("\"%s\" nao foi encontrado na tabela.", cpf);
     return 0;
   }
 
@@ -24,7 +24,10 @@ int __comando_qry_dm(void *_this, void *_controlador) {
 
   Pessoa pessoa = info.valor;
 
-  Lista_t.insert(controlador->saida, pessoa_get_info(pessoa));
+  char *info_pessoa = pessoa_get_info(pessoa);
+  strcat(info_pessoa, "\n");
+
+  Lista_t.insert(controlador->saida, info_pessoa);
 
   Ponto2D posicao = endereco_get_coordenada(
     pessoa_get_endereco(pessoa), controlador);

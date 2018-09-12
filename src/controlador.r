@@ -23,6 +23,7 @@ enum Tabelas {
   CEP_X_QUADRA,
   CPF_X_PESSOA,
   CPF_X_CEP,
+  CNPJ_X_COMERCIO,
   TABELAS_TOTAL
 };
 

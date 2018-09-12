@@ -37,6 +37,7 @@
   ENTRY(   comando_crd, "qry/crd?") \
   ENTRY(   comando_crb, "qry/crb?") \
   ENTRY(comando_qry_dm,  "qry/dm?") \
+  ENTRY(comando_qry_de,  "qry/de?") \
   ENTRY(  comando_ec_t,     "ec/t") \
   ENTRY(  comando_ec_e,     "ec/e") \
   ENTRY(  comando_pm_p,     "pm/p") \
