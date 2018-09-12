@@ -43,12 +43,16 @@ int __comando_qry_rip(void *_this, void *_controlador) {
 
   // Mostrar informacoes
   Ponto2D posicao = endereco_get_coordenada(pessoa_get_endereco(pessoa), controlador);
+  Ponto2D new_max = Ponto2D_t.add_scalar(posicao, TAMANHO_CRUZ);
   posicao = Ponto2D_t.sub_scalar(posicao, TAMANHO_CRUZ / 2);
 
   Figura cruz = cria_custom(posicao.x, posicao.y, TAMANHO_CRUZ, TAMANHO_CRUZ, SVG_FIGURA_CRUZ);
+  controlador->max_qry = Ponto2D_t.maximo(controlador->max_qry, new_max);
+  
   Lista_t.insert(controlador->saida_svg_qry, cruz);
 
-  char *info_pessoa = pessoa_get_info(pessoa);
+
+  char *info_pessoa = pessoa_get_info(pessoa, controlador);
   char *rip_message = malloc(23 + strlen(info_pessoa));
 
   sprintf(rip_message, "Nota de falecimento:\n%s\n", info_pessoa);

@@ -20,7 +20,7 @@ char *pessoa_get_cep(Pessoa this);
 
 char *pessoa_get_nome(Pessoa this);
 
-char *pessoa_get_info(Pessoa this);
+char *pessoa_get_info(Pessoa _this, void *controlador);
 
 Endereco pessoa_get_endereco(Pessoa this);
 

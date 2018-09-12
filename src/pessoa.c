@@ -10,9 +10,9 @@ struct Pessoa {
   char *sobrenome;
   enum Sexo sexo;
   char *nasc;
-  char *complemento;
 
   Endereco endereco;
+  char *complemento;
 };
 
 Pessoa cria_pessoa(char *cpf, char *nome, char *sobrenome, int sexo, char *nasc) {
@@ -29,13 +29,18 @@ Pessoa cria_pessoa(char *cpf, char *nome, char *sobrenome, int sexo, char *nasc)
   strcpy(this->sobrenome, sobrenome);
   strcpy(this->nasc, nasc);
 
-  this->sexo     = sexo;
+  this->sexo = sexo;
 
   return this;
 }
 
 void pessoa_set_endereco(Pessoa _this, char *cep, int face, int num, char *complemento) {
   struct Pessoa *this = (struct Pessoa *) _this;
+
+  if (this->endereco) {
+    endereco_destruir(this->endereco);
+    free(this->complemento);
+  }
 
   this->complemento = malloc(strlen(complemento) + 1);
   strcpy(this->complemento, complemento);
@@ -60,22 +65,28 @@ char *pessoa_get_nome(Pessoa _this) {
   return this->nome;
 }
 
-char *pessoa_get_info(Pessoa _this) {
+char *pessoa_get_info(Pessoa _this, void *controlador) {
   struct Pessoa * this = (struct Pessoa *) _this;
 
   char *saida;
   char *endereco_info = endereco_get_info(this->endereco);
 
-  size_t length = 23 + strlen(this->nome) + strlen(this->sobrenome)
+  size_t length = 40 + strlen(this->nome) + strlen(this->sobrenome)
     + strlen(this->cpf) + strlen(this->complemento)
     + strlen(endereco_info);
 
   saida = malloc(length);
 
-  sprintf(saida, "Pessoa %s %s:\n  %s\n  %s (%s)\n  %s",
+  Ponto2D pos;
+  if (controlador)
+    pos = endereco_get_coordenada(this->endereco, controlador);
+  else
+    pos = Ponto2D_t.new(0, 0);
+
+  sprintf(saida, "Pessoa %s %s:\n  %s\n  %s (%s)\n  em (%.0f,%.0f)",
     this->nome, this->sobrenome, this->cpf,
     endereco_info, this->complemento,
-    "" // Colocar coordenada
+    pos.x, pos.y
   );
 
   free(endereco_info);

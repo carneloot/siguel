@@ -28,7 +28,7 @@ int __comando_qry_dm(void *_this, void *_controlador) {
 
   Pessoa pessoa = info.valor;
 
-  char *info_pessoa = pessoa_get_info(pessoa);
+  char *info_pessoa = pessoa_get_info(pessoa, controlador);
   strcat(info_pessoa, "\n");
 
   Lista_t.insert(controlador->saida, info_pessoa);

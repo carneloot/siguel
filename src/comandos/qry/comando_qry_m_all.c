@@ -39,7 +39,7 @@ static void __reportar_pessoas(Lista pessoas, struct Controlador *controlador) {
   while (it) {
     Pessoa pessoa = Lista_t.get(pessoas, it);
 
-    char *info_pessoa = pessoa_get_info(pessoa);
+    char *info_pessoa = pessoa_get_info(pessoa, controlador);
     strcat(info_pessoa, "\n");
 
     Lista_t.insert(controlador->saida, info_pessoa);
