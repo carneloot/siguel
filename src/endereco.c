@@ -56,7 +56,7 @@ char *endereco_get_info(Endereco this) {
 
   saida = malloc(13 + strlen(this->cep));
 
-  sprintf(saida, "%s, %c - %6d",
+  sprintf(saida, "%s, %c - %d",
     this->cep, face_to_char(this->face), this->numero
   );
 

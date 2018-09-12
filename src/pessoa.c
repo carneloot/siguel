@@ -50,7 +50,9 @@ char *pessoa_get_cpf(Pessoa _this) {
 
 char *pessoa_get_cep(Pessoa _this) {
   struct Pessoa * this = (struct Pessoa *) _this;
-  return this->endereco->cep;
+  if (this->endereco)
+    return this->endereco->cep;
+  return NULL;
 }
 
 char *pessoa_get_nome(Pessoa _this) {
