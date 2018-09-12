@@ -14,6 +14,7 @@
 #define w(f) ((f)->data.rect.w)
 #define h(f) ((f)->data.rect.h)
 #define r(f) ((f)->data.circ.r)
+#define ct(f) ((f)->data.cust.custom_svg)
 
 struct Figura {
   Ponto2D pos;
@@ -32,8 +33,14 @@ struct Figura {
 
     /** DADOS RETANGULO */
     struct {
-      double h, w;
+      double w, h;
     } rect;
+
+    /** DADOS CUSTOM */
+    struct {
+      double w, h;
+      char *custom_svg;
+    } cust;
   } data;
 };
 
@@ -68,6 +75,19 @@ Figura cria_circulo(double x, double y, double r, char *cor, char *cor_borda) {
   r(this)    = r;
 
   return (Figura) this;
+}
+
+Figura cria_custom(double x, double y, double largura, double altura, char *custom_text) {
+  struct Figura *this = __cria_figura(x, y, "", "");
+
+  this->tipo = CUSTOM;
+  ct(this)   = malloc(strlen(custom_text) + 1);
+  w(this)    = largura;
+  h(this)    = altura;
+
+  strcpy(ct(this), custom_text);
+
+  return this;
 }
 
 int sobrepoe_figura(Figura f, Figura f2) {
@@ -193,6 +213,9 @@ void destruir_figura(Figura f) {
   struct Figura *this;
   this = (struct Figura *) f;
 
+  if (this->tipo == CUSTOM)
+    free(ct(this));
+
   free(this->cor);
   free(this->cor_borda);
 
@@ -259,20 +282,30 @@ double get_w(Figura f) {
   struct Figura *this;
   this = (struct Figura *) f;
 
-  if (this->tipo != RETANGULO)
-    return 0;
+  switch (this->tipo) {
+    case RETANGULO:
+    case CUSTOM:
+      return w(this);
+    case CIRCULO:
+      return 0;
+  }
 
-  return w(this);
+  return 0;
 }
 
 double get_h(Figura f) {
   struct Figura *this;
   this = (struct Figura *) f;
 
-  if (this->tipo != RETANGULO)
-    return 0;
+  switch (this->tipo) {
+    case RETANGULO:
+    case CUSTOM:
+      return h(this);
+    case CIRCULO:
+      return 0;
+  }
 
-  return h(this);
+  return 0;
 }
 
 char *get_cor(Figura f) {
@@ -289,6 +322,13 @@ enum TipoFigura get_tipo_figura(Figura f) {
 
 int get_id_figura(Figura f) {
   return ((struct Figura *) f)->id;
+}
+
+char *get_custom_text_figura(Figura _this) {
+  struct Figura * this = (struct Figura *) _this;
+
+  if (this->tipo != CUSTOM) return NULL;
+  return ct(this); 
 }
 
 void set_id_figura(Figura f, int id) {

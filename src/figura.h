@@ -9,16 +9,14 @@
  */
 typedef void *Figura;
 
-enum TipoFigura { CIRCULO, RETANGULO };
+enum TipoFigura { CIRCULO, RETANGULO, CUSTOM };
 
-/**
- * 'cor' e 'cor_borda' devem ser cores válidas de SVG.
- * Retorna uma Figura do tipo Retângulo com as especificações dadas.
- */
 Figura cria_retangulo(
   double x, double y, double w, double h, char *cor, char *cor_borda);
 
 Figura cria_circulo(double x, double y, double r, char *cor, char *cor_borda);
+
+Figura cria_custom(double x, double y, double largura, double altura, char *custom_text);
 
 int sobrepoe_figura(Figura f, Figura f2);
 
@@ -58,6 +56,8 @@ char *get_cor_borda(Figura f);
 enum TipoFigura get_tipo_figura(Figura f);
 
 int get_id_figura(Figura f);
+
+char *get_custom_text_figura(Figura this);
 
 /** Setters */
 

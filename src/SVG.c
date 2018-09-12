@@ -61,16 +61,18 @@ void desenha_figura(SVG s, Figura f, float opacity, int is_dashed) {
 
   double x, y, r, h, w;
   char *cor, *cor_borda;
+  char *asset_string;
 
   this = (struct SVG *) s;
 
-  x         = get_x(f);
-  y         = get_y(f);
-  r         = get_r(f);
-  w         = get_w(f);
-  h         = get_h(f);
-  cor       = get_cor(f);
-  cor_borda = get_cor_borda(f);
+  x            = get_x(f);
+  y            = get_y(f);
+  r            = get_r(f);
+  w            = get_w(f);
+  h            = get_h(f);
+  cor          = get_cor(f);
+  cor_borda    = get_cor_borda(f);
+  asset_string = get_custom_text_figura(f);
 
   switch (get_tipo_figura(f)) {
     case CIRCULO:
@@ -100,6 +102,17 @@ void desenha_figura(SVG s, Figura f, float opacity, int is_dashed) {
         cor_borda,
         opacity,
         (is_dashed) ? DASHED_STRING : "");
+      break;
+    case CUSTOM:
+      escrever_linha(
+        this->saida,
+        "<svg width=\"%.2lf\" height=\"%.2lf\" x=\"%.2lf\" "
+        "y=\"%.2lf\">\n%s</svg>\n",
+        w,
+        h,
+        x,
+        y,
+        asset_string);
       break;
   }
 }
