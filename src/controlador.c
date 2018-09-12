@@ -377,6 +377,11 @@ void printar_mensagem_final(Controlador _this, int eh_erro) {
 
 }
 
+HashTable get_table_quadras(Controlador _this) {
+  struct Controlador * this = (struct Controlador *) _this;
+  return this->tabelas[CEP_X_QUADRA];
+}
+
 void destruir_controlador(Controlador c) {
   struct Controlador *this;
   int i;

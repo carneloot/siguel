@@ -7,9 +7,9 @@
 #include <modules/ponto2d.h>
 
 #define LISTA_EXTRAS \
-  X(qry,  "-q") \
   X( ec, "-ec") \
-  X( pm, "-pm") 
+  X( pm, "-pm") \
+  X(qry,  "-q")
 
 enum TipoExtras {
   #define X(a, b) e_##a,

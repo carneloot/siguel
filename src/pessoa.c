@@ -1,9 +1,8 @@
 #include "pessoa.h"
 
 #include <stdlib.h>
+#include <stdio.h>
 #include <string.h>
-
-#include <endereco.h>
 
 struct Pessoa {
   char *cpf;
@@ -57,6 +56,34 @@ char *pessoa_get_cep(Pessoa _this) {
 char *pessoa_get_nome(Pessoa _this) {
   struct Pessoa * this = (struct Pessoa *) _this;
   return this->nome;
+}
+
+char *pessoa_get_info(Pessoa _this) {
+  struct Pessoa * this = (struct Pessoa *) _this;
+
+  char *saida;
+  char *endereco_info = endereco_get_info(this->endereco);
+
+  size_t length = 23 + strlen(this->nome) + strlen(this->sobrenome)
+    + strlen(this->cpf) + strlen(this->complemento)
+    + strlen(endereco_info);
+
+  saida = malloc(length);
+
+  sprintf(saida, "Pessoa %s %s:\n  %s\n  %s (%s)\n  %s",
+    this->nome, this->sobrenome, this->cpf,
+    endereco_info, this->complemento,
+    "" // Colocar coordenada
+  );
+
+  free(endereco_info);
+
+  return saida;
+}
+
+Endereco pessoa_get_endereco(Pessoa _this) {
+  struct Pessoa * this = (struct Pessoa *) _this;
+  return this->endereco;
 }
 
 void pessoa_destruir(Pessoa _this) {

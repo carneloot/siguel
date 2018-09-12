@@ -1,6 +1,8 @@
 #ifndef __PESSOA_H__
 #define __PESSOA_H__
 
+#include <endereco.h>
+
 typedef void *Pessoa;
 
 enum Sexo { SEXO_MASCULINO, SEXO_FEMININO };
@@ -17,6 +19,10 @@ char *pessoa_get_cpf(Pessoa this);
 char *pessoa_get_cep(Pessoa this);
 
 char *pessoa_get_nome(Pessoa this);
+
+char *pessoa_get_info(Pessoa this);
+
+Endereco pessoa_get_endereco(Pessoa this);
 
 void pessoa_destruir(Pessoa this);
 

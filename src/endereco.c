@@ -1,7 +1,12 @@
 #include "endereco.h"
 
 #include <stdlib.h>
+#include <stdio.h>
 #include <string.h>
+
+#include <elemento.h>
+#include <controlador.h>
+#include <modules/hash.h>
 
 Endereco cria_endereco(char *cep, enum Face face, int numero) {
   Endereco this = malloc(sizeof(*this));
@@ -20,6 +25,44 @@ void endereco_destruir(Endereco this) {
   free(this);
 }
 
+Ponto2D endereco_get_coordenada(Endereco this, void *controlador) {
+
+  HashTable tabela_quadras = get_table_quadras(controlador);
+
+  HashInfo info = HashTable_t.get(tabela_quadras, this->cep);
+
+  Elemento quadra = info.valor;
+
+  Ponto2D pos = get_pos(quadra);
+
+  switch (this->face) {
+    case FACE_LESTE:
+    case FACE_OESTE:
+      pos.y += (double) this->numero;
+      break;
+
+    case FACE_NORTE:
+    case FACE_SUL:
+      pos.x += (double) this->numero;
+      break;
+  }
+
+  return pos;
+}
+
+char *endereco_get_info(Endereco this) {
+  // "%s, %c - $d"
+  char *saida;
+
+  saida = malloc(13 + strlen(this->cep));
+
+  sprintf(saida, "%s, %c - %6d",
+    this->cep, face_to_char(this->face), this->numero
+  );
+
+  return saida;
+}
+
 int char_to_face(char indicador) {
   int face;
 
@@ -31,4 +74,17 @@ int char_to_face(char indicador) {
   }
   
   return face;
+}
+
+char face_to_char(int indicador) {
+  char saida;
+
+  switch (indicador) {
+    case FACE_NORTE: saida = 'N'; break;
+    case FACE_SUL:   saida = 'S'; break;
+    case FACE_LESTE: saida = 'L'; break;
+    case FACE_OESTE: saida = 'O'; break;
+  }
+  
+  return saida;
 }
