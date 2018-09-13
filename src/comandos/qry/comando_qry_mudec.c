@@ -3,7 +3,7 @@
 
 #include <stdlib.h>
 #include <string.h>
-#include <pessoa.h>
+#include <comercio.h>
 #include <desenhavel.h>
 #include <endereco.h>
 #include <utils.h>
@@ -25,7 +25,7 @@ static char *svg_pontos(void *_pontos) {
 
   char *seta = format_string(
     "<svg style=\"fill:%s;opacity:0.8;\" width=\"%.2f\" height=\"%.2f\" x=\"%.2f\" y=\"%.2f\">\n%s</svg>",
-    "green",
+    "red",
     20.0, 20.0,
     pSeta.x, pSeta.y, svg_seta
   );
@@ -37,7 +37,7 @@ static char *svg_pontos(void *_pontos) {
     "style=\"stroke:%s;stroke-width:4;opacity:0.8\" />",
     a.x, a.y,
     b.x, b.y,
-    "green"
+    "red"
   );
 
   char *saida = format_string(
@@ -49,51 +49,44 @@ static char *svg_pontos(void *_pontos) {
   return saida;
 }
 
-int __comando_qry_mud(void *_this, void *_controlador) {
+int __comando_qry_mudec(void *_this, void *_controlador) {
   struct Comando *this            = (struct Comando *) _this;
   struct Controlador *controlador = (struct Controlador *) _controlador;
 
-  char *cpf = this->params[0];
+  char *cnpj = this->params[0];
 
-  HashTable tabela_pessoa = controlador->tabelas[CPF_X_PESSOA];
-  HashTable tabela_cep    = controlador->tabelas[CPF_X_CEP];
+  HashTable tabela = controlador->tabelas[CNPJ_X_COMERCIO];
 
-  if (!HashTable_t.exists(tabela_pessoa, cpf)) {
+  if (!HashTable_t.exists(tabela, cnpj)) {
     char *saida = format_string(
-      "A pessoa com o CPF \"%s\" nao foi encontrada.\n", cpf);
+      "O comercio com o CNPJ \"%s\" nao foi encontrado.\n", cnpj);
     Lista_t.insert(controlador->saida, saida);
     return 1;
   } 
 
-  HashInfo hash_info = HashTable_t.get(tabela_pessoa, cpf);
-  Pessoa pessoa = hash_info.valor;
+  HashInfo hash_info = HashTable_t.get(tabela, cnpj);
+  Comercio comercio = hash_info.valor;
 
   char *cep   = this->params[1];
   int face    = char_to_face(this->params[2][0]);
   int numero  = strtol(this->params[3], NULL, 10);
-  char *compl = this->params[4];
 
-  Ponto2D pos_antiga = endereco_get_coordenada(pessoa_get_endereco(pessoa), controlador);
-  char *info_pessoa = pessoa_get_info(pessoa, controlador);
+  Ponto2D pos_antiga  = endereco_get_coordenada(comercio_get_endereco(comercio), controlador);
+  char *tipo_desc = HashTable_t.get(controlador->tabelas[TIPO_X_DESCRICAO], comercio_get_tipo(comercio)).valor;
+  char *info_comercio = comercio_get_info(
+    comercio, tipo_desc);
 
-  HashTable_t.remove(tabela_cep, cpf);
-  pessoa_set_endereco(pessoa, cep, face, numero, compl);
+  comercio_set_endereco(comercio, cep, face, numero);
 
-  HashInfo new_info = {
-    .chave = pessoa_get_cpf(pessoa),
-    .valor = pessoa_get_cep(pessoa)
-  };
-  HashTable_t.insert(tabela_cep, new_info);
-
-  Ponto2D pos_atual = endereco_get_coordenada(pessoa_get_endereco(pessoa), controlador);
-  char *info_endereco_atual = endereco_get_info(pessoa_get_endereco(pessoa));
+  Ponto2D pos_atual = endereco_get_coordenada(comercio_get_endereco(comercio), controlador);
+  char *info_endereco_atual = endereco_get_info(comercio_get_endereco(comercio));
 
   char *saida = format_string(
     "Mudanca de endereco:\n%s\nmudou para %s\n",
-    info_pessoa, info_endereco_atual);
+    info_comercio, info_endereco_atual);
   Lista_t.insert(controlador->saida, saida);
 
-  free(info_pessoa);
+  free(info_comercio);
   free(info_endereco_atual);
 
   // Desenhar uma linha de pos_antiga ate pos_atual

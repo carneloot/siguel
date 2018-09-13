@@ -1,6 +1,6 @@
 #include "ponto2d.h"
 
-#include "math.h"
+#include <math.h>
 #include "utils.h"
 
 static Ponto2D __new_ponto2d(double x, double y) {
@@ -47,6 +47,10 @@ static Ponto2D __max_ponto2d(Ponto2D this, Ponto2D other) {
   );
 }
 
+static double __angle_ponto2d(Ponto2D this) {
+  return atan2(this.y, this.x);
+}
+
 const struct Ponto2D_t Ponto2D_t = {
   .new          = &__new_ponto2d,
   .equal        = &__equal_ponto2d,
@@ -58,4 +62,5 @@ const struct Ponto2D_t Ponto2D_t = {
   .add_scalar   = &__add_scalar_ponto2d,
   .sub_scalar   = &__sub_scalar_ponto2d,
   .maximo       = &__max_ponto2d,
+  .angle        = &__angle_ponto2d,
 };

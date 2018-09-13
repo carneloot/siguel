@@ -6,6 +6,8 @@
 #include <string.h>
 #include <stdio.h>
 
+#define M_PI 3.1415926535897932384626433
+
 char *trim(char *entrada) {
   int tam, i;
   char *saida;
@@ -155,4 +157,8 @@ char *format_string(const char *fmt, ...) {
   va_end(list);
 
   return saida;
+}
+
+double rad_to_deg(double radians) {
+  return (radians * 180) / M_PI;
 }

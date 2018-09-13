@@ -23,4 +23,6 @@ char *remover_extensao(const char *path);
 
 char *format_string(const char *fmt, ...);
 
+double rad_to_deg(double radians);
+
 #endif /* __UTILS_H__ */

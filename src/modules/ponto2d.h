@@ -27,6 +27,8 @@ struct Ponto2D_t {
   Ponto2D (*sub_scalar)(Ponto2D this, double scalar);
 
   Ponto2D (*maximo)(Ponto2D this, Ponto2D other);
+
+  double (*angle)(Ponto2D this);
 };
 
 extern const struct Ponto2D_t Ponto2D_t;
