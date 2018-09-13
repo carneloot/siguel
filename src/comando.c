@@ -42,6 +42,7 @@
   ENTRY(   comando_qry_dm,   "qry/dm?") \
   ENTRY(   comando_qry_de,   "qry/de?") \
   ENTRY(  comando_qry_rip,   "qry/rip") \
+  ENTRY(  comando_qry_fec,   "qry/fec") \
   ENTRY(  comando_qry_mud,   "qry/mud") \
   ENTRY(comando_qry_mudec, "qry/mudec") \
   ENTRY(     comando_ec_t,      "ec/t") \
