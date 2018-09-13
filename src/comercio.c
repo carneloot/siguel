@@ -31,7 +31,7 @@ Comercio cria_comercio(char *cnpj, char *tipo, char *cep, int face, int num, cha
 void comercio_set_endereco(Comercio _this, char *cep, int face, int num) {
   struct Comercio * this = (struct Comercio *) _this;
 
-  free(this->endereco);
+  endereco_destruir(this->endereco);
   this->endereco = cria_endereco(cep, face, num);
 }
 
