@@ -57,7 +57,8 @@ int __comando_qry_m(void *_this, void *_controlador) {
   char *cep = params[0];
 
   if (!HashTable_t.exists(controlador->tabelas[CEP_X_QUADRA], cep)) {
-    LOG_ERRO("A quadra \"%s\" nao foi encontrada.", cep);
+    Lista_t.insert(controlador->saida,
+      format_string("A quadra \"%s\" nao foi encontrada.\n", cep));
     return 1;
   }
 
@@ -118,7 +119,8 @@ int __comando_qry_mr(void *_this, void *_controlador) {
   destruir_figura(figura);
 
   if (Lista_t.length(quadras_dentro) == 0) {
-    LOG_ERRO("Nao foram encontradas quadras na area especificada.");
+    Lista_t.insert(controlador->saida,
+      format_string("Nao foram encontradas quadras na area especificada.\n"));
     Lista_t.destruir(quadras_dentro, NULL);
     return 1;
   }

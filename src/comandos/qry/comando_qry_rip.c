@@ -25,7 +25,8 @@ int __comando_qry_rip(void *_this, void *_controlador) {
   HashTable tabela = controlador->tabelas[CPF_X_PESSOA];
 
   if (!HashTable_t.exists(tabela, cpf)) {
-    LOG_ERRO("CPF \"%s\" nao encontrado.", cpf);
+    Lista_t.insert(controlador->saida,
+      format_string("CPF \"%s\" nao encontrado.\n", cpf));
     return 1;
   }
 
