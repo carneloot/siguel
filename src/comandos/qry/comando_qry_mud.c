@@ -55,6 +55,6 @@ int __comando_qry_mud(void *_this, void *_controlador) {
   free(info_endereco_atual);
 
   // Desenhar uma linha de pos_antiga ate pos_atual
-
+  
   return 1;
 }

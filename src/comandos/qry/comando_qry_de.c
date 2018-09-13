@@ -2,6 +2,7 @@
 #include <controlador.r>
 
 #include <comercio.h>
+#include <desenhavel.h>
 #include <figura.h>
 #include <endereco.h>
 #include <modules/logger.h>
@@ -39,8 +40,11 @@ int __comando_qry_de(void *_this, void *_controlador) {
     posicao.x, posicao.y, 20,
     "transparent", "red"
   );
+  set_opacity_figura(figura, 0.8);
+  set_dashed_figura(figura, FIG_BORDA_TRACEJADA);
 
-  Lista_t.insert(controlador->saida_svg_qry, figura);
+  Lista_t.insert(controlador->saida_svg_qry,
+    cria_desenhavel(figura, get_svg_figura, destruir_figura));
 
   return 1;
 }

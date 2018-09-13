@@ -2,6 +2,7 @@
 #include <controlador.r>
 
 #include <stdlib.h>
+#include <desenhavel.h>
 #include <figura.h>
 #include <pessoa.h>
 #include <utils.h>
@@ -12,6 +13,39 @@
 
 int procurarPessoa(void * const pessoa1, const void *pessoa2) {
   return !(pessoa1 == pessoa2);
+}
+
+struct Custom {
+  Ponto2D pos;
+  double tamanho;
+  char *string;
+};
+
+void *cria_custom(Ponto2D pos, double tamanho, char *string) {
+  struct Custom *custom = malloc(sizeof(*custom));
+
+  custom->pos     = pos;
+  custom->tamanho = tamanho;
+  custom->string  = format_string(string);
+
+  return custom;
+}
+
+char *print_custom(void *_custom) {
+  struct Custom *custom = _custom;
+  char *saida = format_string(
+    "<svg width=\"%.2lf\" height=\"%.2lf\" x=\"%.2lf\" y=\"%.2lf\">\n%s</svg>\n",
+    custom->tamanho, custom->tamanho,
+    custom->pos.x, custom->pos.y,
+    custom->string
+  );
+  return saida;
+}
+
+void free_custom(void *_custom) {
+  struct Custom *custom = _custom;
+  free(custom->string);
+  free(custom);
 }
 
 int __comando_qry_rip(void *_this, void *_controlador) {
@@ -47,10 +81,11 @@ int __comando_qry_rip(void *_this, void *_controlador) {
   Ponto2D new_max = Ponto2D_t.add_scalar(posicao, TAMANHO_CRUZ);
   posicao = Ponto2D_t.sub_scalar(posicao, TAMANHO_CRUZ / 2);
 
-  Figura cruz = cria_custom(posicao.x, posicao.y, TAMANHO_CRUZ, TAMANHO_CRUZ, SVG_FIGURA_CRUZ);
   controlador->max_qry = Ponto2D_t.maximo(controlador->max_qry, new_max);
   
-  Lista_t.insert(controlador->saida_svg_qry, cruz);
+  void *custom = cria_custom(posicao, TAMANHO_CRUZ, SVG_FIGURA_CRUZ);
+  Lista_t.insert(controlador->saida_svg_qry, cria_desenhavel(
+    custom, print_custom, free_custom));
 
 
   char *info_pessoa = pessoa_get_info(pessoa, controlador);

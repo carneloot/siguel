@@ -3,6 +3,7 @@
 
 #include <elemento.h>
 #include <utils.h>
+#include <desenhavel.h>
 #include <string.h>
 #include <math.h>
 #include <stdlib.h>
@@ -66,10 +67,15 @@ int __comando_crb(void *_this, void *_controlador) {
   pos = get_pos(radio1);
 
   for (int i = 0; i < 2; i++) {
+    Figura circ = cria_circulo(
+        pos.x, pos.y, RAIO_RADIOS_PROXIMOS, "transparent", "purple");
+
+    set_opacity_figura(circ, 0.8);
+    set_dashed_figura(circ, FIG_BORDA_TRACEJADA);
+
     Lista_t.insert(
       controlador->saida_svg_qry,
-      cria_circulo(
-        pos.x, pos.y, RAIO_RADIOS_PROXIMOS, "transparent", "purple"));
+      cria_desenhavel(circ, get_svg_figura, destruir_figura));
 
     Ponto2D new_max = Ponto2D_t.add_scalar(pos, RAIO_RADIOS_PROXIMOS);
     

@@ -14,11 +14,14 @@
 #define w(f) ((f)->data.rect.w)
 #define h(f) ((f)->data.rect.h)
 #define r(f) ((f)->data.circ.r)
-#define ct(f) ((f)->data.cust.custom_svg)
+
+#define DASHED_STRING "stroke-dasharray=\"5, 5\" "
 
 struct Figura {
   Ponto2D pos;
   char *cor, *cor_borda;
+  double opacity;
+  int is_dashed;
 
   int id;
 
@@ -36,11 +39,6 @@ struct Figura {
       double w, h;
     } rect;
 
-    /** DADOS CUSTOM */
-    struct {
-      double w, h;
-      char *custom_svg;
-    } cust;
   } data;
 };
 
@@ -50,6 +48,9 @@ static struct Figura *__cria_figura(
 
   this->pos = Ponto2D_t.new(x, y);
   this->id  = -1;
+
+  this->opacity   = 1;
+  this->is_dashed = 0;
 
   this->cor       = trim(cor);
   this->cor_borda = trim(cor_borda);
@@ -75,19 +76,6 @@ Figura cria_circulo(double x, double y, double r, char *cor, char *cor_borda) {
   r(this)    = r;
 
   return (Figura) this;
-}
-
-Figura cria_custom(double x, double y, double largura, double altura, char *custom_text) {
-  struct Figura *this = __cria_figura(x, y, "", "");
-
-  this->tipo = CUSTOM;
-  ct(this)   = malloc(strlen(custom_text) + 1);
-  w(this)    = largura;
-  h(this)    = altura;
-
-  strcpy(ct(this), custom_text);
-
-  return this;
 }
 
 int sobrepoe_figura(Figura f, Figura f2) {
@@ -213,9 +201,6 @@ void destruir_figura(Figura f) {
   struct Figura *this;
   this = (struct Figura *) f;
 
-  if (this->tipo == CUSTOM)
-    free(ct(this));
-
   free(this->cor);
   free(this->cor_borda);
 
@@ -254,6 +239,43 @@ int dentro_figura(Figura _this, Figura _other) {
   return -1;
 }
 
+char *get_svg_figura(Figura _this) {
+  struct Figura * this = (struct Figura *) _this;
+
+  char *saida;
+  
+  switch (this->tipo) {
+    case CIRCULO:
+      saida = format_string(
+        "<circle cx=\"%.1f\" cy=\"%.1f\" r=\"%.1f\" "
+        "style=\"fill:%s;stroke-width:2;stroke:%s;opacity:%.2f\" %s/>\n",
+        x(this),
+        y(this),
+        r(this),
+        this->cor,
+        this->cor_borda,
+        this->opacity,
+        (this->is_dashed) ? DASHED_STRING : "");
+      break;
+
+    case RETANGULO:
+      saida = format_string(
+        "<rect x=\"%.1f\" y=\"%.1f\" width=\"%.1f\" height=\"%.1f\" "
+        "style=\"fill:%s;stroke-width:2;stroke:%s;opacity:%.2f\" %s/>\n",
+        x(this),
+        y(this),
+        w(this),
+        h(this),
+        this->cor,
+        this->cor_borda,
+        this->opacity,
+        (this->is_dashed) ? DASHED_STRING : "");
+      break;
+  }
+
+  return saida;
+}
+
 /** Getters */
 
 Ponto2D get_pos(Figura f) {
@@ -282,14 +304,8 @@ double get_w(Figura f) {
   struct Figura *this;
   this = (struct Figura *) f;
 
-  switch (this->tipo) {
-    case RETANGULO:
-    case CUSTOM:
-      return w(this);
-    case CIRCULO:
-      return 0;
-  }
-
+  if (this->tipo == RETANGULO)
+    return w(this);
   return 0;
 }
 
@@ -297,14 +313,8 @@ double get_h(Figura f) {
   struct Figura *this;
   this = (struct Figura *) f;
 
-  switch (this->tipo) {
-    case RETANGULO:
-    case CUSTOM:
-      return h(this);
-    case CIRCULO:
-      return 0;
-  }
-
+  if (this->tipo == RETANGULO)
+    return h(this);
   return 0;
 }
 
@@ -324,13 +334,16 @@ int get_id_figura(Figura f) {
   return ((struct Figura *) f)->id;
 }
 
-char *get_custom_text_figura(Figura _this) {
-  struct Figura * this = (struct Figura *) _this;
-
-  if (this->tipo != CUSTOM) return NULL;
-  return ct(this); 
-}
-
 void set_id_figura(Figura f, int id) {
   ((struct Figura *) f)->id = id;
+}
+
+void set_opacity_figura(Figura _this, double opacity) {
+  struct Figura * this = (struct Figura *) _this;
+  this->opacity = opacity;
+}
+
+void set_dashed_figura(Figura _this, int dashed) {
+  struct Figura * this = (struct Figura *) _this;
+  this->is_dashed = dashed;
 }

@@ -1,6 +1,7 @@
 #include <comando.r>
 #include <controlador.r>
 
+#include <desenhavel.h>
 #include <elemento.h>
 #include <figura.h>
 #include <stdlib.h>
@@ -88,7 +89,10 @@ int __comando_qzin(void *_this, void *_controlador) {
   size = Ponto2D_t.new(strtod(params[2], NULL), strtod(params[3], NULL));
 
   figura = cria_retangulo(pos.x, pos.y, size.x, size.y, "transparent", "black");
-  Lista_t.insert(controlador->saida_svg_qry, figura);
+  set_opacity_figura(figura, 0.8);
+  set_dashed_figura(figura, FIG_BORDA_TRACEJADA);
+  Lista_t.insert(controlador->saida_svg_qry,
+    cria_desenhavel(figura, get_svg_figura, destruir_figura));
 
   Ponto2D new_max = Ponto2D_t.add(pos, size);
   new_max         = Ponto2D_t.add_scalar(new_max, 4);
@@ -141,7 +145,11 @@ int __comando_qzao(void *_this, void *_controlador) {
   Ponto2D pos = Ponto2D_t.new(strtod(params[1], NULL), strtod(params[2], NULL));
 
   Figura figura = cria_circulo(pos.x, pos.y, r, "transparent", "black");
-  Lista_t.insert(controlador->saida_svg_qry, figura);
+  set_opacity_figura(figura, 0.8);
+  set_dashed_figura(figura, FIG_BORDA_TRACEJADA);
+
+  Lista_t.insert(controlador->saida_svg_qry,
+    cria_desenhavel(figura, get_svg_figura, destruir_figura));
 
   Ponto2D new_max = Ponto2D_t.add_scalar(pos, r + 4);
 

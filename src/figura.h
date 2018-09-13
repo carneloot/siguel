@@ -9,14 +9,14 @@
  */
 typedef void *Figura;
 
-enum TipoFigura { CIRCULO, RETANGULO, CUSTOM };
+enum FiguraTracejada { FIG_BORDA_SOLIDA, FIG_BORDA_TRACEJADA };
+enum TipoFigura { CIRCULO, RETANGULO };
+
 
 Figura cria_retangulo(
   double x, double y, double w, double h, char *cor, char *cor_borda);
 
 Figura cria_circulo(double x, double y, double r, char *cor, char *cor_borda);
-
-Figura cria_custom(double x, double y, double largura, double altura, char *custom_text);
 
 int sobrepoe_figura(Figura f, Figura f2);
 
@@ -57,10 +57,14 @@ enum TipoFigura get_tipo_figura(Figura f);
 
 int get_id_figura(Figura f);
 
-char *get_custom_text_figura(Figura this);
+char *get_svg_figura(Figura this);
 
 /** Setters */
 
 void set_id_figura(Figura f, int id);
+
+void set_opacity_figura(Figura this, double opacity);
+
+void set_dashed_figura(Figura this, int dashed);
 
 #endif /* __FIGURA_H__ */

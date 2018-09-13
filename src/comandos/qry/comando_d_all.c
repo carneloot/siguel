@@ -3,6 +3,7 @@
 
 #include <elemento.h>
 #include <figura.h>
+#include <desenhavel.h>
 #include <stdlib.h>
 #include <string.h>
 #include <utils.h>
@@ -96,9 +97,13 @@ int __comando_dlezin(void *_this, void *_controlador) {
 
   pos  = Ponto2D_t.new(strtod(params[1], NULL), strtod(params[2], NULL));
   size = Ponto2D_t.new(strtod(params[3], NULL), strtod(params[4], NULL));
+
+  Figura rect = cria_retangulo(pos.x, pos.y, size.x, size.y, "transparent", "black");
+  set_opacity_figura(rect, 0.8);
+  set_dashed_figura(rect, FIG_BORDA_TRACEJADA);
   
   Lista_t.insert(controlador->saida_svg_qry,
-    cria_retangulo(pos.x, pos.y, size.x, size.y, "transparent", "black"));
+    cria_desenhavel(rect, get_svg_figura, destruir_figura));
 
   Ponto2D new_max = Ponto2D_t.add(pos, size);
   new_max         = Ponto2D_t.add_scalar(new_max, 4);
@@ -125,8 +130,12 @@ int __comando_dlezao(void *_this, void *_controlador) {
   Ponto2D pos = Ponto2D_t.new(strtod(params[1], NULL), strtod(params[2], NULL));
   double r    = strtod(params[3], NULL);
 
+  Figura circ = cria_circulo(pos.x, pos.y, r, "transparent", "black");
+  set_opacity_figura(circ, 0.8);
+  set_dashed_figura(circ, FIG_BORDA_TRACEJADA);
+
   Lista_t.insert(controlador->saida_svg_qry,
-    cria_circulo(pos.x, pos.y, r, "transparent", "black"));
+    cria_desenhavel(circ, get_svg_figura, destruir_figura));
     
   Ponto2D pA = Ponto2D_t.sub_scalar(pos, r);
   Ponto2D pB = Ponto2D_t.add_scalar(pos, r);
@@ -175,8 +184,11 @@ int __comando_dzin(void *_this, void *_controlador) {
   size = Ponto2D_t.new(strtod(params[2], NULL), strtod(params[3], NULL));
 
   Figura figura = cria_retangulo(pos.x, pos.y, size.x, size.y, "transparent", "black");
+  set_opacity_figura(figura, 0.8);
+  set_dashed_figura(figura, FIG_BORDA_TRACEJADA);
 
-  Lista_t.insert(controlador->saida_svg_qry, figura);
+  Lista_t.insert(controlador->saida_svg_qry,
+    cria_desenhavel(figura, get_svg_figura, destruir_figura));
 
   Ponto2D new_max = Ponto2D_t.add(pos, size);
   new_max         = Ponto2D_t.add_scalar(new_max, 4);
@@ -224,8 +236,11 @@ int __comando_dzao(void *_this, void *_controlador) {
   pos = Ponto2D_t.new(strtod(params[1], NULL), strtod(params[2], NULL));
 
   Figura figura = cria_circulo(pos.x, pos.y, r, "transparent", "black");
+  set_opacity_figura(figura, 0.8);
+  set_dashed_figura(figura, FIG_BORDA_TRACEJADA);
 
-  Lista_t.insert(controlador->saida_svg_qry, figura);
+  Lista_t.insert(controlador->saida_svg_qry,
+    cria_desenhavel(figura, get_svg_figura, destruir_figura));
 
   Ponto2D new_max = Ponto2D_t.add_scalar(pos, r + 4);
 

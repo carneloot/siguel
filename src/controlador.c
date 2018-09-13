@@ -327,8 +327,7 @@ void finalizar_arquivos(Controlador c) {
 
   iterator = Lista_t.get_first(this->saida_svg_qry);
   while (iterator) {
-    desenha_figura(
-      s, Lista_t.get(this->saida_svg_qry, iterator), 0.8, SVG_BORDA_TRACEJADA);
+    desenha_desenhavel(s, Lista_t.get(this->saida_svg_qry, iterator));
     iterator = Lista_t.get_next(this->saida_svg_qry, iterator);
   }
 
@@ -383,7 +382,7 @@ void destruir_controlador(Controlador c) {
   this = (struct Controlador *) c;
 
   Lista_t.destruir(this->saida, &free);
-  Lista_t.destruir(this->saida_svg_qry, &destruir_figura);
+  Lista_t.destruir(this->saida_svg_qry, desenhavel_destruir);
 
   Lista_t.destruir(this->figuras, &destruir_figura);
 
@@ -438,7 +437,7 @@ void desenhar_todas_figuras(void *c, void *s) {
 
   while (iterator) {
     figAtual = Lista_t.get(this->figuras, iterator);
-    desenha_figura(s, figAtual, 0.4, SVG_BORDA_SOLIDA);
+    desenha_figura(s, figAtual, 0.4, FIG_BORDA_SOLIDA);
     iterator = Lista_t.get_next(this->figuras, iterator);
   }
 }
@@ -458,7 +457,7 @@ void desenhar_sobreposicoes(void *c, void *s) {
   while (iterator) {
     figDash = (Figura) Lista_t.get(this->sobreposicoes, iterator);
 
-    desenha_figura(s, figDash, 1.0, SVG_BORDA_TRACEJADA);
+    desenha_figura(s, figDash, 1.0, FIG_BORDA_TRACEJADA);
     Ponto2D pos = get_pos(figDash);
     pos.y -= 5;
     escreve_texto(s, "sobrepoe", pos, 15, "purple");

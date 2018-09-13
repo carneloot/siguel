@@ -149,7 +149,7 @@ char *format_string(const char *fmt, ...) {
   size_t length = vsnprintf(NULL, 0, fmt, list);
   va_end(list);
 
-  char *saida = malloc(length + 1);
+  char *saida = malloc(length + 2);
   va_start(list, fmt);
   vsprintf(saida, fmt, list);
   va_end(list);
