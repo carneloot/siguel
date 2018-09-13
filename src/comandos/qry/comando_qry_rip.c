@@ -8,44 +8,13 @@
 #include <utils.h>
 #include <modules/logger.h>
 
+#include "svg_custom.h"
+
 #define SVG_FIGURA_CRUZ "<svg style=\"isolation:isolate\" viewBox=\"505.672 93 291.328 291.328\"><g><rect x=\"548.336\" y=\"135.664\" width=\"206\" height=\"206\" transform=\"matrix(0.707,0.707,-0.707,0.707,359.533,-390.661)\" fill=\"rgb(46,46,46)\"/><path d=\" M 663.836 229.164 L 663.836 142.664 L 638.836 142.664 L 638.836 229.164 L 555.336 229.164 L 555.336 254.164 L 638.836 254.164 L 638.836 334.664 L 663.836 334.664 L 663.836 254.164 L 747.336 254.164 L 747.336 229.164 L 663.836 229.164 Z \" fill-rule=\"evenodd\" fill=\"rgb(235,235,235)\"/></g></svg>"
 #define TAMANHO_CRUZ 20
 
 int procurarPessoa(void * const pessoa1, const void *pessoa2) {
   return !(pessoa1 == pessoa2);
-}
-
-struct Custom {
-  Ponto2D pos;
-  double tamanho;
-  char *string;
-};
-
-void *cria_custom(Ponto2D pos, double tamanho, char *string) {
-  struct Custom *custom = malloc(sizeof(*custom));
-
-  custom->pos     = pos;
-  custom->tamanho = tamanho;
-  custom->string  = format_string(string);
-
-  return custom;
-}
-
-char *print_custom(void *_custom) {
-  struct Custom *custom = _custom;
-  char *saida = format_string(
-    "<svg width=\"%.2lf\" height=\"%.2lf\" x=\"%.2lf\" y=\"%.2lf\">\n%s</svg>\n",
-    custom->tamanho, custom->tamanho,
-    custom->pos.x, custom->pos.y,
-    custom->string
-  );
-  return saida;
-}
-
-void free_custom(void *_custom) {
-  struct Custom *custom = _custom;
-  free(custom->string);
-  free(custom);
 }
 
 int __comando_qry_rip(void *_this, void *_controlador) {
@@ -83,9 +52,9 @@ int __comando_qry_rip(void *_this, void *_controlador) {
 
   controlador->max_qry = Ponto2D_t.maximo(controlador->max_qry, new_max);
   
-  void *custom = cria_custom(posicao, TAMANHO_CRUZ, SVG_FIGURA_CRUZ);
+  void *custom = cria_custom(posicao, TAMANHO_CRUZ, SVG_FIGURA_CRUZ, 0);
   Lista_t.insert(controlador->saida_svg_qry, cria_desenhavel(
-    custom, print_custom, free_custom));
+    custom, print_custom_asset, free_custom));
 
 
   char *info_pessoa = pessoa_get_info(pessoa, controlador);

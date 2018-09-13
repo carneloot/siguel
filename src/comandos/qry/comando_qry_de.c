@@ -6,6 +6,9 @@
 #include <figura.h>
 #include <endereco.h>
 #include <modules/logger.h>
+#include <stdlib.h>
+
+#include "svg_custom.h"
 
 int __comando_qry_de(void *_this, void *_controlador) {
   struct Comando *this            = (struct Comando *) _this;
@@ -35,7 +38,6 @@ int __comando_qry_de(void *_this, void *_controlador) {
   Ponto2D posicao = endereco_get_coordenada(
     comercio_get_endereco(comercio), controlador);
 
-  // TODO: Adicionar cnpj no local que fica o comercio.
   Figura figura = cria_circulo(
     posicao.x, posicao.y, 20,
     "transparent", "red"
@@ -45,6 +47,12 @@ int __comando_qry_de(void *_this, void *_controlador) {
 
   Lista_t.insert(controlador->saida_svg_qry,
     cria_desenhavel(figura, get_svg_figura, destruir_figura));
+
+  posicao.y += 30;
+  posicao.x -= strlen(cnpj) * 3.0;
+  void *custom = cria_custom(posicao, 12, cnpj, "red");
+  Lista_t.insert(controlador->saida_svg_qry,
+    cria_desenhavel(custom, print_custom_texto, free_custom));
 
   return 1;
 }

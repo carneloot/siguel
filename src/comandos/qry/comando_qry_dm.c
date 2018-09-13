@@ -9,6 +9,7 @@
 #include <endereco.h>
 #include <modules/logger.h>
 #include <utils.h>
+#include "svg_custom.h"
 
 int __comando_qry_dm(void *_this, void *_controlador) {
   struct Comando *this            = (struct Comando *) _this;
@@ -37,7 +38,6 @@ int __comando_qry_dm(void *_this, void *_controlador) {
   Ponto2D posicao = endereco_get_coordenada(
     pessoa_get_endereco(pessoa), controlador);
 
-  // TODO: Adicionar cpf no local que a pessoa mora.
   Figura figura = cria_circulo(
     posicao.x, posicao.y, 20,
     "transparent", "green"
@@ -47,6 +47,12 @@ int __comando_qry_dm(void *_this, void *_controlador) {
 
   Lista_t.insert(controlador->saida_svg_qry,
     cria_desenhavel(figura, get_svg_figura, destruir_figura));
+
+  posicao.y += 30;
+  posicao.x -= strlen(cpf) * 3.0;
+  void *custom = cria_custom(posicao, 12, cpf, "green");
+  Lista_t.insert(controlador->saida_svg_qry,
+    cria_desenhavel(custom, print_custom_texto, free_custom));
 
   return 1;
 }

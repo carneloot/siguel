@@ -4,8 +4,25 @@
 #include <stdlib.h>
 #include <string.h>
 #include <pessoa.h>
+#include <desenhavel.h>
 #include <endereco.h>
 #include <utils.h>
+
+char *svg_pontos(void *_pontos) {
+  Ponto2D *pontos = _pontos;
+  Ponto2D a = pontos[0];
+  Ponto2D b = pontos[1];
+  
+  char *saida = format_string(
+    "<line x1=\"%.1f\" y1=\"%.1f\" x2=\"%.1f\" y2=\"%.1f\" "
+    "style=\"stroke:%s;stroke-width:4;opacity:0.8\" />\n",
+    a.x, a.y,
+    b.x, b.y,
+    "blue"
+  );
+
+  return saida;
+}
 
 int __comando_qry_mud(void *_this, void *_controlador) {
   struct Comando *this            = (struct Comando *) _this;
@@ -55,6 +72,16 @@ int __comando_qry_mud(void *_this, void *_controlador) {
   free(info_endereco_atual);
 
   // Desenhar uma linha de pos_antiga ate pos_atual
+  Ponto2D *pontos = calloc(2, sizeof(*pontos));
+  pontos[0] = pos_antiga;
+  pontos[1] = pos_atual;
+
+  Ponto2D new_max = Ponto2D_t.maximo(pos_antiga, pos_atual);
+  controlador->max_qry = Ponto2D_t.maximo(controlador->max_qry, new_max);
+
+  Lista_t.insert(controlador->saida_svg_qry, 
+    cria_desenhavel(pontos, svg_pontos, free)
+  );
   
   return 1;
 }
