@@ -61,6 +61,17 @@ static void remover_elementos(
       it = Lista_t.get_next(elementos[QUADRA], it);
     }
   }
+
+  if (elementos[RADIO_BASE]) {
+    Posic it = Lista_t.get_first(elementos[RADIO_BASE]);
+    while (it) {
+      Elemento elemento = Lista_t.get(elementos[RADIO_BASE], it);
+
+      HashTable_t.remove(controlador->tabelas[ID_X_RADIO], get_id_elemento(elemento));
+
+      it = Lista_t.get_next(elementos[RADIO_BASE], it);
+    }
+  }
   
   for (int h = 0; h < 4; h++) {
     if (!elementos[h]) continue;

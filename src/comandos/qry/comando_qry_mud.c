@@ -58,7 +58,7 @@ int __comando_qry_mud(void *_this, void *_controlador) {
   free(info_endereco_atual);
 
   // Desenhar uma linha de pos_antiga ate pos_atual
-  Seta pontos = cria_svg_pontos(pos_antiga, pos_atual, "green", 1);
+  Seta pontos = cria_svg_pontos(pos_antiga, pos_atual, "green", 1, 0);
 
   Ponto2D new_max = Ponto2D_t.maximo(pos_antiga, pos_atual);
   controlador->max_qry = Ponto2D_t.maximo(controlador->max_qry, new_max);

@@ -7,11 +7,12 @@ struct Seta {
   Ponto2D a, b;
   char *cor;
   int seta;
+  int tracejada;
 };
 
 typedef struct Seta *Seta;
 
-Seta cria_svg_pontos(Ponto2D a, Ponto2D b, char *cor, int seta);
+Seta cria_svg_pontos(Ponto2D a, Ponto2D b, char *cor, int seta, int tracejada);
 
 char *svg_pontos(void *_pontos);
 

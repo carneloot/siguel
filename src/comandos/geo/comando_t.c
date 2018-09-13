@@ -22,6 +22,12 @@ int __comando_t(void *_this, void *_controlador) {
 
   KDTree_t.insert(controlador->elementos[RADIO_BASE], elemento);
 
+  HashInfo info = {
+    .chave = get_id_elemento(elemento),
+    .valor = elemento
+  };
+  HashTable_t.insert(controlador->tabelas[ID_X_RADIO], info);
+
   Ponto2D new_max = Ponto2D_t.add_scalar(pos, RAIO_EQUIPAMENTOS + 4);
 
   controlador->max_geo = Ponto2D_t.maximo(controlador->max_geo, new_max);

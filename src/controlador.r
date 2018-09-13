@@ -24,6 +24,7 @@ enum Tabelas {
   CPF_X_PESSOA,
   CPF_X_CEP,
   CNPJ_X_COMERCIO,
+  ID_X_RADIO,
   TABELAS_TOTAL
 };
 
