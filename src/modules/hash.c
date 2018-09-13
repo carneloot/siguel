@@ -205,6 +205,11 @@ static void __print_hashtable(
   }
 }
 
+static unsigned __length_hashtable(HashTable _this) {
+  struct HashTable * this = (struct HashTable *) _this;
+  return this->count;
+}
+
 const struct HashTable_t HashTable_t = {  //
   .create  = &__create_hashtable,
   .destroy = &__destroy_hashtable,
@@ -212,4 +217,6 @@ const struct HashTable_t HashTable_t = {  //
   .exists  = &__exists_hashtable,
   .get     = &__get_hashtable,
   .remove  = &__remove_hashtable,
-  .print   = &__print_hashtable};
+  .print   = &__print_hashtable,
+  .length  = &__length_hashtable,
+};

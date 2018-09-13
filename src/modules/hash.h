@@ -39,6 +39,11 @@ struct HashTable_t {
   HashInfo (*get)(HashTable this, const char chave[]);
 
   /**
+   * Retorna o numero de casas preenchidas da HashTable
+   */
+  unsigned (*length)(HashTable this);
+
+  /**
    * A chave nao pode existir mais
    */
   void (*remove)(HashTable this, const char chave[]);
