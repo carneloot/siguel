@@ -9,7 +9,7 @@
 #include <utils.h>
 #include "../funcoes_checagem.h"
 
-int contemCep(const Item item, const void *other) {
+static int contemCep(const Item item, const void *other) {
   Pessoa pessoa   = item;
   const char *cep = other;
 

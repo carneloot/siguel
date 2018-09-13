@@ -45,6 +45,7 @@
   ENTRY(  comando_qry_fec,   "qry/fec") \
   ENTRY(  comando_qry_mud,   "qry/mud") \
   ENTRY(comando_qry_mudec, "qry/mudec") \
+  ENTRY(  comando_qry_ecq,  "qry/ecq?") \
   ENTRY(     comando_ec_t,      "ec/t") \
   ENTRY(     comando_ec_e,      "ec/e") \
   ENTRY(     comando_pm_p,      "pm/p") \
