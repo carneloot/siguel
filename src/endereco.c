@@ -7,6 +7,7 @@
 #include <elemento.h>
 #include <controlador.h>
 #include <modules/hash.h>
+#include <utils.h>
 
 Endereco cria_endereco(char *cep, enum Face face, int numero) {
   Endereco this = malloc(sizeof(*this));
@@ -58,11 +59,7 @@ Ponto2D endereco_get_coordenada(Endereco this, void *controlador) {
 
 char *endereco_get_info(Endereco this) {
   // "%s, %c - $d"
-  char *saida;
-
-  saida = malloc(13 + strlen(this->cep));
-
-  sprintf(saida, "%s, %c - %d",
+  char *saida = format_string("%s, %c - %d",
     this->cep, face_to_char(this->face), this->numero
   );
 

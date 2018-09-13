@@ -3,6 +3,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
+#include <utils.h>
 
 struct Pessoa {
   char *cpf;
@@ -71,19 +72,13 @@ char *pessoa_get_info(Pessoa _this, void *controlador) {
   char *saida;
   char *endereco_info = endereco_get_info(this->endereco);
 
-  size_t length = 40 + strlen(this->nome) + strlen(this->sobrenome)
-    + strlen(this->cpf) + strlen(this->complemento)
-    + strlen(endereco_info);
-
-  saida = malloc(length);
-
   Ponto2D pos;
   if (controlador)
     pos = endereco_get_coordenada(this->endereco, controlador);
   else
     pos = Ponto2D_t.new(0, 0);
 
-  sprintf(saida, "Pessoa %s %s:\n  %s\n  %s (%s)\n  em (%.0f,%.0f)",
+  saida = format_string("Pessoa %s %s:\n  %s\n  %s (%s)\n  em (%.0f,%.0f)",
     this->nome, this->sobrenome, this->cpf,
     endereco_info, this->complemento,
     pos.x, pos.y

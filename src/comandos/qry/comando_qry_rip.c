@@ -4,6 +4,7 @@
 #include <stdlib.h>
 #include <figura.h>
 #include <pessoa.h>
+#include <utils.h>
 #include <modules/logger.h>
 
 #define SVG_FIGURA_CRUZ "<svg style=\"isolation:isolate\" viewBox=\"505.672 93 291.328 291.328\"><g><rect x=\"548.336\" y=\"135.664\" width=\"206\" height=\"206\" transform=\"matrix(0.707,0.707,-0.707,0.707,359.533,-390.661)\" fill=\"rgb(46,46,46)\"/><path d=\" M 663.836 229.164 L 663.836 142.664 L 638.836 142.664 L 638.836 229.164 L 555.336 229.164 L 555.336 254.164 L 638.836 254.164 L 638.836 334.664 L 663.836 334.664 L 663.836 254.164 L 747.336 254.164 L 747.336 229.164 L 663.836 229.164 Z \" fill-rule=\"evenodd\" fill=\"rgb(235,235,235)\"/></g></svg>"
@@ -53,9 +54,8 @@ int __comando_qry_rip(void *_this, void *_controlador) {
 
 
   char *info_pessoa = pessoa_get_info(pessoa, controlador);
-  char *rip_message = malloc(23 + strlen(info_pessoa));
-
-  sprintf(rip_message, "Nota de falecimento:\n%s\n", info_pessoa);
+  char *rip_message = format_string(
+    "Nota de falecimento:\n%s\n", info_pessoa);
 
   Lista_t.insert(controlador->saida, rip_message);
 

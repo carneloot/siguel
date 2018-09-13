@@ -33,9 +33,8 @@ int __comando_crb(void *_this, void *_controlador) {
 
   // Se nao houver torres
   if (KDTree_t.is_empty(controlador->elementos[RADIO_BASE])) {
-    saida = malloc(63);
-    sprintf(
-      saida, "Nao ha torres de celular suficientes para checar a distancia.\n");
+    saida = format_string(
+      "Nao ha torres de celular suficientes para checar a distancia.\n");
     Lista_t.insert(controlador->saida, saida);
     return 1;
   }
@@ -53,12 +52,7 @@ int __comando_crb(void *_this, void *_controlador) {
   char *id1 = get_id_elemento(radio1);
   char *id2 = get_id_elemento(radio2);
 
-  size_t length = 49 + strlen(id1) + strlen(id2) + 6;
-
-  saida = malloc(length);
-
-  sprintf(
-    saida,
+  saida = format_string(
     "Torres de radio mais proximas:\n%s e %s. Distancia: %3.2f\n",
     id1,
     id2,

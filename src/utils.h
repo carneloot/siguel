@@ -21,4 +21,6 @@ char *evaluate_dir(char *dir);
 
 char *remover_extensao(const char *path);
 
+char *format_string(const char *fmt, ...);
+
 #endif /* __UTILS_H__ */

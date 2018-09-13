@@ -5,6 +5,7 @@
 #include <modules/logger.h>
 #include <stdlib.h>
 #include <string.h>
+#include <utils.h>
 #include "../funcoes_checagem.h"
 
 int __comando_i(void *_this, void *_controlador) {
@@ -28,15 +29,12 @@ int __comando_i(void *_this, void *_controlador) {
 
   Figura figura1 = Lista_t.get(controlador->figuras, posic_figura1);
 
-  size_t length =
-    10 + strlen(params[0]) + strlen(params[1]) + strlen(params[2]);
-
-  char *saida = (char *) malloc(length * sizeof(char));
+  char *saida;
 
   if (contem_ponto(figura1, pos))
-    sprintf(saida, "i %s %s %s\nSIM\n", params[0], params[1], params[2]);
+    saida = format_string("i %s %s %s\nSIM\n", params[0], params[1], params[2]);
   else
-    sprintf(saida, "i %s %s %s\nNAO\n", params[0], params[1], params[2]);
+    saida = format_string("i %s %s %s\nNAO\n", params[0], params[1], params[2]);
 
   Lista_t.insert(controlador->saida, (Item) saida);
 

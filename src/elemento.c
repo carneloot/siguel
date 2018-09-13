@@ -4,6 +4,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <utils.h>
 
 #define x(a) ((a)->pos.x)
 #define y(a) ((a)->pos.y)
@@ -154,14 +155,10 @@ void destruir_elemento(Elemento e) {
 char *get_info_elemento(Elemento e) {
   struct Elemento *this = (struct Elemento *) e;
   char *saida;
-  size_t length;
 
   switch (this->tipo) {
     case QUADRA:
-      length = 28 + strlen(this->cep) + 4 * 8;
-      saida  = (char *) calloc(length, sizeof(char));
-      sprintf(
-        saida,
+      saida = format_string(
         "Quadra: %s em (%5.2f,%5.2f) tamanho (%5.2f,%5.2f)",
         this->cep,
         x(this),
@@ -171,24 +168,18 @@ char *get_info_elemento(Elemento e) {
       break;
 
     case HIDRANTE:
-      length = 18 + strlen(this->cep) + 2 * 8;
-      saida  = (char *) calloc(length, sizeof(char));
-      sprintf(
-        saida, "Hidrante: %s em (%5.2f,%5.2f)", this->cep, x(this), y(this));
+      saida = format_string(
+        "Hidrante: %s em (%5.2f,%5.2f)", this->cep, x(this), y(this));
       break;
 
     case RADIO_BASE:
-      length = 20 + strlen(this->cep) + 2 * 8;
-      saida  = (char *) calloc(length, sizeof(char));
-      sprintf(
-        saida, "Radio Base: %s em (%5.2f,%5.2f)", this->cep, x(this), y(this));
+      saida  = format_string(
+        "Radio Base: %s em (%5.2f,%5.2f)", this->cep, x(this), y(this));
       break;
 
     case SEMAFORO:
-      length = 18 + strlen(this->cep) + 2 * 8;
-      saida  = (char *) calloc(length, sizeof(char));
-      sprintf(
-        saida, "Semaforo: %s em (%5.2f,%5.2f)", this->cep, x(this), y(this));
+      saida  = format_string(
+        "Semaforo: %s em (%5.2f,%5.2f)", this->cep, x(this), y(this));
       break;
   }
 

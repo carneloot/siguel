@@ -2,7 +2,9 @@
 
 #include <math.h>
 #include <stdlib.h>
+#include <stdarg.h>
 #include <string.h>
+#include <stdio.h>
 
 char *trim(char *entrada) {
   int tam, i;
@@ -137,6 +139,20 @@ char *remover_extensao(const char *path) {
   for (j = 0; j < length; j++)
     saida[j] = path[j];
   saida[j] = 0;
+
+  return saida;
+}
+
+char *format_string(const char *fmt, ...) {
+  va_list list;
+  va_start(list, fmt);
+  size_t length = vsnprintf(NULL, 0, fmt, list);
+  va_end(list);
+
+  char *saida = malloc(length + 1);
+  va_start(list, fmt);
+  vsprintf(saida, fmt, list);
+  va_end(list);
 
   return saida;
 }

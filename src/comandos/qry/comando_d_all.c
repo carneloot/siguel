@@ -72,8 +72,7 @@ static void remover_elementos(
 
       KDTree_t.delete(controlador->elementos[h], elemento);
       char *cep   = get_cep_elemento(elemento);
-      char *saida = malloc(18 + strlen(tipo_elemento) + strlen(cep));
-      sprintf(saida, "%s: %s deletado (a).\n", tipo_elemento, cep);
+      char *saida = format_string("%s: %s deletado (a).\n", tipo_elemento, cep);
       Lista_t.insert(controlador->saida, saida);
 
       // FIXME: Quando o elemento é deletado, ele nao funciona para equs.qry e para quads.qrys

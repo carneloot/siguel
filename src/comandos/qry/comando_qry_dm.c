@@ -7,6 +7,7 @@
 #include <figura.h>
 #include <endereco.h>
 #include <modules/logger.h>
+#include <utils.h>
 
 int __comando_qry_dm(void *_this, void *_controlador) {
   struct Comando *this            = (struct Comando *) _this;
@@ -18,8 +19,7 @@ int __comando_qry_dm(void *_this, void *_controlador) {
   HashTable tabela = controlador->tabelas[CPF_X_PESSOA];
 
   if (!HashTable_t.exists(tabela, cpf)) {
-    char *saida = malloc(43 + strlen(cpf));
-    sprintf(saida, "A pessoa com o CPF \"%s\" nao foi encontrada.\n", cpf);
+    char *saida = format_string("A pessoa com o CPF \"%s\" nao foi encontrada.\n", cpf);
     Lista_t.insert(controlador->saida, saida);
     return 1;
   }

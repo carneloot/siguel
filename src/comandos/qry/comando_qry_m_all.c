@@ -6,6 +6,7 @@
 #include <pessoa.h>
 #include <elemento.h>
 #include <modules/logger.h>
+#include <utils.h>
 #include "../funcoes_checagem.h"
 
 int contemCep(const Item item, const void *other) {
@@ -60,8 +61,7 @@ int __comando_qry_m(void *_this, void *_controlador) {
     return 1;
   }
 
-  char *string_saida = malloc(21 + strlen(cep));
-  sprintf(string_saida, "Pessoas na quadra %s:\n", cep);
+  char *string_saida = format_string("Pessoas na quadra %s:\n", cep);
   Lista_t.insert(controlador->saida, string_saida);
 
   Lista pessoas_cep = __comando_m_all(controlador->pessoas, cep);
@@ -123,8 +123,8 @@ int __comando_qry_mr(void *_this, void *_controlador) {
     return 1;
   }
 
-  char *string_saida = malloc(72);
-  sprintf(string_saida, "Pessoas nas quadras entre (%.0f,%.0f) com tamanho (%.0f,%.0f):\n", 
+  char *string_saida = format_string(
+    "Pessoas nas quadras entre (%.0f,%.0f) com tamanho (%.0f,%.0f):\n", 
     pos.x, pos.y, size.x, size.y);
   Lista_t.insert(controlador->saida, string_saida);
 

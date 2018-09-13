@@ -3,6 +3,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <stdio.h>
+#include <utils.h>
 
 struct Comercio {
   char *cnpj;
@@ -53,10 +54,8 @@ char *comercio_get_info(Comercio _this, char *tipo_desc) {
 
   char *endereco_info = endereco_get_info(this->endereco);
 
-  char *saida = malloc(21 + strlen(this->cnpj) + strlen(this->nome)
-    + strlen(tipo_desc) + strlen(endereco_info));
-
-  sprintf(saida, "Comercio %s:\n  %s\n  %s\n  %s",
+  char *saida = format_string(
+    "Comercio %s:\n  %s\n  %s\n  %s",
     this->nome, this->cnpj, tipo_desc, endereco_info
   );
 

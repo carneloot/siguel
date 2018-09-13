@@ -241,21 +241,16 @@ void gerar_fila_execucao(Controlador _this) {
   // Adicionar os arquivos a serem verificados na lista
   Lista arquivos = Lista_t.create();
 
-  size_t length;
-  char *path;
-
-  length = strlen(this->nome_base) + strlen(this->dir_entrada) + 6;
-  path   = (char *) malloc(length * sizeof(char));
-  sprintf(path, "%s/%s.geo", this->dir_entrada, this->nome_base);
+  char *path = format_string(
+    "%s/%s.geo", this->dir_entrada, this->nome_base);
   Lista_t.insert(arquivos, path);
 
   // Se o arquivo de qry foi especificado
   for (int i = 0; i < EXTRAS_TOTAL; i++) {
     if (!this->extras[i]) continue;
 
-    length = strlen(this->extras[i]) + strlen(this->dir_entrada) + 3 + strlen(extra_extensao[i]);
-    path   = (char *) malloc(length * sizeof(char));
-    sprintf(path, "%s/%s.%s", this->dir_entrada, this->extras[i], extra_extensao[i]);
+    path = format_string(
+      "%s/%s.%s", this->dir_entrada, this->extras[i], extra_extensao[i]);
     Lista_t.insert(arquivos, path);
   }
 
@@ -307,7 +302,6 @@ void gerar_fila_execucao(Controlador _this) {
 void finalizar_arquivos(Controlador c) {
   struct Controlador *this = (struct Controlador *) c;
   char *full_path;
-  size_t length;
   Posic iterator;
 
   // Escreve o txt do .geo
@@ -324,9 +318,8 @@ void finalizar_arquivos(Controlador c) {
   // Arquivo [nome_base]-[nome_qry].svg
   SVG s;
 
-  length    = 7 + strlen(this->dir_saida) + strlen(qry_file) + strlen(geo_file);
-  full_path = calloc(length, sizeof(char));
-  sprintf(full_path, "%s%s-%s.svg", this->dir_saida, geo_file, qry_file);
+  full_path = format_string(
+    "%s%s-%s.svg", this->dir_saida, geo_file, qry_file);
 
   s = cria_SVG(full_path, this->max_qry.x, this->max_qry.y);
 
@@ -476,7 +469,6 @@ void desenhar_sobreposicoes(void *c, void *s) {
 
 static void escrever_txt_final(void *c) {
   struct Controlador *this;
-  size_t tamanho_total;
   char *full_path;
   Arquivo arq;
 
@@ -487,10 +479,8 @@ static void escrever_txt_final(void *c) {
     
   LOG_PRINT(LOG_FILE, "Escrevendo txt final.");
 
-  tamanho_total = strlen(this->dir_saida) + strlen(this->nome_base) + 1 + 4;
-  full_path     = (char *) malloc(tamanho_total * sizeof(char));
-
-  sprintf(full_path, "%s%s.txt", this->dir_saida, this->nome_base);
+  full_path     = format_string(
+    "%s%s.txt", this->dir_saida, this->nome_base);
 
   arq = abrir_arquivo(full_path, ALTERACAO);
 

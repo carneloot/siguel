@@ -5,6 +5,7 @@
 #include <string.h>
 #include <pessoa.h>
 #include <endereco.h>
+#include <utils.h>
 
 int __comando_qry_mud(void *_this, void *_controlador) {
   struct Comando *this            = (struct Comando *) _this;
@@ -16,8 +17,8 @@ int __comando_qry_mud(void *_this, void *_controlador) {
   HashTable tabela_cep    = controlador->tabelas[CPF_X_CEP];
 
   if (!HashTable_t.exists(tabela_pessoa, cpf)) {
-    char *saida = malloc(43 + strlen(cpf));
-    sprintf(saida, "A pessoa com o CPF \"%s\" nao foi encontrada.\n", cpf);
+    char *saida = format_string(
+      "A pessoa com o CPF \"%s\" nao foi encontrada.\n", cpf);
     Lista_t.insert(controlador->saida, saida);
     return 1;
   } 
@@ -45,8 +46,8 @@ int __comando_qry_mud(void *_this, void *_controlador) {
   Ponto2D pos_atual = endereco_get_coordenada(pessoa_get_endereco(pessoa), controlador);
   char *info_endereco_atual = endereco_get_info(pessoa_get_endereco(pessoa));
 
-  char *saida = malloc(35 + strlen(info_pessoa) + strlen(info_endereco_atual));
-  sprintf(saida, "Mudanca de endereco:\n%s\nmudou para %s\n",
+  char *saida = format_string(
+    "Mudanca de endereco:\n%s\nmudou para %s\n",
     info_pessoa, info_endereco_atual);
   Lista_t.insert(controlador->saida, saida);
 

@@ -142,8 +142,7 @@ void desenha_elemento(SVG this, Elemento e) {
 void desenha_asset(SVG _this, Ponto2D pos, Ponto2D size, char *nome) {
   struct SVG *this = (struct SVG *) _this;
 
-  char *fullpath = malloc(strlen(ASSETS_FOLDER) + strlen(nome) + 1);
-  sprintf(fullpath, "%s%s", ASSETS_FOLDER, nome);
+  char *fullpath = format_string("%s%s", ASSETS_FOLDER, nome);
 
   Arquivo arq_asset  = abrir_arquivo(fullpath, LEITURA);
   char *asset_string = ler_arquivo_inteiro(arq_asset);

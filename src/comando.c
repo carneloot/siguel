@@ -4,6 +4,7 @@
 #include <stdint.h>
 #include <stdlib.h>
 #include <string.h>
+#include <utils.h>
 
 #include "comando.r"
 
@@ -82,8 +83,7 @@ Comando cria_comando(char *entrada, char *arq) {
 
   item = strtok(linha, " ");
 
-  char *cod = malloc(strlen(item) + strlen(arq) + 2);
-  sprintf(cod, "%s/%s", arq, item);
+  char *cod = format_string("%s/%s", arq, item);
 
   for (i = 0; i < NUM_COMANDOS; i++) {
     if (!strcmp(cod, comandos[i].id)) {
