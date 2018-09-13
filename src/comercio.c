@@ -62,7 +62,7 @@ char *comercio_get_info(Comercio _this, char *tipo_desc) {
   char *endereco_info = endereco_get_info(this->endereco);
 
   char *saida = format_string(
-    "Comercio %s:\n  %s\n  %s\n  %s",
+    "Comercio %s:  %s  %s  %s",
     this->nome, this->cnpj, tipo_desc, endereco_info
   );
 

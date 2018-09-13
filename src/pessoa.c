@@ -78,7 +78,7 @@ char *pessoa_get_info(Pessoa _this, void *controlador) {
   else
     pos = Ponto2D_t.new(0, 0);
 
-  saida = format_string("Pessoa %s %s:\n  %s\n  %s (%s)\n  em (%.0f,%.0f)",
+  saida = format_string("Pessoa %s %s:  %s  %s (%s)  em (%.0f,%.0f)",
     this->nome, this->sobrenome, this->cpf,
     endereco_info, this->complemento,
     pos.x, pos.y
