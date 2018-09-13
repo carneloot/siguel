@@ -18,7 +18,8 @@ int __comando_qry_fec(void *_this, void *_controlador) {
   HashTable tabela = controlador->tabelas[CNPJ_X_COMERCIO];
 
   if (!HashTable_t.exists(tabela, cnpj)) {
-    LOG_ERRO("CNPJ \"%s\" nao encontrado.", cnpj);
+    Lista_t.insert(controlador->saida, 
+      format_string("CNPJ \"%s\" nao encontrado.", cnpj));
     return 1;
   }
 
@@ -31,7 +32,7 @@ int __comando_qry_fec(void *_this, void *_controlador) {
 
   if (!posic) {
     LOG_ERRO("Erro interno.");
-    return 0;
+    exit(EXIT_FAILURE);
   }
 
   HashTable_t.remove(tabela, cnpj);

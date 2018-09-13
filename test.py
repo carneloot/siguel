@@ -3,14 +3,16 @@ from time import time
 import subprocess
 
 BIN_FOLDER   = "./bin"
-TESTS_FOLDER = "./test/t3"
-OUT_FOLDER   = "./out/t3"
+TESTS_FOLDER = "./test/t4"
+OUT_FOLDER   = "./out/t4"
 APP_NAME     = "siguel"
 
 APP_PATH     = "{0}/{1}".format(BIN_FOLDER, APP_NAME)
 
 RUN_COMMAND  = "{0} -e {1} -o {2} -f {3}"
 QRY_COMMAND  = " -q {0}"
+PM_COMMAND   = " -pm {0}"
+EC_COMMAND   = " -ec {0}"
 
 
 def rodar_comando(comando):
@@ -52,6 +54,14 @@ if __name__ == "__main__":
         comando_string = RUN_COMMAND.format(
             APP_PATH, TESTS_FOLDER, OUT_FOLDER, filename
         )
+
+        pm_name = file_name + ".pm"
+        if os.path.exists(TESTS_FOLDER + "/" + pm_name):
+            comando_string += PM_COMMAND.format(pm_name)
+
+        ec_name = file_name + ".ec"
+        if os.path.exists(TESTS_FOLDER + "/" + ec_name):
+            comando_string += EC_COMMAND.format(ec_name)
 
         print(comando_string)
         
