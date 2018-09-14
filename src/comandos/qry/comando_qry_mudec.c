@@ -43,7 +43,7 @@ int __comando_qry_mudec(void *_this, void *_controlador) {
   char *info_endereco_atual = endereco_get_info(comercio_get_endereco(comercio));
 
   char *saida = format_string(
-    "Mudanca de endereco:\n%s\nmudou para %s\n",
+    "Mudanca de endereco:\n\t%s\n\tmudou para %s\n",
     info_comercio, info_endereco_atual);
   Lista_t.insert(controlador->saida, saida);
 

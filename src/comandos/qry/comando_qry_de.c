@@ -22,7 +22,7 @@ int __comando_qry_de(void *_this, void *_controlador) {
 
   if (!HashTable_t.exists(tabela, cnpj)) {
     Lista_t.insert(controlador->saida, 
-      format_string("Nao foi encontrado o comercio de CNPJ %s.", cnpj));
+      format_string("Nao foi encontrado o comercio de CNPJ %s.\n", cnpj));
     return 1;
   }
 

@@ -42,7 +42,7 @@ int __comando_qry_fec(void *_this, void *_controlador) {
   char *tipo_desc = HashTable_t.get(controlador->tabelas[TIPO_X_DESCRICAO], comercio_get_tipo(comercio)).valor;
   char *info_comercio = comercio_get_info(comercio, tipo_desc);
   char *rip_message = format_string(
-    "Nota de fechamento de comercio:\n%s\n", info_comercio);
+    "Nota de fechamento de comercio:\n\t%s\n", info_comercio);
 
   Lista_t.insert(controlador->saida, rip_message);
 
