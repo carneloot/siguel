@@ -60,7 +60,7 @@ int __comando_qry_rip(void *_this, void *_controlador) {
 
   char *info_pessoa = pessoa_get_info(pessoa, controlador);
   char *rip_message = format_string(
-    "Nota de falecimento:\n%s\n", info_pessoa);
+    "Nota de falecimento:\n\t%s\n", info_pessoa);
 
   Lista_t.insert(controlador->saida, rip_message);
 

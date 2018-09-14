@@ -493,6 +493,8 @@ static void escrever_txt_final(void *c) {
     iterator = Lista_t.get_next(this->saida, iterator);
   }
 
+  escrever_linha(arq, "\n\n");
+
   fechar_arquivo(arq);
 }
 

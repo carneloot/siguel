@@ -41,9 +41,10 @@ static void __reportar_pessoas(Lista pessoas, struct Controlador *controlador) {
     Pessoa pessoa = Lista_t.get(pessoas, it);
 
     char *info_pessoa = pessoa_get_info(pessoa, controlador);
-    strcat(info_pessoa, "\n");
 
-    Lista_t.insert(controlador->saida, info_pessoa);
+    Lista_t.insert(controlador->saida, format_string("\t%s\n", info_pessoa));
+
+    free(info_pessoa);
 
     it = Lista_t.get_next(pessoas, it);
   }
@@ -62,10 +63,17 @@ int __comando_qry_m(void *_this, void *_controlador) {
     return 1;
   }
 
+  Lista pessoas_cep = __comando_m_all(controlador->pessoas, cep);
+
+  if (Lista_t.length(pessoas_cep) == 0) {
+    Lista_t.insert(controlador->saida, format_string(
+      "Nao ha pessoas na quadra %s\n", cep));
+    Lista_t.destruir(pessoas_cep, NULL);
+    return 1;
+  }
+
   char *string_saida = format_string("Pessoas na quadra %s:\n", cep);
   Lista_t.insert(controlador->saida, string_saida);
-
-  Lista pessoas_cep = __comando_m_all(controlador->pessoas, cep);
 
   __reportar_pessoas(pessoas_cep, controlador);
 

@@ -99,6 +99,16 @@ struct Lista_t {
     int (*compare)(const Item item, const void *other));
 
   /**
+   * Retorna uma copia da lista passada.
+   */
+  Lista (*copy)(Lista this);
+
+  /**
+   * Retorna uma lista filtrada de acordo com a funcao passada
+   */
+  Lista (*filter)(Lista this, void *other, int (*compare)(const Item item, const void *other));
+
+  /**
    * Retorna uma array de Item com todos os itens da lista.
    * O tamanho do array é o mesmo da lista. Deve ser dado free no retorno.
    */

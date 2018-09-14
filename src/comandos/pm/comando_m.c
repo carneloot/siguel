@@ -5,6 +5,7 @@
 #include <pessoa.h>
 #include <modules/logger.h>
 #include <endereco.h>
+#include <utils.h>
 
 int __comando_pm_m(void *_this, void *_controlador) {
   struct Comando *this            = (struct Comando *) _this;

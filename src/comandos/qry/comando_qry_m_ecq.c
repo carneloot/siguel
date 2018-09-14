@@ -37,9 +37,10 @@ int __comando_qry_ecq(void *_this, void *_controlador) {
 
     char *tipo_desc = HashTable_t.get(controlador->tabelas[TIPO_X_DESCRICAO], comercio_get_tipo(comercio)).valor;
     char *info_comercio = comercio_get_info(comercio, tipo_desc);
-    strcat(info_comercio, "\n");
 
-    Lista_t.insert(controlador->saida, info_comercio);
+    Lista_t.insert(controlador->saida, format_string("\t%s\n", info_comercio));
+
+    free(info_comercio);
 
     it = Lista_t.search(comercios, Lista_t.get_next(comercios, it), cep, contemCep);
   }

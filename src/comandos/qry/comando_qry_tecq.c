@@ -58,6 +58,22 @@ char **__get_tipos(Lista comercios) {
   return tipos;
 }
 
+Lista __get_comercios_area(Lista comercios, Ponto2D pos, Ponto2D size) {
+  Ponto2D pontos[2] = {pos, size};
+
+  Posic it = Lista_t.get_first(comercios);
+
+  Lista comercios_na_area = Lista_t.create();
+
+  it = Lista_t.search(comercios, it, pontos, compararDentro);
+  while (it) {
+    Lista_t.insert(comercios_na_area, Lista_t.get(comercios, it));
+    it = Lista_t.search(comercios, Lista_t.get_next(comercios, it), pontos, compararDentro);
+  }
+
+  return comercios_na_area;
+}
+
 int __comando_qry_tecq(void *_this, void *_controlador) {
   struct Comando     *this        = _this;
   struct Controlador *controlador = _controlador;
@@ -77,15 +93,7 @@ int __comando_qry_tecq(void *_this, void *_controlador) {
 
   Lista comercios = controlador->comercios;
 
-  Lista comercios_na_quadra = Lista_t.create();
-
-  // Peguei todos os tipos
-  Posic it = Lista_t.get_first(comercios);
-  it = Lista_t.search(comercios, it, cep, compararCEP);
-  while (it) {
-    Lista_t.insert(comercios_na_quadra, Lista_t.get(comercios, it));
-    it = Lista_t.search(comercios, Lista_t.get_next(comercios, it), cep, compararCEP);
-  }
+  Lista comercios_na_quadra = Lista_t.filter(comercios, cep, compararCEP);
 
   char **tipos = __get_tipos(comercios_na_quadra);
 
@@ -137,18 +145,7 @@ int __comando_qry_tecr(void *_this, void *_controlador) {
   Ponto2D pos  = Ponto2D_t.new(strtod(this->params[0], 0), strtod(this->params[1], 0));
   Ponto2D size = Ponto2D_t.new(strtod(this->params[2], 0), strtod(this->params[3], 0));
 
-  Ponto2D pontos[2] = {pos, size};
-
-  Lista comercios = controlador->comercios;
-  Posic it = Lista_t.get_first(comercios);
-
-  Lista comercios_na_area = Lista_t.create();
-
-  it = Lista_t.search(comercios, it, pontos, compararDentro);
-  while (it) {
-    Lista_t.insert(comercios_na_area, Lista_t.get(comercios, it));
-    it = Lista_t.search(comercios, Lista_t.get_next(comercios, it), pontos, compararDentro);
-  }
+  Lista comercios_na_area = __get_comercios_area(controlador->comercios, pos, size);
 
   char **tipos = __get_tipos(comercios_na_area);
 
@@ -183,6 +180,61 @@ int __comando_qry_tecr(void *_this, void *_controlador) {
 int __comando_qry_ecr(void *_this, void *_controlador) {
   struct Comando     *this        = _this;
   struct Controlador *controlador = _controlador;
+
+  __controlador = controlador;
+
+  char *tipo = this->params[0];
+
+  Lista comercios;
+  Ponto2D pos, size;
+
+  if (this->num_param > 1) {
+    pos  = Ponto2D_t.new(strtod(this->params[1], 0), strtod(this->params[2], 0));
+    size = Ponto2D_t.new(strtod(this->params[3], 0), strtod(this->params[4], 0));
+    comercios = __get_comercios_area(controlador->comercios, pos, size);
+  } else {
+    comercios = Lista_t.copy(controlador->comercios);
+  }
+
+  char *tipo_desc = HashTable_t.get(controlador->tabelas[TIPO_X_DESCRICAO], tipo).valor;
+
+  // Filtra somente os comercios com o tipo passado
+  Lista comercios_tipo = Lista_t.filter(comercios, tipo, compararTIPO);
+
+  Lista_t.destruir(comercios, 0);
+
+  if (Lista_t.length(comercios_tipo) == 0) {
+    Lista_t.insert(controlador->saida,
+      format_string("Nao ha comercios do tipo \"%s\" com os parametros especificados.\n", tipo_desc));
+    Lista_t.destruir(comercios_tipo, 0);
+    return 1;
+  }
+
+  char *saida;
+
+  if (this->num_param == 1)
+    saida = format_string("Todos comercios do tipo \"%s\":\n", tipo_desc);
+  else
+    saida = format_string("Todos comercios do tipo \"%s\" na area (%.0f,%0.f) de tamanho (%.0f,%0.f):\n",
+      tipo_desc, pos.x, pos.y, size.x, size.y);
+
+  Lista_t.insert(controlador->saida, saida);
+
+  Posic it = Lista_t.get_first(comercios_tipo);
+  while (it) {
+    Comercio comercio = Lista_t.get(comercios_tipo, it);
+
+    char *info_comercio = comercio_get_info(comercio, tipo_desc);
+
+    Lista_t.insert(controlador->saida, format_string(
+      "\t%s\n", info_comercio));
+
+    free(info_comercio);
+
+    it = Lista_t.get_next(comercios_tipo, it);
+  }
+  
+  Lista_t.destruir(comercios_tipo, 0);
 
   return 1;
 }

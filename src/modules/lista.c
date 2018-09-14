@@ -191,6 +191,36 @@ static Posic __search_lista(
   return NULL;
 }
 
+static Lista __copy_lista(Lista _this) {
+  struct Lista * this = (struct Lista *) _this;
+  Lista copia = __create_lista();
+
+  struct Posic *it = this->start;
+  while (it) {
+    __insert_lista(copia, it->value);
+    it = it->next;
+  }
+
+  return copia;
+}
+
+static Lista __filter_lista(Lista _this, void *other, int (*compare)(const Item item, const void *other)) {
+  struct Lista * this = (struct Lista *) _this;
+  Lista filtrado = __create_lista();
+
+  struct Posic *it = __get_first_lista(this);
+  it = __search_lista(this, it, other, compare);
+  while (it) {
+    Item item = __get_lista(this, it);
+
+    __insert_lista(filtrado, item);
+
+    it = __search_lista(this, __get_next_lista(this, it), other, compare);
+  }
+  
+  return filtrado;
+}
+
 static Item *__to_array_lista(Lista _this) {
   struct Lista *this = (struct Lista *) _this;
 
@@ -240,5 +270,7 @@ const struct Lista_t Lista_t = {  //
   .get_last      = &__get_last_lista,
   .get_previous  = &__get_previous_lista,
   .search        = &__search_lista,
+  .copy          = &__copy_lista,
+  .filter        = &__filter_lista,
   .to_array      = &__to_array_lista,
   .destruir      = &__destruir_lista};
