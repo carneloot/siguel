@@ -98,6 +98,49 @@ static KDTree __find_min_kdtree(KDTree this, unsigned dim) {
   return __find_min_rec_kdtree(this, dim, 0);
 }
 
+static KDTree __maximum_kdtree(KDTree _a, KDTree _b, KDTree _c, unsigned dim) {
+  struct KDTree *a = (struct KDTree *) _a;
+  struct KDTree *b = (struct KDTree *) _b;
+  struct KDTree *c = (struct KDTree *) _c;
+
+  struct KDTree *max  = a;
+  func_compare funcao = a->funcs[dim];
+  if (b && funcao(b->value, max->value) > 0)
+    max = b;
+  if (c && funcao(c->value, max->value) > 0)
+    max = c;
+
+  return max;
+}
+
+
+static KDTree __find_max_rec_kdtree(KDTree _this, unsigned dim, unsigned prof) {
+  struct KDTree *this = (struct KDTree *) _this;
+
+  if (!_this)
+    return NULL;
+
+  unsigned cd = prof % this->dim;
+
+  // Só pode estar a esquerda se a dimensao for a mesma
+  if (dim == cd) {
+    if (!this->right)
+      return this;
+    return __find_max_rec_kdtree(this->right, dim, prof + 1);
+  }
+
+  // Pode estar em qualquer lado
+  return __maximum_kdtree(
+    this,
+    __find_max_rec_kdtree(this->left, dim, prof + 1),
+    __find_max_rec_kdtree(this->right, dim, prof + 1),
+    dim);
+}
+
+static KDTree __find_max_kdtree(KDTree this, unsigned dim) {
+  return __find_max_rec_kdtree(this, dim, 0);
+}
+
 static KDTree __insert_rec_kdtree(KDTree _this, Item value, unsigned prof) {
   struct KDTree *this = (struct KDTree *) _this;
 
@@ -158,11 +201,11 @@ static KDTree __delete_rec_kdtree(KDTree _this, Item value, unsigned prof) {
   }
 
   // Se nao estiver nesse node
-  struct KDTree *min;
   unsigned cd = prof % this->dim;
 
   // Se contem no a direita
   if (this->right) {
+    struct KDTree *min;
     min         = __find_min_kdtree(this->right, cd);
     this->value = min->value;
     this->right = __delete_rec_kdtree(this->right, min->value, prof + 1);
@@ -170,9 +213,10 @@ static KDTree __delete_rec_kdtree(KDTree _this, Item value, unsigned prof) {
 
   // Se contem no a esquerda
   else if (this->left) {
-    min         = __find_min_kdtree(this->left, cd);
-    this->value = min->value;
-    this->right = __delete_rec_kdtree(this->left, min->value, prof + 1);
+    struct KDTree *max;
+    max         = __find_max_kdtree(this->left, cd);
+    this->value = max->value;
+    this->right = __delete_rec_kdtree(this->left, max->value, prof + 1);
     this->left  = NULL;
   }
 

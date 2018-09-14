@@ -119,7 +119,7 @@ static void __remover_elementos(
 
       it = Lista_t.get_next(elementos[h], it);
     }
-    
+
   }
 
 }
