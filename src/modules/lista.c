@@ -221,6 +221,20 @@ static Lista __filter_lista(Lista _this, void *other, int (*compare)(const Item 
   return filtrado;
 }
 
+static void __map_lista(Lista _this, void *other, void (*map_function)(const Item item, const void *other)) {
+  struct Lista * this = (struct Lista *) _this;
+
+  struct Posic *it = __get_first_lista(this);
+  while (it) {
+    Item item = __get_lista(this, it);
+
+    map_function(item, other);
+
+    it = __get_next_lista(this, it);
+  }
+  
+}
+
 static Item *__to_array_lista(Lista _this) {
   struct Lista *this = (struct Lista *) _this;
 
@@ -272,5 +286,6 @@ const struct Lista_t Lista_t = {  //
   .search        = &__search_lista,
   .copy          = &__copy_lista,
   .filter        = &__filter_lista,
+  .map           = &__map_lista,
   .to_array      = &__to_array_lista,
   .destruir      = &__destruir_lista};

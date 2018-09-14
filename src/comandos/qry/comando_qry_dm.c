@@ -21,7 +21,7 @@ int __comando_qry_dm(void *_this, void *_controlador) {
   HashTable tabela = controlador->tabelas[CPF_X_PESSOA];
 
   if (!HashTable_t.exists(tabela, cpf)) {
-    char *saida = format_string("A pessoa com o CPF \"%s\" nao foi encontrada.\n", cpf);
+    char *saida = format_string("CPF \"%s\" nao encontrado.\n", cpf);
     Lista_t.insert(controlador->saida, saida);
     return 1;
   }

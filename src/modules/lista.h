@@ -109,6 +109,11 @@ struct Lista_t {
   Lista (*filter)(Lista this, void *other, int (*compare)(const Item item, const void *other));
 
   /**
+   * Mapeia uma funcao para todos os itens da lista.
+   */
+  void (*map)(Lista this, void *other, void (*map_function)(const Item item, const void *other));
+
+  /**
    * Retorna uma array de Item com todos os itens da lista.
    * O tamanho do array é o mesmo da lista. Deve ser dado free no retorno.
    */

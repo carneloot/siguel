@@ -14,6 +14,8 @@ Pessoa cria_pessoa(char *cpf, char *nome, char *sobrenome, int sexo, char *nasc)
 
 void pessoa_set_endereco(Pessoa this, char *cep, int face, int num, char *complemento);
 
+void pessoa_remover_endereco(Pessoa this);
+
 char *pessoa_get_cpf(Pessoa this);
 
 char *pessoa_get_cep(Pessoa this);

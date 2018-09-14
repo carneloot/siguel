@@ -49,6 +49,18 @@ void pessoa_set_endereco(Pessoa _this, char *cep, int face, int num, char *compl
   this->endereco = cria_endereco(cep, face, num);
 }
 
+void pessoa_remover_endereco(Pessoa _this) {
+  struct Pessoa *this = (struct Pessoa *) _this;
+
+  if (this->endereco) {
+    endereco_destruir(this->endereco);
+    free(this->complemento);
+    this->endereco    = NULL;
+    this->complemento = NULL;
+  }
+
+}
+
 char *pessoa_get_cpf(Pessoa _this) {
   struct Pessoa * this = (struct Pessoa *) _this;
   return this->cpf;

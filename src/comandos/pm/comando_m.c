@@ -18,7 +18,7 @@ int __comando_pm_m(void *_this, void *_controlador) {
 
   if (!HashTable_t.exists(tabela, cpf)) {
     Lista_t.insert(controlador->saida,
-      format_string("CPF: \"%s\" não existe na tabela.", cpf));
+      format_string("CPF \"%s\" nao encontrado.\n", cpf));
     return 0;
   }
 

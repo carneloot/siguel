@@ -20,8 +20,7 @@ int __comando_qry_mud(void *_this, void *_controlador) {
   HashTable tabela_cep    = controlador->tabelas[CPF_X_CEP];
 
   if (!HashTable_t.exists(tabela_pessoa, cpf)) {
-    char *saida = format_string(
-      "A pessoa com o CPF \"%s\" nao foi encontrada.\n", cpf);
+    char *saida = format_string("CPF \"%s\" nao encontrado.\n", cpf);
     Lista_t.insert(controlador->saida, saida);
     return 1;
   } 
