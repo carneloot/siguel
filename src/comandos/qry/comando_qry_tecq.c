@@ -47,7 +47,9 @@ char **__get_tipos(Lista comercios) {
     char *tipo_atual = comercio_get_tipo(comercio);
 
     char **tipos_it = tipos;
-    while (*tipos_it && strcmp(tipo_atual, *tipos_it++));
+
+    // Aumenta o tipos_it até ficar vazio ou achar um igual
+    while (*tipos_it != NULL && strcmp(tipo_atual, *tipos_it++));
     *tipos_it = tipo_atual;
 
     it = Lista_t.get_next(comercios, it);
@@ -88,6 +90,12 @@ int __comando_qry_tecq(void *_this, void *_controlador) {
   char **tipos = __get_tipos(comercios_na_quadra);
 
   Lista_t.destruir(comercios_na_quadra, 0);
+
+  if (!tipos) {
+    Lista_t.insert(controlador->saida, 
+      format_string("Nao há comercios na quadra %s.\n", cep));
+    return 1;
+  }
 
   // Passar printando os tipos
   char **tipos_it = tipos;
@@ -148,7 +156,7 @@ int __comando_qry_tecr(void *_this, void *_controlador) {
 
   if (!tipos) {
     Lista_t.insert(controlador->saida, 
-      format_string("Nao há comercios na regiao (%.1f,%.1f) de tamanho (%.1f,%.1f):\n",
+      format_string("Nao há comercios na regiao (%.1f,%.1f) de tamanho (%.1f,%.1f).\n",
       pos.x, pos.y, size.x, size.y));
     return 1;
   }
@@ -168,6 +176,13 @@ int __comando_qry_tecr(void *_this, void *_controlador) {
   }
 
   free(tipos);
+
+  return 1;
+}
+
+int __comando_qry_ecr(void *_this, void *_controlador) {
+  struct Comando     *this        = _this;
+  struct Controlador *controlador = _controlador;
 
   return 1;
 }

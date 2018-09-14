@@ -5,6 +5,7 @@
 #include <desenhavel.h>
 #include <figura.h>
 #include <endereco.h>
+#include <utils.h>
 #include <modules/logger.h>
 #include <stdlib.h>
 
@@ -20,8 +21,9 @@ int __comando_qry_de(void *_this, void *_controlador) {
   HashTable tabela = controlador->tabelas[CNPJ_X_COMERCIO];
 
   if (!HashTable_t.exists(tabela, cnpj)) {
-    LOG_ERRO("\"%s\" nao foi encontrado na tabela.", cnpj);
-    return 0;
+    Lista_t.insert(controlador->saida, 
+      format_string("Nao foi encontrado o comercio de CNPJ %s.", cnpj));
+    return 1;
   }
 
   HashInfo info = HashTable_t.get(tabela, cnpj);
