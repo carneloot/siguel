@@ -198,5 +198,11 @@ int __comando_qry_dpr(void *_this, void *_controlador) {
   Lista_t.insert(controlador->saida_svg_qry, cria_desenhavel(
     custom, print_custom_asset, free_custom));
 
+  Figura area_afetada = cria_retangulo(pos.x, pos.y, size.x, size.y, "transparent", "teal");
+  set_dashed_figura(area_afetada, FIG_BORDA_TRACEJADA);
+
+  Lista_t.insert(controlador->saida_svg_qry, cria_desenhavel(
+    area_afetada, get_svg_figura, destruir_figura));
+
   return 1;
 }
