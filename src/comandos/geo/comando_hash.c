@@ -5,17 +5,13 @@
 #include <string.h>
 #include <stdlib.h>
 #include <SVG.h>
+#include <utils.h>
 
 int __comando_hash(void *_this, void *_controlador) {
   struct Controlador *controlador = (struct Controlador *) _controlador;
 
   /* Escrever SVG final */
-  size_t length =
-    strlen(controlador->nome_base) + strlen(controlador->dir_saida) + 5;
-
-  char *saida = (char *) malloc(length * sizeof(char));
-
-  sprintf(saida, "%s%s.svg", controlador->dir_saida, controlador->nome_base);
+  char *saida = format_string("%s%s.svg", controlador->dir_saida, controlador->nome_base);
 
   SVG svg_saida = cria_SVG(saida, controlador->max_geo.x, controlador->max_geo.y);
 

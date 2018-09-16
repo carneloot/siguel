@@ -3,6 +3,7 @@
 
 #include <elemento.h>
 #include <figura.h>
+#include <desenhavel.h>
 #include <stdlib.h>
 #include <string.h>
 #include <utils.h>
@@ -48,28 +49,53 @@ static void remover_elementos(
   struct Comando *this,
   struct Controlador *controlador,
   Lista *elementos) {
+
+  // Remover quadras da HashTable
+  if (elementos[QUADRA]) {
+    Posic it = Lista_t.get_first(elementos[QUADRA]);
+    while (it) {
+      Elemento elemento = Lista_t.get(elementos[QUADRA], it);
+
+      HashTable_t.remove(controlador->tabelas[CEP_X_QUADRA], get_cep_elemento(elemento));
+
+      it = Lista_t.get_next(elementos[QUADRA], it);
+    }
+  }
+
+  if (elementos[RADIO_BASE]) {
+    Posic it = Lista_t.get_first(elementos[RADIO_BASE]);
+    while (it) {
+      Elemento elemento = Lista_t.get(elementos[RADIO_BASE], it);
+
+      HashTable_t.remove(controlador->tabelas[ID_X_RADIO], get_id_elemento(elemento));
+
+      it = Lista_t.get_next(elementos[RADIO_BASE], it);
+    }
+  }
   
   for (int h = 0; h < 4; h++) {
     if (!elementos[h]) continue;
-    
+
+    const char *tipo_elemento = get_tipo_string_elemento(h);
+
     Posic it = Lista_t.get_first(elementos[h]);
     while (it) {
       Elemento elemento = Lista_t.get(elementos[h], it);
-      
-      KDTree_t.delete(controlador->elementos[h], elemento);
 
+      KDTree_t.delete(controlador->elementos[h], elemento);
       char *cep   = get_cep_elemento(elemento);
-      const char *tipo_elemento = get_tipo_string_elemento(h);
-      char *saida = malloc(14 + strlen(tipo_elemento) + strlen(cep));
-      sprintf(saida, "%s: %s deletada.\n", tipo_elemento, cep);
+      char *saida = format_string("%s: %s deletado (a).\n", tipo_elemento, cep);
       Lista_t.insert(controlador->saida, saida);
+
+      // FIXME: Quando o elemento é deletado, ele nao funciona para equs.qry e para quads.qrys
+      // destruir_elemento(elemento);
 
       it = Lista_t.get_next(elementos[h], it);
     }
     
-    Lista_t.destruir(elementos[h], destruir_elemento);
+    Lista_t.destruir(elementos[h], NULL);
   }
-  
+
 }
 
 int __comando_dlezin(void *_this, void *_controlador) {
@@ -82,15 +108,18 @@ int __comando_dlezin(void *_this, void *_controlador) {
 
   pos  = Ponto2D_t.new(strtod(params[1], NULL), strtod(params[2], NULL));
   size = Ponto2D_t.new(strtod(params[3], NULL), strtod(params[4], NULL));
+
+  Figura rect = cria_retangulo(pos.x, pos.y, size.x, size.y, "transparent", "black");
+  set_opacity_figura(rect, 0.8);
+  set_dashed_figura(rect, FIG_BORDA_TRACEJADA);
   
   Lista_t.insert(controlador->saida_svg_qry,
-    cria_retangulo(pos.x, pos.y, size.x, size.y, "transparent", "black"));
+    cria_desenhavel(rect, get_svg_figura, destruir_figura));
 
   Ponto2D new_max = Ponto2D_t.add(pos, size);
   new_max         = Ponto2D_t.add_scalar(new_max, 4);
 
-  controlador->max_qry.x = max(controlador->max_qry.x, new_max.x);
-  controlador->max_qry.y = max(controlador->max_qry.y, new_max.y);
+  controlador->max_qry = Ponto2D_t.maximo(controlador->max_qry, new_max);
 
   size = Ponto2D_t.add(pos, size);
 
@@ -112,16 +141,19 @@ int __comando_dlezao(void *_this, void *_controlador) {
   Ponto2D pos = Ponto2D_t.new(strtod(params[1], NULL), strtod(params[2], NULL));
   double r    = strtod(params[3], NULL);
 
-  Lista_t.insert(controlador->saida_svg_qry, 
-    cria_circulo(pos.x, pos.y, r, "transparent", "black"));
+  Figura circ = cria_circulo(pos.x, pos.y, r, "transparent", "black");
+  set_opacity_figura(circ, 0.8);
+  set_dashed_figura(circ, FIG_BORDA_TRACEJADA);
+
+  Lista_t.insert(controlador->saida_svg_qry,
+    cria_desenhavel(circ, get_svg_figura, destruir_figura));
     
   Ponto2D pA = Ponto2D_t.sub_scalar(pos, r);
   Ponto2D pB = Ponto2D_t.add_scalar(pos, r);
 
   Ponto2D new_max = Ponto2D_t.add_scalar(pos, r + 4);
 
-  controlador->max_qry.x = max(controlador->max_qry.x, new_max.x);
-  controlador->max_qry.y = max(controlador->max_qry.y, new_max.y);
+  controlador->max_qry = Ponto2D_t.maximo(controlador->max_qry, new_max);
 
   Lista *elementos = __comando_d_all(this, controlador, pA, pB, params[0]);
   
@@ -141,7 +173,7 @@ int __comando_dlezao(void *_this, void *_controlador) {
       
       it = next_it;
     }
-    
+
   }
   
   remover_elementos(this, controlador, elementos);
@@ -163,14 +195,16 @@ int __comando_dzin(void *_this, void *_controlador) {
   size = Ponto2D_t.new(strtod(params[2], NULL), strtod(params[3], NULL));
 
   Figura figura = cria_retangulo(pos.x, pos.y, size.x, size.y, "transparent", "black");
+  set_opacity_figura(figura, 0.8);
+  set_dashed_figura(figura, FIG_BORDA_TRACEJADA);
 
-  Lista_t.insert(controlador->saida_svg_qry, figura);
+  Lista_t.insert(controlador->saida_svg_qry,
+    cria_desenhavel(figura, get_svg_figura, destruir_figura));
 
   Ponto2D new_max = Ponto2D_t.add(pos, size);
   new_max         = Ponto2D_t.add_scalar(new_max, 4);
 
-  controlador->max_qry.x = max(controlador->max_qry.x, new_max.x);
-  controlador->max_qry.y = max(controlador->max_qry.y, new_max.y);
+  controlador->max_qry = Ponto2D_t.maximo(controlador->max_qry, new_max);
 
   size = Ponto2D_t.add(pos, size);
 
@@ -178,7 +212,7 @@ int __comando_dzin(void *_this, void *_controlador) {
 
   // Checar se a quadra está inteiramente dentro da figura
   Lista quadras = elementos[0];
-  Posic it = Lista_t.get_first(quadras);
+  Posic it      = (quadras) ? Lista_t.get_first(quadras) : NULL;
   while (it) {
     Posic next_it   = Lista_t.get_next(quadras, it);
     Elemento quadra = Lista_t.get(quadras, it);
@@ -209,17 +243,19 @@ int __comando_dzao(void *_this, void *_controlador) {
   Ponto2D pos;
   double r;
   
-  r    = strtod(params[0], NULL);
-  pos  = Ponto2D_t.new(strtod(params[1], NULL), strtod(params[2], NULL));
+  r   = strtod(params[0], NULL);
+  pos = Ponto2D_t.new(strtod(params[1], NULL), strtod(params[2], NULL));
 
   Figura figura = cria_circulo(pos.x, pos.y, r, "transparent", "black");
+  set_opacity_figura(figura, 0.8);
+  set_dashed_figura(figura, FIG_BORDA_TRACEJADA);
 
-  Lista_t.insert(controlador->saida_svg_qry, figura);
+  Lista_t.insert(controlador->saida_svg_qry,
+    cria_desenhavel(figura, get_svg_figura, destruir_figura));
 
   Ponto2D new_max = Ponto2D_t.add_scalar(pos, r + 4);
 
-  controlador->max_qry.x = max(controlador->max_qry.x, new_max.x);
-  controlador->max_qry.y = max(controlador->max_qry.y, new_max.y);
+  controlador->max_qry = Ponto2D_t.maximo(controlador->max_qry, new_max);
 
   Ponto2D pA = Ponto2D_t.sub_scalar(pos, r);
   Ponto2D pB = Ponto2D_t.add_scalar(pos, r);
@@ -228,7 +264,7 @@ int __comando_dzao(void *_this, void *_controlador) {
 
   // Checar se a quadra está inteiramente dentro da figura
   Lista quadras = elementos[0];
-  Posic it = Lista_t.get_first(quadras);
+  Posic it      = (quadras) ? Lista_t.get_first(quadras) : NULL;
   while (it) {
     Posic next_it   = Lista_t.get_next(quadras, it);
     Elemento quadra = Lista_t.get(quadras, it);

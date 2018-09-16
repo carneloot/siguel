@@ -25,10 +25,10 @@ int __comando_r(void *_this, void *_controlador) {
 
   Lista_t.insert((Lista) controlador->figuras, figura);
 
-  size = Ponto2D_t.add(size, pos);
+  Ponto2D new_max = Ponto2D_t.add(pos, size);
+  new_max = Ponto2D_t.add_scalar(new_max, 4);
 
-  controlador->max_geo.x = max(controlador->max_geo.x, size.x + 4);
-  controlador->max_geo.y = max(controlador->max_geo.y, size.y + 4);
+  controlador->max_geo = Ponto2D_t.maximo(controlador->max_geo, new_max);
 
   return 1;
 }

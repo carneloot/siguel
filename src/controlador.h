@@ -3,6 +3,7 @@
 
 #include "arquivo.h"
 #include "comando.h"
+#include <modules/hash.h>
 
 typedef void *Controlador;
 
@@ -18,10 +19,10 @@ void gerar_fila_execucao(Controlador c);
 
 void finalizar_arquivos(Controlador c);
 
+void printar_mensagem_final(Controlador this, int eh_erro);
+
 void destruir_controlador(Controlador c);
 
-char *get_nome_base(Controlador c);
-
-char *get_nome_query(Controlador c);
+HashTable get_table_quadras(Controlador this);
 
 #endif /* __CONTROLADOR_H__ */

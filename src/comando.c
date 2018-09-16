@@ -1,42 +1,61 @@
 #include "comando.h"
 
+#include <stdio.h>
 #include <stdint.h>
 #include <stdlib.h>
 #include <string.h>
+#include <utils.h>
 
 #include "comando.r"
 
-#define EXPAND_AS_DECLARATION(a, b, c) extern int __##b(void *this, void *controlador);
-#define EXPAND_AS_JUMPTABLE(a, b, c) {c, __##b},
-#define EXPAND_AS_SIZE_STRUCT(a, b, c) uint8_t b;
-#define COMMAND_TABLE(ENTRY)            \
-  ENTRY(     C,      comando_c,    "c") \
-  ENTRY(     R,      comando_r,    "r") \
-  ENTRY(     O,      comando_o,    "o") \
-  ENTRY(     I,      comando_i,    "i") \
-  ENTRY(     D,      comando_d,    "d") \
-  ENTRY(     A,      comando_a,    "a") \
-  ENTRY(  HASH,   comando_hash,    "#") \
-  ENTRY(     Q,      comando_q,    "q") \
-  ENTRY(     H,      comando_h,    "h") \
-  ENTRY(     S,      comando_s,    "s") \
-  ENTRY(     T,      comando_t,    "t") \
-  ENTRY(    CQ,     comando_cq,   "cq") \
-  ENTRY(    CH,     comando_ch,   "ch") \
-  ENTRY(    CS,     comando_cs,   "cs") \
-  ENTRY(    CT,     comando_ct,   "ct") \
-  ENTRY(  QZIN,   comando_qzin,   "q?") \
-  ENTRY(  QZAO,   comando_qzao,   "Q?") \
-  ENTRY(  DZIN,   comando_dzin,   "dq") \
-  ENTRY(  DZAO,   comando_dzao,   "Dq") \
-  ENTRY(DLEZIN, comando_dlezin,  "dle") \
-  ENTRY(DLEZAO, comando_dlezao,  "Dle") \
-  ENTRY(    CC,     comando_cc,   "cc") \
-  ENTRY(   CRD,    comando_crd, "crd?") \
-  ENTRY(   CRB,    comando_crb, "crb?")
-
-  // ENTRY(  NX,          NULL,   "nx")
-  // ENTRY(COMM,          NULL,   "//")
+#define EXPAND_AS_DECLARATION(a, b) extern int __##a(void *this, void *controlador);
+#define EXPAND_AS_JUMPTABLE(a, b) {b, __##a},
+#define EXPAND_AS_SIZE_STRUCT(a, b) uint8_t a;
+#define COMMAND_TABLE(ENTRY)    \
+  ENTRY(       comando_nx,    "geo/nx") \
+  ENTRY(        comando_c,     "geo/c") \
+  ENTRY(        comando_r,     "geo/r") \
+  ENTRY(        comando_o,     "geo/o") \
+  ENTRY(        comando_i,     "geo/i") \
+  ENTRY(        comando_d,     "geo/d") \
+  ENTRY(        comando_a,     "geo/a") \
+  ENTRY(     comando_hash,     "geo/#") \
+  ENTRY(        comando_q,     "geo/q") \
+  ENTRY(        comando_h,     "geo/h") \
+  ENTRY(        comando_s,     "geo/s") \
+  ENTRY(        comando_t,     "geo/t") \
+  ENTRY(       comando_cq,    "geo/cq") \
+  ENTRY(       comando_ch,    "geo/ch") \
+  ENTRY(       comando_cs,    "geo/cs") \
+  ENTRY(       comando_ct,    "geo/ct") \
+  ENTRY(     comando_qzin,    "qry/q?") \
+  ENTRY(     comando_qzao,    "qry/Q?") \
+  ENTRY(     comando_dzin,    "qry/dq") \
+  ENTRY(     comando_dzao,    "qry/Dq") \
+  ENTRY(   comando_dlezin,   "qry/dle") \
+  ENTRY(   comando_dlezao,   "qry/Dle") \
+  ENTRY(       comando_cc,    "qry/cc") \
+  ENTRY(      comando_crd,  "qry/crd?") \
+  ENTRY(      comando_crb,  "qry/crb?") \
+  ENTRY(    comando_qry_m,    "qry/m?") \
+  ENTRY(   comando_qry_mr,   "qry/mr?") \
+  ENTRY(   comando_qry_dm,   "qry/dm?") \
+  ENTRY(   comando_qry_de,   "qry/de?") \
+  ENTRY(  comando_qry_rip,   "qry/rip") \
+  ENTRY(  comando_qry_fec,   "qry/fec") \
+  ENTRY(  comando_qry_mud,   "qry/mud") \
+  ENTRY(comando_qry_mudec, "qry/mudec") \
+  ENTRY(  comando_qry_ecr,  "qry/ecr?") \
+  ENTRY( comando_qry_tecr, "qry/tecr?") \
+  ENTRY(  comando_qry_ecq,  "qry/ecq?") \
+  ENTRY( comando_qry_tecq, "qry/tecq?") \
+  ENTRY(  comando_qry_hmp,  "qry/hmp?") \
+  ENTRY( comando_qry_hmpe, "qry/hmpe?") \
+  ENTRY(  comando_qry_dpr,   "qry/dpr") \
+  ENTRY(     comando_ec_t,      "ec/t") \
+  ENTRY(     comando_ec_e,      "ec/e") \
+  ENTRY(     comando_pm_p,      "pm/p") \
+  ENTRY(     comando_pm_m,      "pm/m")
 
 COMMAND_TABLE(EXPAND_AS_DECLARATION)
 
@@ -54,7 +73,7 @@ const struct {
 
 static int conta_params(char *entrada);
 
-Comando cria_comando(char *entrada) {
+Comando cria_comando(char *entrada, char *arq) {
   int h, i;
   char *linha, *item;
 
@@ -73,12 +92,16 @@ Comando cria_comando(char *entrada) {
 
   item = strtok(linha, " ");
 
+  char *cod = format_string("%s/%s", arq, item);
+
   for (i = 0; i < NUM_COMANDOS; i++) {
-    if (!strcmp(item, comandos[i].id)) {
+    if (!strcmp(cod, comandos[i].id)) {
       this->executar = comandos[i].executar;
       break;
     }
   }
+
+  free(cod);
 
   // Se nao achar o comando, quer dizer que ele nao faz nada, então retorna nulo
   if (i == NUM_COMANDOS) {

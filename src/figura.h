@@ -9,12 +9,10 @@
  */
 typedef void *Figura;
 
+enum FiguraTracejada { FIG_BORDA_SOLIDA, FIG_BORDA_TRACEJADA };
 enum TipoFigura { CIRCULO, RETANGULO };
 
-/**
- * 'cor' e 'cor_borda' devem ser cores válidas de SVG.
- * Retorna uma Figura do tipo Retângulo com as especificações dadas.
- */
+
 Figura cria_retangulo(
   double x, double y, double w, double h, char *cor, char *cor_borda);
 
@@ -59,8 +57,14 @@ enum TipoFigura get_tipo_figura(Figura f);
 
 int get_id_figura(Figura f);
 
+char *get_svg_figura(Figura this);
+
 /** Setters */
 
 void set_id_figura(Figura f, int id);
+
+void set_opacity_figura(Figura this, double opacity);
+
+void set_dashed_figura(Figura this, int dashed);
 
 #endif /* __FIGURA_H__ */

@@ -5,7 +5,7 @@
 
 typedef struct Comando *Comando;
 
-Comando cria_comando(char *entrada);
+Comando cria_comando(char *entrada, char *arq);
 
 void destruir_comando(Comando c);
 

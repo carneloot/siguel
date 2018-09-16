@@ -4,16 +4,27 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include "SVG.h"
-#include "elemento.h"
-#include "figura.h"
-#include "modules/kdtree.h"
-#include "modules/lista.h"
-#include "modules/logger.h"
-#include "modules/ponto2d.h"
-#include "utils.h"
+#include <SVG.h>
+#include <elemento.h>
+#include <figura.h>
+#include <modules/logger.h>
+#include <utils.h>
+#include <comercio.h>
+#include <pessoa.h>
 
-#include "controlador.r"
+#include <controlador.r>
+
+const char *extra_extensao[EXTRAS_TOTAL] = {
+  #define X(a, b) [e_##a] = #a,
+  LISTA_EXTRAS
+  #undef X
+};
+
+const char *extra_flag[EXTRAS_TOTAL] = {
+  #define X(a, b) [e_##a] = b,
+  LISTA_EXTRAS
+  #undef X
+};
 
 static void escrever_txt_final(void *c);
 
@@ -23,8 +34,7 @@ int equalElements(const void *_a, const void *_b) {
   const Elemento a = (const Elemento) _a;
   const Elemento b = (const Elemento) _b;
 
-  double dist = Ponto2D_t.dist_squared(get_pos(a), get_pos(b));
-  return (!dist && !strcmp(get_id_elemento(a), get_id_elemento(b)));
+  return (Ponto2D_t.equal(get_pos(a), get_pos(b)) && !strcmp(get_id_elemento(a), get_id_elemento(b)));
 }
 
 int compareX(const void *_a, const void *_b) {
@@ -54,7 +64,6 @@ void desenharElementoSVG(const Item _ele, unsigned prof, va_list _list) {
 
   SVG svg = va_arg(list, SVG);
   
-  LOG_PRINT(LOG_FILE, "Desenhando \"%s\".", get_cep_elemento(ele));
   desenha_elemento(svg, ele);
 }
 
@@ -104,9 +113,12 @@ Controlador cria_controlador() {
 
   this->nome_base   = NULL;
   this->dir_saida   = NULL;
-  this->arq_query   = NULL;
+
   this->dir_entrada = (char *) malloc(3 * sizeof(char));
   strcpy(this->dir_entrada, "./");
+
+  for (i = 0; i < EXTRAS_TOTAL; i++)
+    this->extras[i] = NULL;
 
   this->figuras = Lista_t.create();
 
@@ -125,6 +137,12 @@ Controlador cria_controlador() {
   this->max_qry = Ponto2D_t.new(0, 0);
 
   this->fila_execucao = Lista_t.create();
+
+  this->comercios = Lista_t.create();
+  this->pessoas   = Lista_t.create();
+
+  for (i = 0; i < TABELAS_TOTAL; i++)
+    this->tabelas[i] = HashTable_t.create(73);
 
   return (void *) this;
 }
@@ -163,10 +181,14 @@ void lidar_parametros(Controlador c, int argc, const char *argv[]) {
       free(texto_auxiliar);
     }
 
-    else if (!strcmp(argv[i], "-q")) {
-      i++;
-
-      this->arq_query = remover_extensao(argv[i]);
+    else  {
+      for (int k = 0; k < EXTRAS_TOTAL; k++) {
+        if (!strcmp(argv[i], extra_flag[k])) {
+          i++;
+          this->extras[k] = remover_extensao(argv[i]);
+          break;
+        }
+      }
     }
 
     i++;
@@ -182,14 +204,11 @@ void lidar_parametros(Controlador c, int argc, const char *argv[]) {
     exit(EXIT_FAILURE);
   }
 
-  if (!this->arq_query)
-    LOG_PRINT(LOG_FILE, "Arquivo  \"%s.geo\" iniciado.", this->nome_base);
-  else
-    LOG_PRINT(
-      LOG_FILE,
-      "Arquivos \"%s.geo\" e \"%s.qry\" iniciados.",
-      this->nome_base,
-      this->arq_query);
+  LOG_PRINT(LOG_FILE, "Arquivo \"%s.geo\" iniciado.", this->nome_base);
+  for (i = 0; i < EXTRAS_TOTAL; i++) {
+    if (!this->extras[i]) continue;
+    LOG_PRINT(LOG_FILE, "Arquivo \"%s.%s\" iniciado.", this->extras[i], extra_extensao[i]);
+  }
 }
 
 int executar_proximo_comando(Controlador c) {
@@ -203,11 +222,11 @@ int executar_proximo_comando(Controlador c) {
 
   this->linha_atual++;
 
-  comando->executar(comando, c);
+  int result = comando->executar(comando, c);
   
   destruir_comando(comando);
 
-  return 1;
+  return result;
 }
 
 int ha_comandos(Controlador c) {
@@ -216,73 +235,63 @@ int ha_comandos(Controlador c) {
   return !!Lista_t.length(this->fila_execucao);
 }
 
-void gerar_fila_execucao(Controlador c) {
-  // Lê os arquivos de entrada e coloca os comandos numa fila de comandos
-  struct Controlador *this = (struct Controlador *) c;
-  Arquivo arq;
-  size_t length;
-  char *path, *linha;
-  Comando comando;
+void gerar_fila_execucao(Controlador _this) {
+  struct Controlador *this = (struct Controlador *) _this;
 
-  length = strlen(this->nome_base) + strlen(this->dir_entrada) + 6;
+  // Adicionar os arquivos a serem verificados na lista
+  Lista arquivos = Lista_t.create();
 
-  path = (char *) malloc(length * sizeof(char));
+  char *path = format_string(
+    "%s/%s.geo", this->dir_entrada, this->nome_base);
+  Lista_t.insert(arquivos, path);
 
-  sprintf(path, "%s/%s.geo", this->dir_entrada, this->nome_base);
+  // Se o arquivo de qry foi especificado
+  for (int i = 0; i < EXTRAS_TOTAL; i++) {
+    if (!this->extras[i]) continue;
 
-  arq = abrir_arquivo(path, LEITURA);
-
-  while ((linha = ler_proxima_linha(arq))) {
-    comando = cria_comando(linha);
-
-    // Comentarios nao sao inseridos na fila de execução
-    if (!comando) {
-      free(linha);
-      continue;
-    }
-    
-    LOG_PRINT(LOG_FILE, "Comando inserido: \"%s\"", linha);
-
-    Lista_t.insert(this->fila_execucao, (Item) comando);
-
-    free(linha);
+    path = format_string(
+      "%s/%s.%s", this->dir_entrada, this->extras[i], extra_extensao[i]);
+    Lista_t.insert(arquivos, path);
   }
 
-  free(path);
+  // Adicionando comandos a fila de execução
+  Posic iterator = Lista_t.get_first(arquivos);
 
-  fechar_arquivo(arq);
+  while (iterator) {
+    path        = Lista_t.get(arquivos, iterator);
+    Arquivo arq = abrir_arquivo(path, LEITURA);
 
-  // Caso exista um arquivo .qry
-  if (!this->arq_query)
-    return;
+    char *linha;
+    char *extensao = get_extensao(path);
 
-  length = strlen(this->arq_query) + strlen(this->dir_entrada) + 2 + 4;
+    while ((linha = ler_proxima_linha(arq))) {
 
-  path = (char *) malloc(length * sizeof(char));
+      Comando comando = cria_comando(linha, extensao);
 
-  sprintf(path, "%s/%s.qry", this->dir_entrada, this->arq_query);
+      // Comentarios nao sao inseridos na fila de execução
+      if (!comando) {
+        char *codigo_comando = strtok(linha, " ");
+        LOG_PRINT(LOG_STDOUT, "ERRO: Comando inexistente \"%s\"", codigo_comando);
 
-  arq = abrir_arquivo(path, LEITURA);
+        free(linha);
+        continue;
+      }
+      
+      LOG_PRINT(LOG_FILE, "Comando inserido: \"%s\"", linha);
 
-  while ((linha = ler_proxima_linha(arq))) {
-    comando = cria_comando(linha);
-    
-    // Comentarios nao sao inseridos na fila de execução
-    if (!comando) {
+      Lista_t.insert(this->fila_execucao, (Item) comando);
+
       free(linha);
-      continue;
     }
-    
-    LOG_PRINT(LOG_FILE, "Comando inserido: \"%s\"", linha);
-    
-    Lista_t.insert(this->fila_execucao, (Item) comando);
 
-    free(linha);
+    free(extensao);
+
+    fechar_arquivo(arq);
+
+    iterator = Lista_t.get_next(arquivos, iterator);
   }
 
-  free(path);
-
-  fechar_arquivo(arq);
+  Lista_t.destruir(arquivos, free);
 }
 
 /**
@@ -293,7 +302,6 @@ void gerar_fila_execucao(Controlador c) {
 void finalizar_arquivos(Controlador c) {
   struct Controlador *this = (struct Controlador *) c;
   char *full_path;
-  size_t length;
   Posic iterator;
 
   // Escreve o txt do .geo
@@ -301,18 +309,17 @@ void finalizar_arquivos(Controlador c) {
 
   char *qry_file, *geo_file;
 
-  if (!this->arq_query)
+  if (!this->extras[e_qry])
     return;
 
-  qry_file = get_nome(this->arq_query);
+  qry_file = get_nome(this->extras[e_qry]);
   geo_file = get_nome(this->nome_base);
 
   // Arquivo [nome_base]-[nome_qry].svg
   SVG s;
 
-  length    = 7 + strlen(this->dir_saida) + strlen(qry_file) + strlen(geo_file);
-  full_path = calloc(length, sizeof(char));
-  sprintf(full_path, "%s%s-%s.svg", this->dir_saida, geo_file, qry_file);
+  full_path = format_string(
+    "%s%s-%s.svg", this->dir_saida, geo_file, qry_file);
 
   s = cria_SVG(full_path, this->max_qry.x, this->max_qry.y);
 
@@ -320,8 +327,7 @@ void finalizar_arquivos(Controlador c) {
 
   iterator = Lista_t.get_first(this->saida_svg_qry);
   while (iterator) {
-    desenha_figura(
-      s, Lista_t.get(this->saida_svg_qry, iterator), 0.8, SVG_BORDA_TRACEJADA);
+    desenha_desenhavel(s, Lista_t.get(this->saida_svg_qry, iterator));
     iterator = Lista_t.get_next(this->saida_svg_qry, iterator);
   }
 
@@ -334,6 +340,41 @@ void finalizar_arquivos(Controlador c) {
   destruir_SVG(s);
 }
 
+void printar_mensagem_final(Controlador _this, int eh_erro) {
+  struct Controlador * this = (struct Controlador *) _this;
+
+  if (eh_erro) {
+    LOG_PRINT(
+      LOG_STDOUT, "Arquivo \"%s.geo\" finalizado com erro.", this->nome_base);
+    return;
+  }
+
+  LOG_PRINT(LOG_FILE, "Arquivo \"%s.geo\" finalizado.", this->nome_base);
+
+  int count = 0;
+
+  for (int i = 0; i < EXTRAS_TOTAL; i++)
+    count += !!this->extras[i];
+
+  if (!count) {
+    printf("Arquivo \"%s.geo\" finalizado com sucesso.\n", this->nome_base);
+    return;
+  }
+
+  printf("Arquivos \"%s.geo\"", this->nome_base);
+  for (int i = 0; i < EXTRAS_TOTAL; i++) {
+    if (!this->extras[i]) continue;
+    printf(" \"%s.%s\"", this->extras[i], extra_extensao[i]);
+  }
+  printf(" finalizados com sucesso.\n");
+
+}
+
+HashTable get_table_quadras(Controlador _this) {
+  struct Controlador * this = (struct Controlador *) _this;
+  return this->tabelas[CEP_X_QUADRA];
+}
+
 void destruir_controlador(Controlador c) {
   struct Controlador *this;
   int i;
@@ -341,7 +382,7 @@ void destruir_controlador(Controlador c) {
   this = (struct Controlador *) c;
 
   Lista_t.destruir(this->saida, &free);
-  Lista_t.destruir(this->saida_svg_qry, &destruir_figura);
+  Lista_t.destruir(this->saida_svg_qry, desenhavel_destruir);
 
   Lista_t.destruir(this->figuras, &destruir_figura);
 
@@ -364,20 +405,24 @@ void destruir_controlador(Controlador c) {
     free(this->dir_saida);
   if (this->dir_entrada)
     free(this->dir_entrada);
-  if (this->arq_query)
-    free(this->arq_query);
+  
+  for (i = 0; i < EXTRAS_TOTAL; i++)
+    if (this->extras[i])
+      free(this->extras[i]);
 
   Lista_t.destruir(this->fila_execucao, NULL);
 
+  Lista_t.destruir(this->comercios, comercio_destruir);
+  Lista_t.destruir(this->pessoas,     pessoa_destruir);
+
+  HashTable_t.destroy(this->tabelas[CPF_X_CEP],        NULL, 0);
+  HashTable_t.destroy(this->tabelas[CEP_X_QUADRA],     NULL, 0);
+  HashTable_t.destroy(this->tabelas[TIPO_X_DESCRICAO], free, 1);
+  HashTable_t.destroy(this->tabelas[CPF_X_PESSOA],     NULL, 0);
+  HashTable_t.destroy(this->tabelas[CNPJ_X_COMERCIO],  NULL, 0);
+  HashTable_t.destroy(this->tabelas[ID_X_RADIO],       NULL, 0);
+
   free(c);
-}
-
-char *get_nome_base(Controlador c) {
-  return ((struct Controlador *) c)->nome_base;
-}
-
-char *get_nome_query(Controlador c) {
-  return ((struct Controlador *) c)->arq_query;
 }
 
 /** METODOS PRIVADOS */
@@ -393,7 +438,7 @@ void desenhar_todas_figuras(void *c, void *s) {
 
   while (iterator) {
     figAtual = Lista_t.get(this->figuras, iterator);
-    desenha_figura(s, figAtual, 0.4, SVG_BORDA_SOLIDA);
+    desenha_figura(s, figAtual, 0.4, FIG_BORDA_SOLIDA);
     iterator = Lista_t.get_next(this->figuras, iterator);
   }
 }
@@ -413,7 +458,7 @@ void desenhar_sobreposicoes(void *c, void *s) {
   while (iterator) {
     figDash = (Figura) Lista_t.get(this->sobreposicoes, iterator);
 
-    desenha_figura(s, figDash, 1.0, SVG_BORDA_TRACEJADA);
+    desenha_figura(s, figDash, 1.0, FIG_BORDA_TRACEJADA);
     Ponto2D pos = get_pos(figDash);
     pos.y -= 5;
     escreve_texto(s, "sobrepoe", pos, 15, "purple");
@@ -424,7 +469,6 @@ void desenhar_sobreposicoes(void *c, void *s) {
 
 static void escrever_txt_final(void *c) {
   struct Controlador *this;
-  size_t tamanho_total;
   char *full_path;
   Arquivo arq;
 
@@ -435,10 +479,8 @@ static void escrever_txt_final(void *c) {
     
   LOG_PRINT(LOG_FILE, "Escrevendo txt final.");
 
-  tamanho_total = strlen(this->dir_saida) + strlen(this->nome_base) + 1 + 4;
-  full_path     = (char *) malloc(tamanho_total * sizeof(char));
-
-  sprintf(full_path, "%s%s.txt", this->dir_saida, this->nome_base);
+  full_path     = format_string(
+    "%s%s.txt", this->dir_saida, this->nome_base);
 
   arq = abrir_arquivo(full_path, ALTERACAO);
 
@@ -451,6 +493,8 @@ static void escrever_txt_final(void *c) {
     iterator = Lista_t.get_next(this->saida, iterator);
   }
 
+  escrever_linha(arq, "\n\n");
+
   fechar_arquivo(arq);
 }
 
@@ -462,8 +506,6 @@ void desenhar_elementos(void *_this, void *svg) {
   for (int i = 0; i < 4; i++) {
     KDTree arvore_atual = this->elementos[i];
     
-    LOG_PRINT(LOG_FILE, "Desenhando [%d]", i);
-
     if (KDTree_t.is_empty(arvore_atual))
       continue;
 

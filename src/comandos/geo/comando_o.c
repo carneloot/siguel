@@ -5,6 +5,7 @@
 #include <figura.h>
 #include <modules/logger.h>
 #include <stdlib.h>
+#include <utils.h>
 #include <string.h>
 
 int __comando_o(void *_this, void *_controlador) {
@@ -40,18 +41,16 @@ int __comando_o(void *_this, void *_controlador) {
   Figura figura1 = Lista_t.get(controlador->figuras, posic_figura1);
   Figura figura2 = Lista_t.get(controlador->figuras, posic_figura2);
 
-  size_t length = 9 + strlen(params[0]) + strlen(params[1]);
-
-  char *saida = (char *) malloc(length * sizeof(char));
+  char *saida;
 
   if (sobrepoe_figura(figura1, figura2)) {
-    sprintf(saida, "o %s %s\nSIM\n", params[0], params[1]);
+    saida = format_string("o %s %s\nSIM\n", params[0], params[1]);
     /* Desenhar retangulo no lugar da sobreposicao */
     Lista_t.insert(
       controlador->sobreposicoes,
       (Item) get_rect_sobreposicao(figura1, figura2));
   } else
-    sprintf(saida, "o %s %s\nNAO\n", params[0], params[1]);
+    saida = format_string("o %s %s\nNAO\n", params[0], params[1]);
 
   Lista_t.insert(controlador->saida, (Item) saida);
 

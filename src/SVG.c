@@ -7,8 +7,6 @@
 #include "arquivo.h"
 #include "utils.h"
 
-#define DASHED_STRING "stroke-dasharray=\"5, 5\" "
-
 struct SVG {
   Arquivo saida;
   Ponto2D max;
@@ -57,57 +55,19 @@ SVG cria_SVG(char *path, double max_width, double max_height) {
 }
 
 void desenha_figura(SVG s, Figura f, float opacity, int is_dashed) {
-  struct SVG *this;
+  struct SVG *this = (struct SVG *) s;
 
-  double x, y, r, h, w;
-  char *cor, *cor_borda;
-
-  this = (struct SVG *) s;
-
-  x         = get_x(f);
-  y         = get_y(f);
-  r         = get_r(f);
-  w         = get_w(f);
-  h         = get_h(f);
-  cor       = get_cor(f);
-  cor_borda = get_cor_borda(f);
-
-  switch (get_tipo_figura(f)) {
-    case CIRCULO:
-      escrever_linha(
-        this->saida,
-        "<circle cx=\"%.1f\" cy=\"%.1f\" r=\"%.1f\" "
-        "style=\"fill:%s;stroke-width:2;stroke:%s;opacity:%.2f\" %s/>\n",
-        x,
-        y,
-        r,
-        cor,
-        cor_borda,
-        opacity,
-        (is_dashed) ? DASHED_STRING : "");
-      break;
-
-    case RETANGULO:
-      escrever_linha(
-        this->saida,
-        "<rect x=\"%.1f\" y=\"%.1f\" width=\"%.1f\" height=\"%.1f\" "
-        "style=\"fill:%s;stroke-width:2;stroke:%s;opacity:%.2f\" %s/>\n",
-        x,
-        y,
-        w,
-        h,
-        cor,
-        cor_borda,
-        opacity,
-        (is_dashed) ? DASHED_STRING : "");
-      break;
-  }
+  set_opacity_figura(f, opacity);
+  set_dashed_figura(f, is_dashed);
+  char *fig_saida = get_svg_figura(f);
+  escrever_linha(this->saida, fig_saida);
+  free(fig_saida);
 }
 
 void desenha_elemento(SVG this, Elemento e) {
   Figura figura = get_figura_elemento(e);
 
-  desenha_figura(this, figura, 0.4, SVG_BORDA_SOLIDA);
+  desenha_figura(this, figura, 0.4, FIG_BORDA_SOLIDA);
 
   // Se for quadra, desenhar o CEP no meio
   if (get_tipo_elemento(e) == QUADRA) {
@@ -129,8 +89,7 @@ void desenha_elemento(SVG this, Elemento e) {
 void desenha_asset(SVG _this, Ponto2D pos, Ponto2D size, char *nome) {
   struct SVG *this = (struct SVG *) _this;
 
-  char *fullpath = malloc(strlen(ASSETS_FOLDER) + strlen(nome) + 1);
-  sprintf(fullpath, "%s%s", ASSETS_FOLDER, nome);
+  char *fullpath = format_string("%s%s", ASSETS_FOLDER, nome);
 
   Arquivo arq_asset  = abrir_arquivo(fullpath, LEITURA);
   char *asset_string = ler_arquivo_inteiro(arq_asset);
@@ -181,6 +140,16 @@ void desenha_linha(SVG s, Ponto2D a, Ponto2D b, float opacity, char *cor) {
     b.y,
     (!!cor) ? cor : "black",
     opacity);
+}
+
+void desenha_desenhavel(SVG _this, Desenhavel desenhavel) {
+  struct SVG *this = (struct SVG *) _this;
+
+  char *text = desenhavel->to_svg(desenhavel->valor);
+
+  escrever_linha(this->saida, text);
+
+  free(text);
 }
 
 void salva_SVG(SVG s) {

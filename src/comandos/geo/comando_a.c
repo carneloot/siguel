@@ -5,6 +5,7 @@
 #include <modules/logger.h>
 #include <stdlib.h>
 #include <string.h>
+#include <utils.h>
 #include "../funcoes_checagem.h"
 
 int __comando_a(void *_this, void *_controlador) {
@@ -31,13 +32,7 @@ int __comando_a(void *_this, void *_controlador) {
   /* Cria o sufixo padrao caso nao tenha sido especificado */
   char *sufixo = params[1];
 
-  size_t length = strlen(controlador->nome_base) +
-                  strlen(controlador->dir_saida) + strlen(sufixo) + 6;
-
-  char *saida = (char *) malloc(length * sizeof(char));
-
-  sprintf(
-    saida,
+  char *saida = format_string(
     "%s%s-%s.svg",
     controlador->dir_saida,
     controlador->nome_base,
@@ -71,11 +66,7 @@ int __comando_a(void *_this, void *_controlador) {
 
     desenha_linha(svg_saida, pos, pos2, 1, cor);
 
-    length = 9;
-
-    saida = calloc(length, sizeof(char));
-
-    sprintf(saida, "%6.1f", distancia);
+    saida = format_string("%.1f", distancia);
 
     Ponto2D aux = Ponto2D_t.add(pos, pos2);
     aux         = Ponto2D_t.mult(aux, 0.5);

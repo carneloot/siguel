@@ -3,7 +3,30 @@
 
 #include <modules/lista.h>
 #include <modules/kdtree.h>
+#include <modules/hash.h>
 #include <modules/ponto2d.h>
+
+#define LISTA_EXTRAS \
+  X( ec, "-ec") \
+  X( pm, "-pm") \
+  X(qry,  "-q")
+
+enum TipoExtras {
+  #define X(a, b) e_##a,
+  LISTA_EXTRAS
+  #undef X
+  EXTRAS_TOTAL
+};
+
+enum Tabelas {
+  TIPO_X_DESCRICAO,
+  CEP_X_QUADRA,
+  CPF_X_PESSOA,
+  CPF_X_CEP,
+  CNPJ_X_COMERCIO,
+  ID_X_RADIO,
+  TABELAS_TOTAL
+};
 
 struct Controlador {
   Lista saida;
@@ -12,7 +35,12 @@ struct Controlador {
   char *nome_base;
   char *dir_saida;
   char *dir_entrada;
-  char *arq_query;
+
+  char *extras[EXTRAS_TOTAL];
+
+  Lista comercios;
+  Lista pessoas;
+  HashTable tabelas[TABELAS_TOTAL];
 
   Lista figuras;
 

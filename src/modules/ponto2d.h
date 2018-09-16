@@ -10,6 +10,8 @@ typedef struct Ponto2D Ponto2D;
 struct Ponto2D_t {
   Ponto2D (*new)(double x, double y);
 
+  int (*equal)(Ponto2D this, Ponto2D other);
+
   double (*dist_squared)(Ponto2D this, Ponto2D other);
 
   double (*dist)(Ponto2D this, Ponto2D other);
@@ -23,6 +25,10 @@ struct Ponto2D_t {
   Ponto2D (*add_scalar)(Ponto2D this, double scalar);
 
   Ponto2D (*sub_scalar)(Ponto2D this, double scalar);
+
+  Ponto2D (*maximo)(Ponto2D this, Ponto2D other);
+
+  double (*angle)(Ponto2D this);
 };
 
 extern const struct Ponto2D_t Ponto2D_t;

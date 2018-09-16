@@ -4,8 +4,7 @@
 #include <modules/ponto2d.h>
 #include "elemento.h"
 #include "figura.h"
-
-enum FiguraTracejada { SVG_BORDA_SOLIDA, SVG_BORDA_TRACEJADA };
+#include <desenhavel.h>
 
 #define ASSETS_FOLDER "./assets/" 
 
@@ -23,6 +22,8 @@ void escreve_texto(
   SVG this, char *texto, Ponto2D pos, float tamanho, char *cor);
 
 void desenha_linha(SVG this, Ponto2D a, Ponto2D b, float opacity, char *cor);
+
+void desenha_desenhavel(SVG this, Desenhavel desenhavel);
 
 void salva_SVG(SVG this);
 

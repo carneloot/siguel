@@ -2,7 +2,11 @@
 
 #include <math.h>
 #include <stdlib.h>
+#include <stdarg.h>
 #include <string.h>
+#include <stdio.h>
+
+#define M_PI 3.1415926535897932384626433
 
 char *trim(char *entrada) {
   int tam, i;
@@ -125,11 +129,36 @@ char *remover_extensao(const char *path) {
   char *saida;
   int j;
 
-  length = strlen(path) - 4;
+  int tamanho_extensao = 0;
+
+  char *iterador = (char *) path + strlen(path) - 1;
+
+  while (*iterador-- != '.')
+    tamanho_extensao++;
+
+  length = strlen(path) - 1 - tamanho_extensao;
   saida  = (char *) malloc((length + 1) * sizeof(char));
   for (j = 0; j < length; j++)
     saida[j] = path[j];
   saida[j] = 0;
 
   return saida;
+}
+
+char *format_string(const char *fmt, ...) {
+  va_list list;
+  va_start(list, fmt);
+  size_t length = vsnprintf(NULL, 0, fmt, list);
+  va_end(list);
+
+  char *saida = malloc(length + 2);
+  va_start(list, fmt);
+  vsprintf(saida, fmt, list);
+  va_end(list);
+
+  return saida;
+}
+
+double rad_to_deg(double radians) {
+  return (radians * 180) / M_PI;
 }

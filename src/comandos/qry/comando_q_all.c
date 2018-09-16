@@ -1,6 +1,7 @@
 #include <comando.r>
 #include <controlador.r>
 
+#include <desenhavel.h>
 #include <elemento.h>
 #include <figura.h>
 #include <stdlib.h>
@@ -88,13 +89,15 @@ int __comando_qzin(void *_this, void *_controlador) {
   size = Ponto2D_t.new(strtod(params[2], NULL), strtod(params[3], NULL));
 
   figura = cria_retangulo(pos.x, pos.y, size.x, size.y, "transparent", "black");
-  Lista_t.insert(controlador->saida_svg_qry, figura);
+  set_opacity_figura(figura, 0.8);
+  set_dashed_figura(figura, FIG_BORDA_TRACEJADA);
+  Lista_t.insert(controlador->saida_svg_qry,
+    cria_desenhavel(figura, get_svg_figura, destruir_figura));
 
   Ponto2D new_max = Ponto2D_t.add(pos, size);
   new_max         = Ponto2D_t.add_scalar(new_max, 4);
 
-  controlador->max_qry.x = max(controlador->max_qry.x, new_max.x);
-  controlador->max_qry.y = max(controlador->max_qry.y, new_max.y);
+  controlador->max_qry = Ponto2D_t.maximo(controlador->max_qry, new_max);
 
   char *prefixo = calloc(5, sizeof(char));
   strcpy(prefixo, "q?:\n");
@@ -127,6 +130,8 @@ int __comando_qzin(void *_this, void *_controlador) {
 
   reportar_elementos(this, controlador, elementos);
 
+  free(elementos);
+
   return 1;
 }
 
@@ -140,12 +145,15 @@ int __comando_qzao(void *_this, void *_controlador) {
   Ponto2D pos = Ponto2D_t.new(strtod(params[1], NULL), strtod(params[2], NULL));
 
   Figura figura = cria_circulo(pos.x, pos.y, r, "transparent", "black");
-  Lista_t.insert(controlador->saida_svg_qry, figura);
+  set_opacity_figura(figura, 0.8);
+  set_dashed_figura(figura, FIG_BORDA_TRACEJADA);
+
+  Lista_t.insert(controlador->saida_svg_qry,
+    cria_desenhavel(figura, get_svg_figura, destruir_figura));
 
   Ponto2D new_max = Ponto2D_t.add_scalar(pos, r + 4);
 
-  controlador->max_qry.x = max(controlador->max_qry.x, new_max.x);
-  controlador->max_qry.y = max(controlador->max_qry.y, new_max.y);
+  controlador->max_qry = Ponto2D_t.maximo(controlador->max_qry, new_max);
 
   char *prefixo = calloc(5, sizeof(char));
   strcpy(prefixo, "Q?:\n");
@@ -177,6 +185,8 @@ int __comando_qzao(void *_this, void *_controlador) {
   }
 
   reportar_elementos(this, controlador, elementos);
+
+  free(elementos);
 
   return 1;
 }

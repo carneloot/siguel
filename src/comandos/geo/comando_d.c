@@ -4,6 +4,7 @@
 #include <figura.h>
 #include <modules/logger.h>
 #include <stdlib.h>
+#include <utils.h>
 #include <string.h>
 #include "../funcoes_checagem.h"
 
@@ -41,11 +42,7 @@ int __comando_d(void *_this, void *_controlador) {
 
   double distancia = distancia_figuras(figura1, figura2);
 
-  size_t length = 12 + strlen(params[0]) + strlen(params[1]);
-
-  char *saida = (char *) malloc(length * sizeof(char));
-
-  sprintf(saida, "d %s %s\n%4.1f\n", params[0], params[1], distancia);
+  char *saida = format_string("d %s %s\n%4.1f\n", params[0], params[1], distancia);
 
   Lista_t.insert(controlador->saida, (Item) saida);
 

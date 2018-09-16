@@ -16,9 +16,7 @@ sed -i -e 's/= bin/= ./g' $NAME/src/Makefile
 sed -i -e 's/= $(SRCDIR)/= ./g' $NAME/src/Makefile
 
 # Removendo o que deve ser removido
-sed -i -e 's/-g\s*//g' $NAME/src/Makefile
-sed -i -e 's/-Wall\s*//g' $NAME/src/Makefile
-sed -i -e 's/ -D DEBUG//g' $NAME/src/Makefile
+sed -i -e 's/DEBUG = 1/DEBUG = 0/g' $NAME/src/Makefile
 
 # Compacta a pasta
 zip $NAME -r $NAME/ -q
