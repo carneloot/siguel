@@ -15,6 +15,8 @@
 
 FILE *fp;
 
+#define NOME_ARQUIVO "siguel.log"
+
 #ifdef DEBUG
 static int SESSION_TRACKER;  // Keeps track of session
 
@@ -52,9 +54,9 @@ void log_print(char *filename, int line, int stdout_print, char *fmt, ...) {
   char *time_string;
 
   if (SESSION_TRACKER > 0)
-    fp = fopen("log.txt", "a");
+    fp = fopen(NOME_ARQUIVO, "a");
   else
-    fp = fopen("log.txt", "w");
+    fp = fopen(NOME_ARQUIVO, "w");
 
   time_string = getDateString();
   fprintf(fp, "%s ", time_string);

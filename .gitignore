@@ -103,7 +103,7 @@ GTAGS
 
 out
 
-log.txt
+*.log
 
 vgcore.*
 
