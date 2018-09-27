@@ -7,7 +7,7 @@
 #include <SVG.h>
 #include <utils.h>
 
-int __comando_hash(void *_this, void *_controlador) {
+int comando_hash(void *_this, void *_controlador) {
   struct Controlador *controlador = (struct Controlador *) _controlador;
 
   /* Escrever SVG final */

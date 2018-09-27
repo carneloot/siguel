@@ -32,7 +32,7 @@ static Pair hidrante_mais_proximo(
     ponto, distancia);
 }
 
-int __comando_qry_hmp(void *_this, void *_controlador) {
+int comando_qry_hmp(void *_this, void *_controlador) {
   struct Comando *this            = (struct Comando *) _this;
   struct Controlador *controlador = (struct Controlador *) _controlador;
 
@@ -66,7 +66,7 @@ int __comando_qry_hmp(void *_this, void *_controlador) {
   return 1;
 }
 
-int __comando_qry_hmpe(void *_this, void *_controlador) {
+int comando_qry_hmpe(void *_this, void *_controlador) {
   struct Comando *this            = (struct Comando *) _this;
   struct Controlador *controlador = (struct Controlador *) _controlador;
 

@@ -8,7 +8,7 @@
 #include <string.h>
 #include "../funcoes_checagem.h"
 
-int __comando_d(void *_this, void *_controlador) {
+int comando_d(void *_this, void *_controlador) {
   struct Comando *this            = (struct Comando *) _this;
   struct Controlador *controlador = (struct Controlador *) _controlador;
 

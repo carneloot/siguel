@@ -17,7 +17,7 @@ int procurarPessoa(void * const pessoa1, const void *pessoa2) {
   return !(pessoa1 == pessoa2);
 }
 
-int __comando_qry_rip(void *_this, void *_controlador) {
+int comando_qry_rip(void *_this, void *_controlador) {
   struct Comando *this            = (struct Comando *) _this;
   struct Controlador *controlador = (struct Controlador *) _controlador;
 

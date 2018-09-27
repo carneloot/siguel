@@ -10,7 +10,7 @@
 #include "../funcoes_checagem.h"
 #include <modules/logger.h>
 
-static Lista *__comando_d_all(
+static Lista *comando_d_all(
   struct Comando *this,
   struct Controlador *controlador,
   Ponto2D pA, Ponto2D pB,
@@ -98,7 +98,7 @@ static void remover_elementos(
 
 }
 
-int __comando_dlezin(void *_this, void *_controlador) {
+int comando_dlezin(void *_this, void *_controlador) {
   struct Comando *this            = (struct Comando *) _this;
   struct Controlador *controlador = (struct Controlador *) _controlador;
 
@@ -123,7 +123,7 @@ int __comando_dlezin(void *_this, void *_controlador) {
 
   size = Ponto2D_t.add(pos, size);
 
-  Lista *elementos = __comando_d_all(this, controlador, pos, size, params[0]);
+  Lista *elementos = comando_d_all(this, controlador, pos, size, params[0]);
   
   remover_elementos(this, controlador, elementos);
   
@@ -132,7 +132,7 @@ int __comando_dlezin(void *_this, void *_controlador) {
   return 1;
 }
 
-int __comando_dlezao(void *_this, void *_controlador) {
+int comando_dlezao(void *_this, void *_controlador) {
   struct Comando *this            = (struct Comando *) _this;
   struct Controlador *controlador = (struct Controlador *) _controlador;
 
@@ -155,7 +155,7 @@ int __comando_dlezao(void *_this, void *_controlador) {
 
   controlador->max_qry = Ponto2D_t.maximo(controlador->max_qry, new_max);
 
-  Lista *elementos = __comando_d_all(this, controlador, pA, pB, params[0]);
+  Lista *elementos = comando_d_all(this, controlador, pA, pB, params[0]);
   
   // Como eh no circulo, tem que remover os que nao estao no circulo
   for (int h = 1; h < 4; h++) {
@@ -183,7 +183,7 @@ int __comando_dlezao(void *_this, void *_controlador) {
   return 1;
 }
 
-int __comando_dzin(void *_this, void *_controlador) {
+int comando_dzin(void *_this, void *_controlador) {
   struct Comando *this            = (struct Comando *) _this;
   struct Controlador *controlador = (struct Controlador *) _controlador;
 
@@ -208,7 +208,7 @@ int __comando_dzin(void *_this, void *_controlador) {
 
   size = Ponto2D_t.add(pos, size);
 
-  Lista *elementos = __comando_d_all(this, controlador, pos, size, "q");
+  Lista *elementos = comando_d_all(this, controlador, pos, size, "q");
 
   // Checar se a quadra está inteiramente dentro da figura
   Lista quadras = elementos[0];
@@ -234,7 +234,7 @@ int __comando_dzin(void *_this, void *_controlador) {
   return 1;
 }
 
-int __comando_dzao(void *_this, void *_controlador) {
+int comando_dzao(void *_this, void *_controlador) {
   struct Comando *this            = (struct Comando *) _this;
   struct Controlador *controlador = (struct Controlador *) _controlador;
 
@@ -260,7 +260,7 @@ int __comando_dzao(void *_this, void *_controlador) {
   Ponto2D pA = Ponto2D_t.sub_scalar(pos, r);
   Ponto2D pB = Ponto2D_t.add_scalar(pos, r);
 
-  Lista *elementos = __comando_d_all(this, controlador, pA, pB, "q");
+  Lista *elementos = comando_d_all(this, controlador, pA, pB, "q");
 
   // Checar se a quadra está inteiramente dentro da figura
   Lista quadras = elementos[0];

@@ -74,7 +74,7 @@ Lista __get_comercios_area(Lista comercios, Ponto2D pos, Ponto2D size) {
   return comercios_na_area;
 }
 
-int __comando_qry_tecq(void *_this, void *_controlador) {
+int comando_qry_tecq(void *_this, void *_controlador) {
   struct Comando     *this        = _this;
   struct Controlador *controlador = _controlador;
 
@@ -136,7 +136,7 @@ int __comando_qry_tecq(void *_this, void *_controlador) {
   return 1;
 }
 
-int __comando_qry_tecr(void *_this, void *_controlador) {
+int comando_qry_tecr(void *_this, void *_controlador) {
   struct Comando     *this        = _this;
   struct Controlador *controlador = _controlador;
 
@@ -177,7 +177,7 @@ int __comando_qry_tecr(void *_this, void *_controlador) {
   return 1;
 }
 
-int __comando_qry_ecr(void *_this, void *_controlador) {
+int comando_qry_ecr(void *_this, void *_controlador) {
   struct Comando     *this        = _this;
   struct Controlador *controlador = _controlador;
 

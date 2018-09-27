@@ -6,7 +6,7 @@
 #include <stdlib.h>
 #include <utils.h>
 
-int __comando_h(void *_this, void *_controlador) {
+int comando_h(void *_this, void *_controlador) {
   struct Comando *this            = (struct Comando *) _this;
   struct Controlador *controlador = (struct Controlador *) _controlador;
 

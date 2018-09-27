@@ -33,7 +33,7 @@ static int elemento_dentro_figura(const void *_elemento, const void *_figura) {
   return contem;
 }
 
-static Lista *__comando_q_all(
+static Lista *comando_q_all(
   struct Comando *this,
   struct Controlador *controlador,
   Ponto2D pA, Ponto2D pB) {
@@ -76,7 +76,7 @@ static void reportar_elementos(
   }
 }
 
-int __comando_qzin(void *_this, void *_controlador) {
+int comando_qzin(void *_this, void *_controlador) {
   struct Comando *this            = (struct Comando *) _this;
   struct Controlador *controlador = (struct Controlador *) _controlador;
 
@@ -106,7 +106,7 @@ int __comando_qzin(void *_this, void *_controlador) {
   Ponto2D pA = pos;
   Ponto2D pB = Ponto2D_t.add(pos, size);
 
-  Lista *elementos = __comando_q_all(this, controlador, pA, pB);
+  Lista *elementos = comando_q_all(this, controlador, pA, pB);
 
   // Checar se os elementos estão dentro da figura mesmo
   for (int i = 0; i < 4; i++) {
@@ -135,7 +135,7 @@ int __comando_qzin(void *_this, void *_controlador) {
   return 1;
 }
 
-int __comando_qzao(void *_this, void *_controlador) {
+int comando_qzao(void *_this, void *_controlador) {
   struct Comando *this            = (struct Comando *) _this;
   struct Controlador *controlador = (struct Controlador *) _controlador;
 
@@ -162,7 +162,7 @@ int __comando_qzao(void *_this, void *_controlador) {
   Ponto2D pA = Ponto2D_t.sub_scalar(pos, r);
   Ponto2D pB = Ponto2D_t.add_scalar(pos, r);
 
-  Lista *elementos = __comando_q_all(this, controlador, pA, pB);
+  Lista *elementos = comando_q_all(this, controlador, pA, pB);
 
   // Checar se os elementos estão dentro da figura mesmo
   for (int i = 0; i < 4; i++) {

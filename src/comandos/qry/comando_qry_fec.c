@@ -10,7 +10,7 @@ int procurarComercio(void * const com1, const void *com2) {
   return !(com1 == com2);
 }
 
-int __comando_qry_fec(void *_this, void *_controlador) {
+int comando_qry_fec(void *_this, void *_controlador) {
   struct Comando *this            = (struct Comando *) _this;
   struct Controlador *controlador = (struct Controlador *) _controlador;
 

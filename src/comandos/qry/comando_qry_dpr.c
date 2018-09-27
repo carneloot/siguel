@@ -124,7 +124,7 @@ static void __remover_elementos(
 
 }
 
-int __comando_qry_dpr(void *_this, void *_controlador) {
+int comando_qry_dpr(void *_this, void *_controlador) {
   struct Comando     *this        = _this;
   struct Controlador *controlador = _controlador;
 

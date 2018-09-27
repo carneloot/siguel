@@ -11,7 +11,7 @@
 #include <utils.h>
 #include "svg_custom.h"
 
-int __comando_qry_dm(void *_this, void *_controlador) {
+int comando_qry_dm(void *_this, void *_controlador) {
   struct Comando *this            = (struct Comando *) _this;
   struct Controlador *controlador = (struct Controlador *) _controlador;
 

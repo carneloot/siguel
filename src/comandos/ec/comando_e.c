@@ -7,7 +7,7 @@
 
 #include <stdlib.h>
 
-int __comando_ec_e(void *_this, void *_controlador) {
+int comando_ec_e(void *_this, void *_controlador) {
   struct Comando *this            = (struct Comando *) _this;
   struct Controlador *controlador = (struct Controlador *) _controlador;
 

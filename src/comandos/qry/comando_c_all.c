@@ -6,7 +6,7 @@
 #include <stdlib.h>
 #include <utils.h>
 
-static int __comando_c_all(void *_this, void *_controlador, int elemento_id) {
+static int comando_c_all(void *_this, void *_controlador, int elemento_id) {
   struct Comando *this            = (struct Comando *) _this;
   struct Controlador *controlador = (struct Controlador *) _controlador;
 
@@ -28,18 +28,18 @@ static int __comando_c_all(void *_this, void *_controlador, int elemento_id) {
   return 1;
 }
 
-int __comando_cq(void *this, void *controlador) {
-  return __comando_c_all(this, controlador, QUADRA);
+int comando_cq(void *this, void *controlador) {
+  return comando_c_all(this, controlador, QUADRA);
 }
 
-int __comando_ch(void *this, void *controlador) {
-  return __comando_c_all(this, controlador, HIDRANTE);
+int comando_ch(void *this, void *controlador) {
+  return comando_c_all(this, controlador, HIDRANTE);
 }
 
-int __comando_ct(void *this, void *controlador) {
-  return __comando_c_all(this, controlador, RADIO_BASE);
+int comando_ct(void *this, void *controlador) {
+  return comando_c_all(this, controlador, RADIO_BASE);
 }
 
-int __comando_cs(void *this, void *controlador) {
-  return __comando_c_all(this, controlador, SEMAFORO);
+int comando_cs(void *this, void *controlador) {
+  return comando_c_all(this, controlador, SEMAFORO);
 }

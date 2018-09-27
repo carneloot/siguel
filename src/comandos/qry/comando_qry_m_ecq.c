@@ -17,7 +17,7 @@ static int contemCep(const Item item, const void *other) {
 
   return strcmp(cep, cep_comercio);
 }
-int __comando_qry_ecq(void *_this, void *_controlador) {
+int comando_qry_ecq(void *_this, void *_controlador) {
   struct Comando *this            = (struct Comando *) _this;
   struct Controlador *controlador = (struct Controlador *) _controlador;
 

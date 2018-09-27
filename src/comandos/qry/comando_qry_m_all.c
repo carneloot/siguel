@@ -21,7 +21,7 @@ static int contemCep(const Item item, const void *other) {
   return strcmp(cep, cep_pessoa);
 }
 
-static Lista __comando_m_all(Lista lista, char *cep) {
+static Lista comando_m_all(Lista lista, char *cep) {
   Posic it = Lista_t.get_first(lista);
   Lista saida = Lista_t.create();
 
@@ -50,7 +50,7 @@ static void __reportar_pessoas(Lista pessoas, struct Controlador *controlador) {
   }
 }
 
-int __comando_qry_m(void *_this, void *_controlador) {
+int comando_qry_m(void *_this, void *_controlador) {
   struct Comando *this            = (struct Comando *) _this;
   struct Controlador *controlador = (struct Controlador *) _controlador;
 
@@ -63,7 +63,7 @@ int __comando_qry_m(void *_this, void *_controlador) {
     return 1;
   }
 
-  Lista pessoas_cep = __comando_m_all(controlador->pessoas, cep);
+  Lista pessoas_cep = comando_m_all(controlador->pessoas, cep);
 
   if (Lista_t.length(pessoas_cep) == 0) {
     Lista_t.insert(controlador->saida, format_string(
@@ -111,7 +111,7 @@ static Lista __quadras_dentro(KDTree arvore, Figura figura) {
   return quadras;
 }
 
-int __comando_qry_mr(void *_this, void *_controlador) {
+int comando_qry_mr(void *_this, void *_controlador) {
   struct Comando *this            = (struct Comando *) _this;
   struct Controlador *controlador = (struct Controlador *) _controlador;
 
@@ -144,7 +144,7 @@ int __comando_qry_mr(void *_this, void *_controlador) {
 
     char *cep = get_cep_elemento(quadra);
 
-    Lista pessoas_cep = __comando_m_all(controlador->pessoas, cep);
+    Lista pessoas_cep = comando_m_all(controlador->pessoas, cep);
     
     __reportar_pessoas(pessoas_cep, controlador);
 
