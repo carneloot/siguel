@@ -1,5 +1,6 @@
 #include "hash.h"
 
+#include <assert.h>
 #include <stdlib.h>
 #include <string.h>
 
@@ -14,7 +15,9 @@ struct HashTable {
   HashInfo *table;
 };
 
-static HashTable __create_hashtable(unsigned tamanho) {
+static HashTable __create_hashtable(int tamanho) {
+  assert(tamanho >= 0); // Tamanho deve ser positivo
+
   struct HashTable *this = calloc(1, sizeof(*this));
 
   this->size  = tamanho;

@@ -16,7 +16,7 @@ struct HashTable_t {
   /**
    * Cria a HashTable. Use tamanho, de preferencia, numeros primos.
    */
-  HashTable (*create)(unsigned tamanho);
+  HashTable (*create)(int tamanho);
 
   /**
    * Destroi a HashTable this;
