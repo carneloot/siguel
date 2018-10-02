@@ -44,6 +44,11 @@ struct HashTable_t {
   unsigned (*length)(HashTable this);
 
   /**
+   * Retorna o total de casas existentes na HashTable
+   */
+  unsigned (*max_size)(HashTable this);
+
+  /**
    * A chave nao pode existir mais
    */
   void (*remove)(HashTable this, const char chave[]);
