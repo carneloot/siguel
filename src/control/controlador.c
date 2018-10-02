@@ -143,7 +143,7 @@ Controlador cria_controlador() {
   this->pessoas   = Lista_t.create();
 
   for (i = 0; i < TABELAS_TOTAL; i++)
-    this->tabelas[i] = HashTable_t.create(31);
+    this->tabelas[i] = HashTable_t.create(73);
 
   return (void *) this;
 }
