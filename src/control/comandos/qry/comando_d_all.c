@@ -83,18 +83,17 @@ static void remover_elementos(
     while (it) {
       Elemento elemento = Lista_t.get(elementos[h], it);
 
-      KDTree_t.delete(controlador->elementos[h], elemento);
+      KDTree_t.remove(controlador->elementos[h], elemento);
       char *cep   = get_cep_elemento(elemento);
       char *saida = format_string("%s: %s deletado (a).\n", tipo_elemento, cep);
       Lista_t.insert(controlador->saida, saida);
 
-      // FIXME: Quando o elemento é deletado, ele nao funciona para equs.qry e para quads.qrys
       // destruir_elemento(elemento);
 
       it = Lista_t.get_next(elementos[h], it);
     }
     
-    Lista_t.destruir(elementos[h], NULL);
+    Lista_t.destruir(elementos[h], destruir_elemento);
   }
 
 }

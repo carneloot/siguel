@@ -9,6 +9,8 @@ struct KDTree {
   Item value;
   struct KDTree *left, *right;
 
+  unsigned qtd;
+
   int dim;
   func_compare check_equal;
   func_compare *funcs;
@@ -28,6 +30,8 @@ static KDTree __create_aux_kdtree(
   this->check_equal = check_equal;
 
   this->funcs = funcs;
+
+  this->qtd = 0;
 
   return this;
 }
@@ -113,7 +117,6 @@ static KDTree __maximum_kdtree(KDTree _a, KDTree _b, KDTree _c, unsigned dim) {
   return max;
 }
 
-
 static KDTree __find_max_rec_kdtree(KDTree _this, unsigned dim, unsigned prof) {
   struct KDTree *this = (struct KDTree *) _this;
 
@@ -143,6 +146,8 @@ static KDTree __find_max_kdtree(KDTree this, unsigned dim) {
 
 static KDTree __insert_rec_kdtree(KDTree _this, Item value, unsigned prof) {
   struct KDTree *this = (struct KDTree *) _this;
+
+  this->qtd++;
 
   if (this->value == NULL) {
     this->value = value;
@@ -181,6 +186,8 @@ static KDTree __remove_rec_kdtree(KDTree _this, Item value, unsigned prof) {
 
   if (!this)
     return NULL;
+
+  this->qtd--;
 
   unsigned cd = prof % this->dim;
 

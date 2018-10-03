@@ -16,7 +16,7 @@
 
 #define NUCLEAR_SVG \
 "<svg version=\"1.1\" id=\"Capa_1\" xmlns=\"http://www.w3.org/2000/svg\" xmlns:xlink=\"http://www.w3.org/1999/xlink\" x=\"0px\" y=\"0px\"" \
-"	viewBox=\"0 0 512 512\" style=\"enable-background:new 0 0 512 512;\" xml:space=\"preserve\">" \
+"	viewBox=\"0 0 512 512\" style=\"opacity:0.8;enable-background:new 0 0 512 512;\" xml:space=\"preserve\">" \
 "<polygon style=\"fill:#EB874B;\" points=\"512,245.556 371.069,208.064 442.546,82.405 310.181,143.136 283.136,1.508 221.273,132.046 " \
 "	108.361,40.717 145.946,179.982 0,181.687 119.446,264.514 8.756,358.455 154.173,346.089 130.531,488.311 233.878,386.538 " \
 "	308.347,510.492 321.266,366.933 459.001,414.621 375.446,296.448 \"/>" \
@@ -111,7 +111,7 @@ static void __remover_elementos(
     while (it) {
       Elemento elemento = Lista_t.get(elementos[h], it);
 
-      KDTree_t.delete(controlador->elementos[h], elemento);
+      KDTree_t.remove(controlador->elementos[h], elemento);
       char *cep   = get_cep_elemento(elemento);
       char *saida = format_string("\t%s: %s deletado (a).\n", tipo_elemento, cep);
       Lista_t.insert(controlador->saida, saida);
@@ -120,6 +120,8 @@ static void __remover_elementos(
 
       it = Lista_t.get_next(elementos[h], it);
     }
+
+    Lista_t.destruir(elementos[h], destruir_elemento);
 
   }
 
@@ -184,23 +186,22 @@ int comando_qry_dpr(void *_this, void *_controlador) {
   // Remover todos os equipamentos em elementos_dentro
   __remover_elementos(this, controlador, elementos_dentro);
   
-  for (int i = 0; i < 4; i++) {
-    if (!elementos_dentro[i]) continue;
-    Lista_t.destruir(elementos_dentro[i], 0);
-  }
-
-  Ponto2D posicao_asset = size;
-  posicao_asset = Ponto2D_t.mult(posicao_asset, 0.5);
-  posicao_asset = Ponto2D_t.add(posicao_asset, pos);
-  posicao_asset = Ponto2D_t.sub_scalar(posicao_asset, 30);
-
-  void *custom = cria_custom(posicao_asset, 100, NUCLEAR_SVG, NULL);
-
-  Lista_t.insert(controlador->saida_svg_qry, cria_desenhavel(
-    custom, print_custom_asset, free_custom));
+  double tamanho = min(size.x, size.y) * 0.8;
 
   Figura area_afetada = cria_retangulo(pos.x, pos.y, size.x, size.y, "transparent", "teal");
   set_dashed_figura(area_afetada, FIG_BORDA_TRACEJADA);
+  
+  Ponto2D posicao_asset = Ponto2D_t.new(0, 0);
+  posicao_asset = Ponto2D_t.sub_scalar(posicao_asset, tamanho / 2);
+
+  // posicao_asset agora marca o centro do local
+  // Agora é só adicionar a posicao do centro do retangulo para posicao_asset
+  posicao_asset = Ponto2D_t.add(posicao_asset, get_centro_massa(area_afetada));
+
+  void *custom = cria_custom(posicao_asset, tamanho, NUCLEAR_SVG, NULL);
+
+  Lista_t.insert(controlador->saida_svg_qry, cria_desenhavel(
+    custom, print_custom_asset, free_custom));
 
   Lista_t.insert(controlador->saida_svg_qry, cria_desenhavel(
     area_afetada, get_svg_figura, destruir_figura));
