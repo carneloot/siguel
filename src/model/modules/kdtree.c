@@ -176,55 +176,54 @@ static KDTree __insert_kdtree(KDTree this, Item value) {
   return __insert_rec_kdtree(this, value, 0);
 }
 
-static KDTree __delete_rec_kdtree(KDTree _this, Item value, unsigned prof) {
+static KDTree __remove_rec_kdtree(KDTree _this, Item value, unsigned prof) {
   struct KDTree *this = (struct KDTree *) _this;
 
   if (!this)
     return NULL;
 
+  unsigned cd = prof % this->dim;
+
   // Se nao estiver nesse node
   if (!this->check_equal(this->value, value)) {
-    if (this->funcs[prof % this->dim](value, this->value) < 0)
-      this->left = __delete_rec_kdtree(this->left, value, prof + 1);
+    if (this->funcs[cd](value, this->value) < 0)
+      this->left = __remove_rec_kdtree(this->left, value, prof + 1);
     else
-      this->right = __delete_rec_kdtree(this->right, value, prof + 1);
+      this->right = __remove_rec_kdtree(this->right, value, prof + 1);
     return this;
   }
 
   // Se estiver nesse node
   if (__is_leaf_kdtree(this)) {
-    if (prof)
+    if (prof != 0)
       free(this);
     else
       this->value = NULL;
     return NULL;
   }
 
-  // Se nao estiver nesse node
-  unsigned cd = prof % this->dim;
-
   // Se contem no a direita
   if (this->right) {
     struct KDTree *min;
     min         = __find_min_kdtree(this->right, cd);
     this->value = min->value;
-    this->right = __delete_rec_kdtree(this->right, min->value, prof + 1);
+    this->right = __remove_rec_kdtree(this->right, this->value, prof + 1);
   }
 
   // Se contem no a esquerda
   else if (this->left) {
-    struct KDTree *max;
-    max         = __find_max_kdtree(this->left, cd);
-    this->value = max->value;
-    this->right = __delete_rec_kdtree(this->left, max->value, prof + 1);
+    struct KDTree *min;
+    min         = __find_min_kdtree(this->left, cd);
+    this->value = min->value;
+    this->right = __remove_rec_kdtree(this->left, this->value, prof + 1);
     this->left  = NULL;
   }
 
   return this;
 }
 
-static void __delete_kdtree(KDTree this, Item value) {
-  __delete_rec_kdtree(this, value, 0);
+static void __remove_kdtree(KDTree this, Item value) {
+  __remove_rec_kdtree(this, value, 0);
 }
 
 static KDTree __search_rec_kdtree(
@@ -511,7 +510,7 @@ static void __destroy_kdtree(KDTree _this, void (*destroy)(Item item)) {
 const struct KDTree_t KDTree_t = {  //
   .create           = &__create_kdtree,
   .insert           = &__insert_kdtree,
-  .delete           = &__delete_kdtree,
+  .remove           = &__remove_kdtree,
   .search           = &__search_kdtree,
   .get              = &__get_kdtree,
   .find_min         = &__find_min_kdtree,
