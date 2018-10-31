@@ -145,6 +145,9 @@ Controlador cria_controlador() {
   for (i = 0; i < TABELAS_TOTAL; i++)
     this->tabelas[i] = HashTable_t.create(73);
 
+  for (i = 0; i < 11; i++)
+    this->registradores[i] = Ponto2D_t.new(0, 0);
+
   return (void *) this;
 }
 
