@@ -55,6 +55,9 @@ struct Controlador {
   Ponto2D max_geo, max_qry;
 
   Lista fila_execucao;
+
+  // O valor padrão dos registradores é (0, 0)
+  Ponto2D registradores[11];
 };
 
 extern void desenhar_todas_figuras(void *c, void *svg);
