@@ -58,11 +58,8 @@ int compareY(const void *_a, const void *_b) {
   return (posA.y - posB.y);
 }
 
-void desenharElementoSVG(const Item _ele, unsigned prof, va_list _list) {
-  va_list list;
-  va_copy(list, _list);
+void desenharElementoSVG(const Item _ele, unsigned prof, va_list list) {
   const Elemento ele = (const Elemento) _ele;
-
   SVG svg = va_arg(list, SVG);
   
   desenha_elemento(svg, ele);

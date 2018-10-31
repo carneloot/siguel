@@ -270,17 +270,23 @@ static void __passe_simetrico_rec_kdtree(
   KDTree _this,
   void (*executar)(const Item item, unsigned prof, va_list list),
   unsigned prof,
-  va_list list) {
+  va_list _list) {
   struct KDTree *this = (struct KDTree *) _this;
 
   if (this->left)
-    __passe_simetrico_rec_kdtree(this->left, executar, prof + 1, list);
+    __passe_simetrico_rec_kdtree(this->left, executar, prof + 1, _list);
 
-  if (this->value)
+  if (this->value) {
+    va_list list;
+    va_copy(list, _list);
+
     executar(this->value, prof, list);
 
+    va_end(list);
+  }
+
   if (this->right)
-    __passe_simetrico_rec_kdtree(this->right, executar, prof + 1, list);
+    __passe_simetrico_rec_kdtree(this->right, executar, prof + 1, _list);
 }
 
 static void __passe_simetrico_kdtree(
