@@ -14,6 +14,18 @@
 
   Adicionar o carro no svg // Pode ser removido
   
-  adicionar o carro lista ligada
+  adicionar o carro à lista ligada
 
 */
+
+#include <model/comando.r>
+#include <control/controlador.r>
+
+int comando_qry_au( void* _this, void* _controlador ){
+  struct Comando *this = _this;
+  struct Controlador *controlador = _controlador;
+
+  
+}
+
+
