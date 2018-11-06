@@ -34,6 +34,7 @@ int comando_qry_au( void* _this, void* _controlador ){
   Lista_t.insert(controlador->figuras, get_figura_veiculo( veiculo ));
   // TODO Escrever a placa do carro no svg
 
+  return 1;
 }
 
 
