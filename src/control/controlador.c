@@ -121,6 +121,7 @@ Controlador cria_controlador() {
   for (i = 0; i < EXTRAS_TOTAL; i++)
     this->extras[i] = NULL;
 
+  this->veiculos = Lista_t.create();
   this->figuras = Lista_t.create();
 
   this->linha_atual = 0;
@@ -385,6 +386,7 @@ void destruir_controlador(Controlador c) {
   Lista_t.destruir(this->saida, &free);
   Lista_t.destruir(this->saida_svg_qry, desenhavel_destruir);
 
+  Lista_t.destruir(this->veiculos, 0);
   Lista_t.destruir(this->figuras, &destruir_figura);
 
   // Sobreposicoes

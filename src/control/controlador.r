@@ -42,6 +42,8 @@ struct Controlador {
   Lista pessoas;
   HashTable tabelas[TABELAS_TOTAL];
 
+  Lista veiculos;
+  
   Lista figuras;
 
   int linha_atual;
@@ -56,7 +58,6 @@ struct Controlador {
 
   Lista fila_execucao;
 
-  Lista veiculos;
 };
 
 extern void desenhar_todas_figuras(void *c, void *svg);
