@@ -3,7 +3,8 @@
 
 
 #include <stdbool.h>
-#include "modules/ponto2d.h"
+#include <model/modules/ponto2d.h>
+#include <model/figura.h>
 
 typedef void* Veiculo;
 
@@ -20,7 +21,7 @@ void destruir_veiculo( Veiculo this );
 
 char* get_placa_veiculo( Veiculo this );
 
-
+Figura get_figura_veiculo( Veiculo this );
 
 
 #endif /* __CARRO_H__ */
