@@ -7,6 +7,11 @@
 
 typedef void* Veiculo;
 
+/**
+ * Cria um veículo e retorna um ponteiro para ele.
+ * Sobre char placa: A função faz uma cópia de placa
+ *  logo, não é necessário alocar memória dinamicamente para ela.
+ */
 Veiculo cria_veiculo( double x, double y, double w, double h, char *placa );
 
 bool colide_veiculo( Veiculo this, Veiculo other );

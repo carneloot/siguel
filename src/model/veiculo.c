@@ -18,7 +18,7 @@ struct Veiculo{
 
 Veiculo cria_veiculo( double x, double y, double w, double h, char *placa ) {
   struct Veiculo* this =  malloc(sizeof(struct Veiculo));
-  
+
   this->pos = Ponto2D_t.new(x, y);
   this->size = Ponto2D_t.new(w, h);
   
@@ -34,6 +34,12 @@ bool colide_veiculo( Veiculo _this, Veiculo _other ){
   struct Veiculo* other = _other;
   
   return sobrepoe_figura(this, other);
+}
+
+void destruir_veiculo( Veiculo _this ){
+  struct Veiculo* this = _this;
+  free(this->placa);
+  free(this);
 }
 
 char* get_placa_veiculo( Veiculo _this ){
