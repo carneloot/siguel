@@ -55,6 +55,8 @@ struct Controlador {
   Ponto2D max_geo, max_qry;
 
   Lista fila_execucao;
+
+  Lista veiculos;
 };
 
 extern void desenhar_todas_figuras(void *c, void *svg);
