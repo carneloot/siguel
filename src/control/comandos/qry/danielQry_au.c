@@ -12,7 +12,7 @@
   receber dados do carro
 
 
-  Adicionar o carro no svg
+  Adicionar o carro no svg // Pode ser removido
   
   adicionar o carro lista ligada
 

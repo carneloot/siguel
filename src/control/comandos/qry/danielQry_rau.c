@@ -9,7 +9,7 @@
   Procurar carro por placa
   Remover carro da lista
 
-  imprimir a placa do carro e a posição onde estava
+  Escrever a placa do carro e a posição onde estava no txt
 
 
 */
