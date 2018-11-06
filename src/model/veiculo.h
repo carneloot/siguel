@@ -3,14 +3,17 @@
 
 
 #include <stdbool.h>
-
 #include "modules/ponto2d.h"
 
 typedef void* Veiculo;
 
-Veiculo cria_veiculo( Ponto2D posicao, double w, double h, char *placa );
+Veiculo cria_veiculo( double x, double y, double w, double h, char *placa );
 
-bool colide_veiculo( Veiculo v1, Veiculo v2 );
+bool colide_veiculo( Veiculo this, Veiculo other );
+
+void destruir_veiculo( Veiculo this );
+
+char* get_placa_veiculo( Veiculo this );
 
 
 
