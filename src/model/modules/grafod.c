@@ -50,6 +50,17 @@ static void __destroy_grafod(GrafoD _this) {
   free(this);
 }
 
+static void __definir_funcoes_grafod(GrafoD _this,
+    int (*check_equal)(const void *a, const void *b),
+    int (*compare_x)(const void *a, const void *b),
+    int (*comapre_y)(const void *a, const void *b)
+  ) {
+  struct GrafoD *this = (struct GrafoD *) _this;
+
+  this->vertices = KDTree_t.create(2, check_equal, compare_x, comapre_y);
+  
+}
+
 /* ===== FUNCOES ARESTA ===== */
 
 static void __insert_aresta_grafod(GrafoD this, char *node1, char *node2) {}
@@ -87,4 +98,5 @@ const struct GrafoD_t GrafoD_t = { //
   .remove_vertice      = &__remove_vertice_grafod,
   .adjacentes          = &__adjacentes_grafod,
   .destroy             = &__destroy_grafod,
+  .definir_funcoes     = &__definir_funcoes_grafod,
 };
