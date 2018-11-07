@@ -1,0 +1,14 @@
+@e? R3 b04.4 N 10
+@tp? R9 assl R3
+p? p 03-c D R9 R3 cyan
+au br.AAA6A50 752.500000 124.730000 4.500000 11.250000
+au br.AAA6A51 752.725000 125.855000 4.500000 11.250000
+dc engav--2
+@e? R3 b04.4 N 10
+@tp? R9 assl R3
+p? p 03-c D R9 R3 cyan
+rau br.AAA6A50
+dc engav--2rem
+@e? R3 b04.4 N 10
+@tp? R9 assl R3
+p? p 03-c D R9 R3 cyan
