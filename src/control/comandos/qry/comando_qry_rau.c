@@ -35,6 +35,7 @@ int comando_qry_rau( void* _this, void* _controlador ){
 
   Posic atual = Lista_t.get_first(controlador->veiculos);
 
+  // Encontrar veículo
   atual = Lista_t.search( controlador->veiculos, atual, placa, comparar_placa );
   
   if( atual == NULL){
@@ -42,9 +43,12 @@ int comando_qry_rau( void* _this, void* _controlador ){
     return 0;
   }
 
-  Lista_t.remove(controlador->veiculos, atual);
+  // free em veículo
+  Veiculo veiculo = Lista_t.get( controlador->veiculos, atual );
+  destruir_veiculo( veiculo );
 
-  Lista_t.remove(controlador->figuras, get_figura_veiculo(Lista_t.get(controlador->veiculos, atual)) );
+  // Tirar veículo da lista
+  Lista_t.remove(controlador->veiculos, atual);
 
   // TODO: Remover a placa do carro do SVG
 
