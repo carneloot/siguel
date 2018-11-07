@@ -7,6 +7,8 @@
 #include "hash.h"
 #include "kdtree.h"
 
+#include <model/modules/logger.h>
+
 struct Aresta {
   InfoG info;
 
@@ -138,9 +140,28 @@ static bool __adjacente_grafod(GrafoD _this, char *node1, char *node2) {}
 
 /* ===== FUNCOES VERTICE ===== */
 
-// static void __insert_vertice_grafod(GrafoD this, char *node) {}
+// static void __insert_vertice_grafod(GrafoD _this, char *node) {}
 
-static void __define_info_vertice_grafod(GrafoD this, char *node, InfoG info) {}
+static void __define_info_vertice_grafod(GrafoD _this, char *node, InfoG info) {
+  struct GrafoD *this = _this;
+
+  if (HashTable_t.exists(this->label_x_vertice, node)) {
+    LOG_PRINT(LOG_STDOUT, "Vertice de nome \"%s\" ja existe.", node);
+    return;
+  }
+
+  struct Vertice *vertice = create_vertice(info, node);
+
+  KDTree_t.insert(this->vertices, vertice);
+
+  HashInfo hash_info = {
+    .chave = vertice->label,
+    .valor = vertice,
+  };
+
+  HashTable_t.insert(this->label_x_vertice, hash_info);
+
+}
 
 static InfoG __get_info_vertice_grafod(GrafoD _this, char *node) {}
 
