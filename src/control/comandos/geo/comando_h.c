@@ -23,6 +23,13 @@ int comando_h(void *_this, void *_controlador) {
 
   KDTree_t.insert(controlador->elementos[HIDRANTE], elemento);
 
+  HashInfo info = {
+    .chave = get_id_elemento(elemento),
+    .valor = elemento
+  };
+
+  HashTable_t.insert(controlador->tabelas[ID_X_HIDRANTE], info);
+
   Ponto2D new_max = Ponto2D_t.add_scalar(pos, RAIO_EQUIPAMENTOS + 4);
 
   controlador->max_geo = Ponto2D_t.maximo(controlador->max_geo, new_max);
