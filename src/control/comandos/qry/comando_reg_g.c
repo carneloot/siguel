@@ -16,7 +16,7 @@ int comando_reg_g(void *_this, void *_controlador) {
   struct Comando *this = (struct Comando *) _this;
   struct Controlador *controlador = (struct Controlador *) _controlador;
 
-  int numero_registrador = strtol(this->params[0], NULL, 10);
+  int numero_registrador = strtol(this->params[0] + 1, NULL, 10);
   char *id_equipamento = this->params[1];
 
   Elemento encontrado = NULL;

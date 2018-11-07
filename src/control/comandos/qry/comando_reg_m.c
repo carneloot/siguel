@@ -2,6 +2,7 @@
 #include <control/controlador.r>
 
 #include <model/pessoa.h>
+#include <model/modules/logger.h>
 #include <stdlib.h>
 
 /**
@@ -14,10 +15,15 @@ int comando_reg_m(void *_this, void *_controlador) {
   struct Comando *this = (struct Comando *) _this;
   struct Controlador *controlador = (struct Controlador *) _controlador;
 
-  int numero_registrador = strtol(this->params[0], NULL, 10);
+  int numero_registrador = strtol(this->params[0] + 1, NULL, 10);
   char *cpf = this->params[1];
 
   Pessoa pessoa = HashTable_t.get(controlador->tabelas[CPF_X_PESSOA], cpf).valor;
+
+  if (pessoa == NULL) {
+    LOG_ERRO("Nao foi possivel encontrar a pessoa de CPF \"%s\".", cpf);
+    return 1;
+  }
 
   Endereco endereco_pessoa = pessoa_get_endereco(pessoa);
 
