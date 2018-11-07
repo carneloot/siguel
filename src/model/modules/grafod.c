@@ -2,9 +2,65 @@
 
 #include <assert.h>
 #include <stdlib.h>
+#include <string.h>
 
 #include "hash.h"
 #include "kdtree.h"
+
+struct Aresta {
+  void *info;
+
+  char *label_partida;
+  char *label_destino;
+};
+
+static struct Aresta *create_aresta(void *info, char *label_partida, char *label_destino) {
+  struct Aresta *this = calloc(1, sizeof(*this));
+
+  this->info = info;
+
+  this->label_partida = calloc(strlen(label_partida) + 1, sizeof(char));
+  strcpy(this->label_partida, label_partida);
+
+  this->label_destino = calloc(strlen(label_destino) + 1, sizeof(char));
+  strcpy(this->label_destino, label_destino);
+
+  return this;
+}
+
+static void destroy_aresta(struct Aresta *this) {
+  free(this->label_partida);
+  free(this->label_destino);
+  free(this);
+}
+
+struct Vertice {
+  void *info;
+
+  char *label;
+  HashTable arestas;
+};
+
+static struct Vertice *create_vertice(void *info, char *label) {
+  struct Vertice *this = calloc(1, sizeof(*this));
+
+  this->info = info;
+
+  this->label = calloc(strlen(label) + 1, sizeof(char));
+  strcpy(this->label, label);
+
+  this->arestas = HashTable_t.create(7);
+
+  return this;
+}
+
+static void destroy_vertice(struct Vertice *this) {
+  HashTable_t.destroy(this->arestas, destroy_aresta, 0);
+
+  free(this->label);
+
+  free(this);
+}
 
 struct GrafoD {
   int num_vertices;
@@ -43,7 +99,7 @@ static void __destroy_grafod(GrafoD _this) {
   struct GrafoD *this = (struct GrafoD *) _this;
 
   if (this->vertices)
-    KDTree_t.destroy(this->vertices, free);
+    KDTree_t.destroy(this->vertices, destroy_vertice);
   
   HashTable_t.destroy(this->label_x_vertice, 0, false);
 
