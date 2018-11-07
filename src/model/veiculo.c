@@ -42,6 +42,16 @@ void destruir_veiculo( Veiculo _this ){
   free(this);
 }
 
+bool igual_veiculo(Veiculo _this, Veiculo _other){
+  struct Veiculo* this = _this;
+  struct Veiculo* other = _other;
+
+  if( !strcmp(this->placa, other->placa) == 0)
+    return false;
+
+  return true;
+}
+
 char* get_placa_veiculo( Veiculo _this ){
   struct Veiculo* this = _this;
 

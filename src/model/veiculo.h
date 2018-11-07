@@ -19,6 +19,8 @@ bool colide_veiculo( Veiculo this, Veiculo other );
 
 void destruir_veiculo( Veiculo this );
 
+bool igual_veiculo(Veiculo this, Veiculo other);
+
 char* get_placa_veiculo( Veiculo this );
 
 Figura get_figura_veiculo( Veiculo this );
