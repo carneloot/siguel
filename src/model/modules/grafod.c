@@ -145,8 +145,15 @@ static bool __adjacente_grafod(GrafoD _this, char *node1, char *node2) {}
 static void __define_info_vertice_grafod(GrafoD _this, char *node, InfoG info) {
   struct GrafoD *this = _this;
 
+  assert(__validar_grafo(this));
+
+  if (this->num_vertices >= this->max_vertices) {
+    LOG_ERRO("Grafo cheio.");
+    return;
+  }
+
   if (HashTable_t.exists(this->label_x_vertice, node)) {
-    LOG_PRINT(LOG_STDOUT, "Vertice de nome \"%s\" ja existe.", node);
+    LOG_ERRO("Vertice de nome \"%s\" ja existe.", node);
     return;
   }
 
@@ -161,9 +168,24 @@ static void __define_info_vertice_grafod(GrafoD _this, char *node, InfoG info) {
 
   HashTable_t.insert(this->label_x_vertice, hash_info);
 
+  this->num_vertices++;
+
 }
 
-static InfoG __get_info_vertice_grafod(GrafoD _this, char *node) {}
+static InfoG __get_info_vertice_grafod(GrafoD _this, char *node) {
+  struct GrafoD *this = _this;
+
+  assert(__validar_grafo(this));
+
+  if (!HashTable_t.exists(this->label_x_vertice, node)) {
+    LOG_ERRO("Vertice de nome \"%s\" nao encontrado.", node);
+    return;
+  }
+
+  struct Vertice *vertice = HashTable_t.get(this->label_x_vertice, node).valor;
+
+  return vertice->info;
+}
 
 static void __remove_vertice_grafod(GrafoD _this, char *node) {}
 
