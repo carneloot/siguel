@@ -66,4 +66,6 @@ extern void desenhar_sobreposicoes(void *c, void *svg);
 
 extern void desenhar_elementos(void *this, void *svg);
 
+extern void desenhar_veiculos(void *this, void *svg);
+
 #endif /* __CONTROLADOR_R__ */

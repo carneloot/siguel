@@ -7,6 +7,7 @@
 
 #include <model/SVG.h>
 #include <model/elemento.h>
+#include <model/desenhavel.h>
 #include <model/figura.h>
 #include <model/comercio.h>
 #include <model/pessoa.h>
@@ -327,6 +328,9 @@ void finalizar_arquivos(Controlador c) {
 
   desenhar_elementos(c, s);
 
+  desenhar_veiculos(c, s);
+
+  // Desenhando saida dos comandos
   iterator = Lista_t.get_first(this->saida_svg_qry);
   while (iterator) {
     desenha_desenhavel(s, Lista_t.get(this->saida_svg_qry, iterator));
@@ -514,4 +518,22 @@ void desenhar_elementos(void *_this, void *svg) {
 
     KDTree_t.passe_simetrico(arvore_atual, desenharElementoSVG, svg);
   }
+}
+
+void desenha_veiculo(const Item _veiculo, const void *_svg) {
+  Veiculo veiculo = _veiculo;
+  SVG svg = _svg;
+
+  Desenhavel desenhavel = cria_desenhavel(veiculo, to_svg_veiculo, NULL);
+
+  desenha_desenhavel(svg, desenhavel);
+
+  destruir_desenhavel(desenhavel);
+}
+  
+void desenhar_veiculos(void *_this, void *svg) {
+  struct Controlador* this = _this;
+
+  Lista_t.map(this->veiculos, svg, desenha_veiculo);
+
 }
