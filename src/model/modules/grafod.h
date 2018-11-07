@@ -74,7 +74,7 @@ struct GrafoD_t {
   /**
    * Insere um vertice sem informacao no grafo this.
    */
-  void (*insert_vertice)(GrafoD this, char *node);
+  // void (*insert_vertice)(GrafoD this, char *node);
 
   /**
    * Define a informacao ligada ao vertice node.
