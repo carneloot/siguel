@@ -25,5 +25,6 @@ char* get_placa_veiculo( Veiculo this );
 
 Figura get_figura_veiculo( Veiculo this );
 
+char* get_svg_veiculo( Veiculo this );
 
 #endif /* __CARRO_H__ */

@@ -4,7 +4,8 @@
 #include <string.h>
 
 #include "figura.h"
-#include "modules/ponto2d.h"
+#include <model/modules/ponto2d.h>
+#include <model/utils.h>
 
 #define COR_VEICULO "lightgray"
 #define COR_BORDA_VEICULO "dimgray"
@@ -58,3 +59,21 @@ char* get_placa_veiculo( Veiculo _this ){
 
   return this->placa;
 }
+
+char* get_svg_veiculo( Veiculo _this ){
+  struct Veiculo* this = _this;
+
+  Ponto2D pos_texto = Ponto2D_t.new( this->pos.x, this->pos.y + this->size.y );
+  pos_texto.x += 5;
+  pos_texto.y -= 5;
+
+  char* svg_figura = get_svg_figura( this->figura );
+  char* svg_placa = format_string( 
+    "<text x=\"%.1f\" y=\"%.1f\" "
+    "style=\"fill:%s;font-size:%.1fpx;font-family:sans-serif\">%s</text>\n", 
+    pos_texto.x, pos_texto.y, COR_BORDA_VEICULO, 10, this->placa 
+  );
+
+  return format_string( "%s\n%s", svg_figura, svg_placa );
+}
+
