@@ -28,7 +28,13 @@ int comando_qry_au( void* _this, void* _controlador ){
   struct Comando *this = _this;
   struct Controlador *controlador = _controlador;
 
-  Veiculo veiculo = cria_veiculo( strtod(this->params[1]), strtod(this->params[2]), strtod(this->params[3]), strtod(this->params[4]), this->params[0] );
+  Ponto2D pos = Ponto2D_t.new( strtod(this->params[1], NULL), strtod(this->params[2], NULL) );
+
+  double w = strtod(this->params[3], NULL);
+  double h = strtod(this->params[4], NULL);
+  char* placa = this->params[0];
+
+  Veiculo veiculo = cria_veiculo( pos, w, h, placa );
 
   Lista_t.insert(controlador->veiculos, veiculo);
   Lista_t.insert(controlador->figuras, get_figura_veiculo( veiculo ));
