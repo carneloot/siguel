@@ -79,6 +79,9 @@ struct GrafoD {
   HashTable label_x_vertice;
 };
 
+/**
+ * Valida o grafo para que nao esteja faltando nenhuma estrutura
+ */
 static bool __validar_grafo(struct GrafoD *this) {
   if (this->vertices == NULL)
     return false;
@@ -193,7 +196,7 @@ static InfoG __get_info_vertice_grafod(GrafoD _this, char *node) {
 
   if (!HashTable_t.exists(this->label_x_vertice, node)) {
     LOG_ERRO("Vertice de nome \"%s\" nao encontrado.", node);
-    return;
+    return NULL;
   }
 
   struct Vertice *vertice = HashTable_t.get(this->label_x_vertice, node).valor;
@@ -201,7 +204,33 @@ static InfoG __get_info_vertice_grafod(GrafoD _this, char *node) {
   return vertice->info;
 }
 
-static void __remove_vertice_grafod(GrafoD _this, char *node) {}
+static void __remove_vertice_grafod(GrafoD _this, char *node) {
+  struct GrafoD *this = _this;
+
+  assert(__validar_grafo(this));
+
+  if (!HashTable_t.exists(this->label_x_vertice, node)) {
+    LOG_ERRO("Vertice com nome \"%s\" nao encontrado.", node);
+    return;
+  }
+
+  struct Vertice *vertice = HashTable_t.get(this->label_x_vertice, node).valor;
+
+  // Checar se tem alguma ligacao saindo dele
+  if (HashTable_t.length(vertice->arestas) != 0) {
+    LOG_ERRO("Vertice \"%s\" contem arestas, e nao pode ser removido.", node);
+    return;
+  }
+
+  // Checar se tem alguma ligacao chegando nele
+  // Todo: 
+
+  HashTable_t.remove(this->label_x_vertice, node);
+
+  KDTree_t.remove(this->vertices, vertice);
+
+  destroy_vertice(vertice);
+}
 
 static Lista __adjacentes_grafod(GrafoD _this, char *node) {}
 
