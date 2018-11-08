@@ -232,7 +232,22 @@ static void __remove_vertice_grafod(GrafoD _this, char *node) {
   destroy_vertice(vertice);
 }
 
-static Lista __adjacentes_grafod(GrafoD _this, char *node) {}
+static void __adicionar_lista(const void *_vertice, void *_lista) {
+  const struct Vertice *vertice = (const struct Vertice *) _vertice;
+  Lista lista = _lista;
+
+  Lista_t.insert(lista, vertice->label);
+}
+
+static Lista __adjacentes_grafod(GrafoD _this, char *node) {
+  struct GrafoD *this = _this;
+
+  Lista lista = Lista_t.create();
+
+  HashTable_t.map(this->label_x_vertice, lista, __adicionar_lista);
+
+  return lista;
+}
 
 const struct GrafoD_t GrafoD_t = { //
   .create              = &__create_grafod,
