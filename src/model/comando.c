@@ -53,7 +53,6 @@
   ENTRY(  comando_qry_hmp,  "qry/hmp?") \
   ENTRY( comando_qry_hmpe, "qry/hmpe?") \
   ENTRY(  comando_qry_dpr,   "qry/dpr") \
-  ENTRY(tire_esse_comando,   "qry/tec") \
   ENTRY(   comando_qry_au,    "qry/au") \
   ENTRY(  comando_qry_rau,    "qry/au") \
   ENTRY(     comando_ec_t,      "ec/t") \

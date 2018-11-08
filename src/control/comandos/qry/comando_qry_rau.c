@@ -20,9 +20,9 @@
 #include <model/modules/logger.h>
 
 
-int comparar_placa( const Item _veiculo, void* _placa ){
+int comparar_placa( void* const _veiculo, const void* _placa ){
   Veiculo veiculo = _veiculo;
-  char* placa = _placa;
+  const char* placa = (const char*) _placa;
 
   return strcmp( get_placa_veiculo( veiculo ), placa );
 }

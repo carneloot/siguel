@@ -17,10 +17,10 @@
   adicionar o carro à lista ligada
 
 */
+#include <stdlib.h>
 
 #include <model/comando.r>
 #include <control/controlador.r>
-
 #include <model/veiculo.h>
 #include <model/modules/lista.h>
 

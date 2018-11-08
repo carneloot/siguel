@@ -13,6 +13,7 @@
 #include <model/pessoa.h>
 #include <model/utils.h>
 #include <model/modules/logger.h>
+#include <model/veiculo.h>
 
 #include "controlador.r"
 
@@ -522,13 +523,13 @@ void desenhar_elementos(void *_this, void *svg) {
 
 void desenha_veiculo(const Item _veiculo, const void *_svg) {
   Veiculo veiculo = _veiculo;
-  SVG svg = _svg;
+  const SVG svg = (const SVG) _svg;
 
-  Desenhavel desenhavel = cria_desenhavel(veiculo, to_svg_veiculo, NULL);
+  Desenhavel desenhavel = cria_desenhavel(veiculo, get_svg_veiculo, NULL);
 
   desenha_desenhavel(svg, desenhavel);
 
-  destruir_desenhavel(desenhavel);
+  desenhavel_destruir(desenhavel);
 }
   
 void desenhar_veiculos(void *_this, void *svg) {
