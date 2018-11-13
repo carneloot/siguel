@@ -8,7 +8,7 @@
 #include <stdlib.h>
 
 /**
- * Comando:    @sp?
+ * Comando:    @tp?
  * Parametros: r1 tp r2
  * Descricao:  Armazena no registrador r1 o
  *             estabelecimento comercial do tipo tp mais
@@ -24,7 +24,7 @@ int search_tp(void * const _comercio, const void *_tp) {
   return strcmp(tp, comercio_get_tipo(comercio));
 }
 
-int comando_reg_sp(void *_this, void *_controlador) {
+int comando_reg_tp(void *_this, void *_controlador) {
   struct Comando *this = (struct Comando *) _this;
   struct Controlador *controlador = (struct Controlador *) _controlador;
 
