@@ -55,6 +55,7 @@
   ENTRY(  comando_qry_dpr,   "qry/dpr") \
   ENTRY(    comando_reg_m,   "qry/@m?") \
   ENTRY(    comando_reg_g,   "qry/@g?") \
+  ENTRY(   comando_reg_sp,  "qry/@sp?") \
   ENTRY(     comando_ec_t,      "ec/t") \
   ENTRY(     comando_ec_e,      "ec/e") \
   ENTRY(     comando_pm_p,      "pm/p") \
