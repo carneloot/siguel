@@ -58,6 +58,11 @@ struct HashTable_t {
    */
   void (*print)(
     HashTable this, char *(*to_string)(void *valor), FILE *fp);
+
+  /**
+   * Mapeia uma funcao pela lista inteira
+   */
+  void (*map)(HashTable this, void *other, void (*map_function)(const void *valor, void *other));
 };
 
 extern const struct HashTable_t HashTable_t;

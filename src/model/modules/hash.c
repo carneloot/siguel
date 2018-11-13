@@ -229,6 +229,17 @@ static void __print_hashtable(
   }
 }
 
+static void __map_hashtable(
+  HashTable _this, void *other, void (*map_function)(const void *valor, void *other)) {
+  struct HashTable *this = (struct HashTable *) _this;
+
+  for (int i = 0; i < this->size; i++) {
+    if (this->table[i].chave == NULL) continue;
+
+    map_function(this->table[i].valor, other);
+  }
+}
+
 static unsigned __length_hashtable(HashTable _this) {
   struct HashTable * this = (struct HashTable *) _this;
 
@@ -257,4 +268,5 @@ const struct HashTable_t HashTable_t = {  //
   .print    = &__print_hashtable,
   .length   = &__length_hashtable,
   .max_size = &__max_size_hashtable,
+  .map      = &__map_hashtable,
 };
