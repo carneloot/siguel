@@ -40,34 +40,34 @@ struct GrafoD_t {
   /* ===== FUNCOES ARESTA ===== */
 
   /**
-   * Insere no grafo this uma aresta que liga os vertices node1 e node2.
-   * A direcao eh node1 -> node2
-   * Os vertices node1 e node2 devem existir;
+   * Insere no grafo this uma aresta que liga os vertices origem e destino.
+   * A direcao eh origem -> destino
+   * Os vertices origem e destino devem existir;
    */
-  void (*insert_aresta)(GrafoD this, char *node1, char *node2);
+  void (*insert_aresta)(GrafoD this, char *origem, char *destino);
 
   /**
-   * Define a informacao ligada a aresta node1->node2.
+   * Define a informacao ligada a aresta origem->destino.
    * A aresta deve existir
    */
-  void (*define_info_aresta)(GrafoD this, char *node1, char *node2, InfoG info);
+  void (*define_info_aresta)(GrafoD this, char *origem, char *destino, InfoG info);
 
   /**
-   * Retorna a informacao ligada a aresta node1->node2.
+   * Retorna a informacao ligada a aresta origem->destino.
    * A aresta deve existir.
    */
-  InfoG (*get_info_aresta)(GrafoD this, char *node1, char *node2);
+  InfoG (*get_info_aresta)(GrafoD this, char *origem, char *destino);
 
   /**
-   * Remove a aresta node1->node2 do grafo this.
+   * Remove a aresta origem->destino do grafo this.
    * A aresta nao deve mais partencer ao grafo.
    */
-  void (*remove_aresta)(GrafoD this, char *node1, char *node2);
+  void (*remove_aresta)(GrafoD this, char *origem, char *destino);
 
   /**
-   * Retorna true se node1 aponta para node2. Falso caso contrario.
+   * Retorna true se origem aponta para destino. Falso caso contrario.
    */
-  bool (*adjacente)(GrafoD this, char *node1, char *node2);
+  bool (*adjacente)(GrafoD this, char *origem, char *destino);
 
   /* ===== FUNCOES VERTICE ===== */
 

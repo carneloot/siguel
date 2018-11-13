@@ -155,7 +155,34 @@ static void __insert_aresta_grafod(GrafoD _this, char *origem, char *destino) {
 
 }
 
-static void __define_info_aresta_grafod(GrafoD _this, char *origem, char *destino, InfoG info) {}
+static void __define_info_aresta_grafod(GrafoD _this, char *origem, char *destino, InfoG info) {
+  struct GrafoD *this = _this;
+
+  assert(__validar_grafo(this));
+
+  if (!HashTable_t.exists(this->label_x_vertice, origem)) {
+    LOG_ERRO("Vertice de nome \"%s\" nao existe.", origem);
+    return;
+  }
+
+  if (!HashTable_t.exists(this->label_x_vertice, destino)) {
+    LOG_ERRO("Vertice de nome \"%s\" nao existe.", destino);
+    return;
+  }
+
+  struct Vertice *vertice_origem = HashTable_t.get(this->label_x_vertice, origem).valor;
+
+  if (!HashTable_t.exists(vertice_origem->arestas, destino)) {
+    LOG_ERRO(
+      "Aresta de \"%s\" a \"%s\" nao existe. Por favor, crie a "
+      "aresta antes de atribuir uma informacao a ela.", origem, destino);
+    return;
+  }
+
+  struct Aresta *aresta = HashTable_t.get(vertice_origem->arestas, destino).valor;
+
+  aresta->info = info;
+}
 
 static InfoG __get_info_aresta_grafod(GrafoD _this, char *origem, char *destino) {}
 
