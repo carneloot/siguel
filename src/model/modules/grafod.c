@@ -23,19 +23,15 @@ static struct Aresta *create_aresta(InfoG info, char *label_origem, char *label_
 
   this->info = info;
 
-  this->label_origem = calloc(strlen(label_origem) + 1, sizeof(char));
-  strcpy(this->label_origem, label_origem);
+  this->label_origem = label_origem;
 
-  this->label_destino = calloc(strlen(label_destino) + 1, sizeof(char));
-  strcpy(this->label_destino, label_destino);
+  this->label_destino = label_destino;
 
   return this;
 }
 
 static void destroy_aresta(void *_this) {
   struct Aresta *this = _this;
-  free(this->label_origem);
-  free(this->label_destino);
   free(this);
 }
 
@@ -130,15 +126,42 @@ static void __definir_funcoes_grafod(GrafoD _this,
 
 /* ===== FUNCOES ARESTA ===== */
 
-static void __insert_aresta_grafod(GrafoD _this, char *node1, char *node2) {}
+static void __insert_aresta_grafod(GrafoD _this, char *origem, char *destino) {
+  struct GrafoD *this = _this;
 
-static void __define_info_aresta_grafod(GrafoD _this, char *node1, char *node2, InfoG info) {}
+  assert(__validar_grafo(this));
 
-static InfoG __get_info_aresta_grafod(GrafoD _this, char *node1, char *node2) {}
+  if (!HashTable_t.exists(this->label_x_vertice, origem)) {
+    LOG_ERRO("Vertice de nome \"%s\" nao existe.", origem);
+    return;
+  }
 
-static void __remove_aresta_grafod(GrafoD _this, char *node1, char *node2) {}
+  if (!HashTable_t.exists(this->label_x_vertice, destino)) {
+    LOG_ERRO("Vertice de nome \"%s\" nao existe.", destino);
+    return;
+  }
 
-static bool __adjacente_grafod(GrafoD _this, char *node1, char *node2) {}
+  struct Vertice *vertice_origem  = HashTable_t.get(this->label_x_vertice, origem).valor;
+  struct Vertice *vertice_destino = HashTable_t.get(this->label_x_vertice, destino).valor;
+
+  struct Aresta *aresta = create_aresta(NULL, vertice_origem->label, vertice_destino->label);
+
+  HashInfo info = {
+    .chave = vertice_destino->label,
+    .valor = aresta
+  };
+
+  HashTable_t.insert(vertice_origem->arestas, info);
+
+}
+
+static void __define_info_aresta_grafod(GrafoD _this, char *origem, char *destino, InfoG info) {}
+
+static InfoG __get_info_aresta_grafod(GrafoD _this, char *origem, char *destino) {}
+
+static void __remove_aresta_grafod(GrafoD _this, char *origem, char *destino) {}
+
+static bool __adjacente_grafod(GrafoD _this, char *origem, char *destino) {}
 
 /* ===== FUNCOES VERTICE ===== */
 
