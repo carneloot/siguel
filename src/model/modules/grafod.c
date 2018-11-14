@@ -71,28 +71,13 @@ static void destroy_vertice(void *_this) {
 struct GrafoD {
   int num_vertices;
 
-  KDTree vertices;
   HashTable label_x_vertice;
 };
-
-/**
- * Valida o grafo para que nao esteja faltando nenhuma estrutura
- */
-static bool __validar_grafo(struct GrafoD *this) {
-  if (this->vertices == NULL)
-    return false;
-  
-  if (this->label_x_vertice == NULL)
-    return false;
-  
-  return true;
-}
 
 static GrafoD __create_grafod() {
   struct GrafoD *this = calloc(1, sizeof(*this));
 
   this->num_vertices = 0;
-  this->vertices     = NULL;
 
   this->label_x_vertice = HashTable_t.create(7);
   
@@ -102,34 +87,15 @@ static GrafoD __create_grafod() {
 static void __destroy_grafod(GrafoD _this) {
   struct GrafoD *this = (struct GrafoD *) _this;
 
-  if (this->vertices)
-    KDTree_t.destroy(this->vertices, destroy_vertice);
-  
   HashTable_t.destroy(this->label_x_vertice, 0, false);
 
   free(this);
-}
-
-static void __definir_funcoes_grafod(GrafoD _this,
-    int (*check_equal)(const void *a, const void *b),
-    int (*compare_x)(const void *a, const void *b),
-    int (*comapre_y)(const void *a, const void *b)
-  ) {
-  struct GrafoD *this = (struct GrafoD *) _this;
-
-  if (this->vertices != NULL)
-    return;
-
-  this->vertices = KDTree_t.create(2, check_equal, compare_x, comapre_y);
-  
 }
 
 /* ===== FUNCOES ARESTA ===== */
 
 static void __insert_aresta_grafod(GrafoD _this, char *origem, char *destino) {
   struct GrafoD *this = _this;
-
-  assert(__validar_grafo(this));
 
   if (!HashTable_t.exists(this->label_x_vertice, origem)) {
     LOG_ERRO("Vertice de nome \"%s\" nao existe.", origem);
@@ -158,8 +124,6 @@ static void __insert_aresta_grafod(GrafoD _this, char *origem, char *destino) {
 static void __define_info_aresta_grafod(GrafoD _this, char *origem, char *destino, InfoG info) {
   struct GrafoD *this = _this;
 
-  assert(__validar_grafo(this));
-
   if (!HashTable_t.exists(this->label_x_vertice, origem)) {
     LOG_ERRO("Vertice de nome \"%s\" nao existe.", origem);
     return;
@@ -187,8 +151,6 @@ static void __define_info_aresta_grafod(GrafoD _this, char *origem, char *destin
 static InfoG __get_info_aresta_grafod(GrafoD _this, char *origem, char *destino) {
   struct GrafoD *this = _this;
 
-  assert(__validar_grafo(this));
-
   if (!HashTable_t.exists(this->label_x_vertice, origem)) {
     LOG_ERRO("Vertice de nome \"%s\" nao existe.", origem);
     return NULL;
@@ -215,8 +177,6 @@ static InfoG __get_info_aresta_grafod(GrafoD _this, char *origem, char *destino)
 
 static void __remove_aresta_grafod(GrafoD _this, char *origem, char *destino) {
   struct GrafoD *this = _this;
-
-  assert(__validar_grafo(this));
 
   if (!HashTable_t.exists(this->label_x_vertice, origem)) {
     LOG_ERRO("Vertice de nome \"%s\" nao existe.", origem);
@@ -247,8 +207,6 @@ static void __remove_aresta_grafod(GrafoD _this, char *origem, char *destino) {
 static bool __adjacente_grafod(GrafoD _this, char *origem, char *destino) {
   struct GrafoD *this = _this;
 
-  assert(__validar_grafo(this));
-
   if (!HashTable_t.exists(this->label_x_vertice, origem)) {
     LOG_ERRO("Vertice de nome \"%s\" nao existe.", origem);
     return false;
@@ -269,16 +227,12 @@ static bool __adjacente_grafod(GrafoD _this, char *origem, char *destino) {
 static void __insert_vertice_grafod(GrafoD _this, char *node) {
   struct GrafoD *this = _this;
 
-  assert(__validar_grafo(this));
-
   if (HashTable_t.exists(this->label_x_vertice, node)) {
     LOG_ERRO("Vertice com nome \"%s\" ja existe.", node);
     return;
   }
 
   struct Vertice *vertice = create_vertice(NULL, node);
-
-  KDTree_t.insert(this->vertices, vertice);
 
   HashInfo info = {
     .chave = vertice->label,
@@ -291,8 +245,6 @@ static void __insert_vertice_grafod(GrafoD _this, char *node) {
 
 static void __define_info_vertice_grafod(GrafoD _this, char *node, InfoG info) {
   struct GrafoD *this = _this;
-
-  assert(__validar_grafo(this));
 
   if (!HashTable_t.exists(this->label_x_vertice, node)) {
     LOG_ERRO("Vertice de nome \"%s\" nao existe.", node);
@@ -307,8 +259,6 @@ static void __define_info_vertice_grafod(GrafoD _this, char *node, InfoG info) {
 static InfoG __get_info_vertice_grafod(GrafoD _this, char *node) {
   struct GrafoD *this = _this;
 
-  assert(__validar_grafo(this));
-
   if (!HashTable_t.exists(this->label_x_vertice, node)) {
     LOG_ERRO("Vertice de nome \"%s\" nao encontrado.", node);
     return NULL;
@@ -321,8 +271,6 @@ static InfoG __get_info_vertice_grafod(GrafoD _this, char *node) {
 
 static void __remove_vertice_grafod(GrafoD _this, char *node) {
   struct GrafoD *this = _this;
-
-  assert(__validar_grafo(this));
 
   if (!HashTable_t.exists(this->label_x_vertice, node)) {
     LOG_ERRO("Vertice com nome \"%s\" nao encontrado.", node);
@@ -341,8 +289,6 @@ static void __remove_vertice_grafod(GrafoD _this, char *node) {
   // Todo: 
 
   HashTable_t.remove(this->label_x_vertice, node);
-
-  KDTree_t.remove(this->vertices, vertice);
 
   destroy_vertice(vertice);
 }
@@ -377,5 +323,4 @@ const struct GrafoD_t GrafoD_t = { //
   .remove_vertice      = &__remove_vertice_grafod,
   .adjacentes          = &__adjacentes_grafod,
   .destroy             = &__destroy_grafod,
-  .definir_funcoes     = &__definir_funcoes_grafod,
 };

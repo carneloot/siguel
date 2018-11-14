@@ -27,6 +27,8 @@ int comando_via_v(void *_this, void *_controlador) {
   GrafoD_t.insert_vertice(controlador->mapa_viario, id);
   GrafoD_t.define_info_vertice(controlador->mapa_viario, id, vertice_info);
 
+  KDTree_t.insert(controlador->vertices_mapa_viario, vertice_info);
+
   return 1;
 }
 
