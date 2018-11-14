@@ -12,6 +12,7 @@
 #include <model/pessoa.h>
 #include <model/utils.h>
 #include <model/modules/logger.h>
+#include <model/mapa_viario/vertice.h>
 
 #include "controlador.r"
 
@@ -99,6 +100,29 @@ int elementoDentro(Item _this, int dim, Item rect[]) {
   return result;
 }
 
+/** FUNCOES ARVORE DO GRAFO */
+
+int equalVerticesGrafo(const void *_a, const void *_b) {
+  const VerticeInfo a = (const VerticeInfo) * (const void **) _a;
+  const VerticeInfo b = (const VerticeInfo) * (const void **) _b;
+
+  return (Ponto2D_t.equal(a->pos, b->pos) && !strcmp(a->id, b->id));
+}
+
+int compareXGrafo(const void *_a, const void *_b) {
+  const VerticeInfo a = (const VerticeInfo) * (const void **) _a;
+  const VerticeInfo b = (const VerticeInfo) * (const void **) _b;
+
+  return (a->pos.x - b->pos.x);
+}
+
+int compareYGrafo(const void *_a, const void *_b) {
+  const VerticeInfo a = (const VerticeInfo) * (const void **) _a;
+  const VerticeInfo b = (const VerticeInfo) * (const void **) _b;
+
+  return (a->pos.y - b->pos.y);
+}
+
 /** METODOS PUBLICOS */
 
 Controlador cria_controlador() {
@@ -144,6 +168,13 @@ Controlador cria_controlador() {
 
   for (i = 0; i < 11; i++)
     this->registradores[i] = Ponto2D_t.new(0, 0);
+
+  this->mapa_viario = GrafoD_t.create();
+  GrafoD_t.definir_funcoes(
+    this->mapa_viario,
+    equalVerticesGrafo,
+    compareXGrafo,
+    compareYGrafo);
 
   return (void *) this;
 }
@@ -422,6 +453,8 @@ void destruir_controlador(Controlador c) {
   HashTable_t.destroy(this->tabelas[CPF_X_PESSOA],     NULL, 0);
   HashTable_t.destroy(this->tabelas[CNPJ_X_COMERCIO],  NULL, 0);
   HashTable_t.destroy(this->tabelas[ID_X_RADIO],       NULL, 0);
+
+  GrafoD_t.destroy(this->mapa_viario);
 
   free(c);
 }

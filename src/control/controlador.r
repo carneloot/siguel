@@ -5,10 +5,12 @@
 #include <model/modules/kdtree.h>
 #include <model/modules/hash.h>
 #include <model/modules/ponto2d.h>
+#include <model/modules/grafod.h>
 
 #define LISTA_EXTRAS \
   X( ec, "-ec") \
   X( pm, "-pm") \
+  X(via,  "-v") \
   X(qry,  "-q")
 
 enum TipoExtras {
@@ -58,6 +60,8 @@ struct Controlador {
 
   // O valor padrão dos registradores é (0, 0)
   Ponto2D registradores[11];
+
+  GrafoD mapa_viario;
 };
 
 extern void desenhar_todas_figuras(void *c, void *svg);

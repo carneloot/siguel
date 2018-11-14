@@ -299,18 +299,9 @@ static void __define_info_vertice_grafod(GrafoD _this, char *node, InfoG info) {
     return;
   }
 
-  struct Vertice *vertice = create_vertice(info, node);
+  struct Vertice *vertice = HashTable_t.get(this->label_x_vertice, node).valor;
 
-  KDTree_t.insert(this->vertices, vertice);
-
-  HashInfo hash_info = {
-    .chave = vertice->label,
-    .valor = vertice,
-  };
-
-  HashTable_t.insert(this->label_x_vertice, hash_info);
-
-  this->num_vertices++;
+  vertice->info = info;
 }
 
 static InfoG __get_info_vertice_grafod(GrafoD _this, char *node) {
