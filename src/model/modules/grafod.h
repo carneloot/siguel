@@ -19,7 +19,7 @@ struct GrafoD_t {
   /**
    * Cria um grafo sem nenhuma aresta e o numero de vertices definido.
    */
-  GrafoD (*create)(int numero_vertices);
+  GrafoD (*create)();
 
   /**
    * Funcao para destruir e desalocar o grafo.

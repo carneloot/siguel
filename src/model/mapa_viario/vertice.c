@@ -1,6 +1,7 @@
 #include "vertice.h"
 
 #include <stdlib.h>
+#include <string.h>
 
 VerticeInfo create_vertice_info(Ponto2D pos, char *id) {
   VerticeInfo this = calloc(1, sizeof(*this));

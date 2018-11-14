@@ -145,6 +145,8 @@ Controlador cria_controlador() {
   for (i = 0; i < 11; i++)
     this->registradores[i] = Ponto2D_t.new(0, 0);
 
+  this->mapa_viario = GrafoD_t.create();
+
   return (void *) this;
 }
 
@@ -422,6 +424,8 @@ void destruir_controlador(Controlador c) {
   HashTable_t.destroy(this->tabelas[CPF_X_PESSOA],     NULL, 0);
   HashTable_t.destroy(this->tabelas[CNPJ_X_COMERCIO],  NULL, 0);
   HashTable_t.destroy(this->tabelas[ID_X_RADIO],       NULL, 0);
+
+  GrafoD_t.destroy(this->mapa_viario);
 
   free(c);
 }

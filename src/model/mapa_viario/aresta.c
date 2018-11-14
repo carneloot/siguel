@@ -1,6 +1,7 @@
 #include "aresta.h";
 
 #include <stdlib.h>
+#include <string.h>
 
 ArestaInfo create_aresta_info(
   char *nome,
