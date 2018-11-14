@@ -79,7 +79,7 @@ static GrafoD __create_grafod() {
 
   this->num_vertices = 0;
 
-  this->label_x_vertice = HashTable_t.create(7);
+  this->label_x_vertice = HashTable_t.create(199);
   
   return this;
 }
@@ -246,6 +246,7 @@ static void __insert_vertice_grafod(GrafoD _this, char *node) {
 
   HashTable_t.insert(this->label_x_vertice, info);
 
+  this->num_vertices++;
 }
 
 static void __define_info_vertice_grafod(GrafoD _this, char *node, InfoG info) {
