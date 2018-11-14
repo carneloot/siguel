@@ -151,8 +151,6 @@ static void __define_info_aresta_grafod(GrafoD _this, char *origem, char *destin
 static InfoG __get_info_aresta_grafod(GrafoD _this, char *origem, char *destino) {
   struct GrafoD *this = _this;
 
-  assert(__validar_grafo(this));
-
   if (!HashTable_t.exists(this->label_x_vertice, origem)) {
     LOG_ERRO("Vertice de nome \"%s\" nao existe.", origem);
     return NULL;

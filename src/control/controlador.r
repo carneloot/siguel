@@ -62,6 +62,7 @@ struct Controlador {
   Ponto2D registradores[11];
 
   GrafoD mapa_viario;
+  KDTree vertices_mapa_viario;
 };
 
 extern void desenhar_todas_figuras(void *c, void *svg);

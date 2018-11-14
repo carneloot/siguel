@@ -102,23 +102,23 @@ int elementoDentro(Item _this, int dim, Item rect[]) {
 
 /** FUNCOES ARVORE DO GRAFO */
 
-int equalVerticesGrafo(const void *_a, const void *_b) {
-  const VerticeInfo a = (const VerticeInfo) * (const void **) _a;
-  const VerticeInfo b = (const VerticeInfo) * (const void **) _b;
+int equalVertices(const void *_a, const void *_b) {
+  const VerticeInfo a = (const VerticeInfo) _a;
+  const VerticeInfo b = (const VerticeInfo) _b;
 
   return (Ponto2D_t.equal(a->pos, b->pos) && !strcmp(a->id, b->id));
 }
 
-int compareXGrafo(const void *_a, const void *_b) {
-  const VerticeInfo a = (const VerticeInfo) * (const void **) _a;
-  const VerticeInfo b = (const VerticeInfo) * (const void **) _b;
+int compareXVertice(const void *_a, const void *_b) {
+  const VerticeInfo a = (const VerticeInfo) _a;
+  const VerticeInfo b = (const VerticeInfo) _b;
 
   return (a->pos.x - b->pos.x);
 }
 
-int compareYGrafo(const void *_a, const void *_b) {
-  const VerticeInfo a = (const VerticeInfo) * (const void **) _a;
-  const VerticeInfo b = (const VerticeInfo) * (const void **) _b;
+int compareYVertice(const void *_a, const void *_b) {
+  const VerticeInfo a = (const VerticeInfo) _a;
+  const VerticeInfo b = (const VerticeInfo) _b;
 
   return (a->pos.y - b->pos.y);
 }
@@ -170,11 +170,7 @@ Controlador cria_controlador() {
     this->registradores[i] = Ponto2D_t.new(0, 0);
 
   this->mapa_viario = GrafoD_t.create();
-  GrafoD_t.definir_funcoes(
-    this->mapa_viario,
-    equalVerticesGrafo,
-    compareXGrafo,
-    compareYGrafo);
+  this->vertices_mapa_viario = KDTree_t.create(2, equalVertices, compareXVertice, compareYVertice);
 
   return (void *) this;
 }
@@ -455,6 +451,7 @@ void destruir_controlador(Controlador c) {
   HashTable_t.destroy(this->tabelas[ID_X_RADIO],       NULL, 0);
 
   GrafoD_t.destroy(this->mapa_viario);
+  KDTree_t.destroy(this->vertices_mapa_viario, &destroy_vertice_info);
 
   free(c);
 }
