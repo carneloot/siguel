@@ -27,16 +27,6 @@ struct GrafoD_t {
    */
   void (*destroy)(GrafoD this);
 
-  /**
-   * Funcao para definir as funcoes de checagem para usar nos vertices.
-   * Os vertices serao guardados em uma KDTree, para facilitar processos mais a frente.
-   */
-  void (*definir_funcoes)(GrafoD this,
-    int (*check_equal)(const void *a, const void *b),
-    int (*compare_x)(const void *a, const void *b),
-    int (*comapre_y)(const void *a, const void *b)
-  );
-
   /* ===== FUNCOES ARESTA ===== */
 
   /**
