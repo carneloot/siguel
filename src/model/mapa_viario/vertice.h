@@ -12,6 +12,6 @@ typedef struct VerticeInfo *VerticeInfo;
 
 VerticeInfo create_vertice_info(Ponto2D pos, char *id);
 
-void destroy_vertice_info(VerticeInfo this);
+void destroy_vertice_info(void *this);
 
 #endif /* __VERTICE_H__ */

@@ -1,4 +1,4 @@
-#include "aresta.h";
+#include "aresta.h"
 
 #include <stdlib.h>
 #include <string.h>
@@ -26,7 +26,8 @@ ArestaInfo create_aresta_info(
   return this;
 }
 
-void destroy_aresta_info(ArestaInfo this) {
+void destroy_aresta_info(void *_this) {
+  ArestaInfo this = _this;
 
   free(this->nome);
   free(this->quadra_direita);

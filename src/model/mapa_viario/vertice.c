@@ -15,7 +15,8 @@ VerticeInfo create_vertice_info(Ponto2D pos, char *id) {
   return this;
 }
 
-void destroy_vertice_info(VerticeInfo this) {
+void destroy_vertice_info(void *_this) {
+  VerticeInfo this = _this;
   free(this->id);
 
   free(this);

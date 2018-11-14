@@ -19,6 +19,6 @@ ArestaInfo create_aresta_info(
   double velocidade_media
 );
 
-void destroy_aresta_info(ArestaInfo this);
+void destroy_aresta_info(void *this);
 
 #endif /* __ARESTA_H__ */
