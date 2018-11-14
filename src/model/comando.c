@@ -56,7 +56,8 @@
   ENTRY(     comando_ec_t,      "ec/t") \
   ENTRY(     comando_ec_e,      "ec/e") \
   ENTRY(     comando_pm_p,      "pm/p") \
-  ENTRY(     comando_pm_m,      "pm/m")
+  ENTRY(     comando_pm_m,      "pm/m") \
+  ENTRY(    comando_via_v,     "via/v")
 
 COMMAND_TABLE(EXPAND_AS_DECLARATION)
 
