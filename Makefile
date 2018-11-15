@@ -45,7 +45,7 @@ INCLUDES := $(shell find $(SRCDIR) -type f -name "*.h")
 OBJECTS  := $(SOURCES:$(SRCDIR)/%.c=$(OBJDIR)/%.o)
 rm       = rm -rf
 
-$(BINDIR)/$(TARGET): $(OBJECTS)
+$(BINDIR)/$(TARGET): $(OBJECTS) $(INCLUDES)
 	@mkdir -p $(dir $@)
 	@$(LINKER) $(OBJECTS) $(LFLAGS) -o $@
 	@echo "Linking complete!"

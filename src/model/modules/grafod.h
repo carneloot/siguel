@@ -2,6 +2,7 @@
 #define __GRAFOD_H__
 
 #include <stdbool.h>
+#include <stdio.h>
 #include "lista.h"
 
 /**
@@ -36,6 +37,11 @@ struct GrafoD_t {
    * Funcao para retornar o label de todos os vertices existentes
    */
   int (*total_vertices)(GrafoD this);
+
+  /**
+   * Funcao para gerar um arquivo GraphViz do grafo
+   */
+  void (*generate_dot)(GrafoD this, FILE *fp);
 
   /* ===== FUNCOES ARESTA ===== */
 

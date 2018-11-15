@@ -120,6 +120,38 @@ static int __total_vertices_grafod(GrafoD _this) {
   return this->num_vertices;
 }
 
+static void __imprimir_aresta_dot(const void *_aresta, void *_fp) {
+  struct Aresta *aresta = (struct Aresta *) _aresta;
+  FILE *fp = (FILE *) _fp;
+
+  fprintf(fp, "\"%p\" -> \"%p\";\n", aresta->label_origem, aresta->label_destino);
+
+}
+
+static void __generate_dot_grafod(GrafoD _this, FILE *fp) {
+  struct GrafoD *this = _this;
+  fprintf(fp, "digraph T {\n");
+  fprintf(fp, "graph [rankdir=LR];\n");
+  fprintf(fp, "node [fontname=\"Arial\"];\n");
+  fprintf(fp, "edge [shape=\"normal\"];\n");
+
+  // Passar por todos os vertices imprimindo as arestas
+
+  Posic it = Lista_t.get_first(this->vertices);
+
+  while (it) {
+    struct Vertice *vertice = Lista_t.get(this->vertices, it);
+    
+    fprintf(fp, "\"%p\" [label=\"%s\"];\n", vertice->label, vertice->label);
+
+    HashTable_t.map(vertice->arestas, fp, __imprimir_aresta_dot);
+
+    it = Lista_t.get_next(this->vertices, it);
+  }
+
+  fprintf(fp, "}\n");
+}
+
 /* ===== FUNCOES ARESTA ===== */
 
 static void __insert_aresta_grafod(GrafoD _this, char *origem, char *destino) {
@@ -350,6 +382,7 @@ const struct GrafoD_t GrafoD_t = { //
   .destroy             = &__destroy_grafod,
   .get_all_vertices    = &__get_all_vertices_grafod,
   .total_vertices      = &__total_vertices_grafod,
+  .generate_dot        = &__generate_dot_grafod,
   .insert_aresta       = &__insert_aresta_grafod,
   .define_info_aresta  = &__define_info_aresta_grafod,
   .get_info_aresta     = &__get_info_aresta_grafod,
