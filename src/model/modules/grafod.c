@@ -94,6 +94,32 @@ static void __destroy_grafod(GrafoD _this) {
   free(this);
 }
 
+static char **__get_all_vertices_grafod(GrafoD _this) {
+  struct GrafoD *this = (struct GrafoD *) _this;
+
+  char **retorno = calloc(this->num_vertices, sizeof(*retorno));
+
+  int indice = 0;
+
+  Posic it = Lista_t.get_first(this->vertices);
+
+  while (it) {
+    struct Vertice *vertice = Lista_t.get(this->vertices, it);
+
+    retorno[indice++] = vertice->label;
+
+    it = Lista_t.get_next(this->vertices, it);
+  }
+
+  return retorno;
+}
+
+static int __total_vertices_grafod(GrafoD _this) {
+  struct GrafoD *this = (struct GrafoD *) _this;
+
+  return this->num_vertices;
+}
+
 /* ===== FUNCOES ARESTA ===== */
 
 static void __insert_aresta_grafod(GrafoD _this, char *origem, char *destino) {
@@ -321,6 +347,9 @@ static Lista __adjacentes_grafod(GrafoD _this, char *node) {
 
 const struct GrafoD_t GrafoD_t = { //
   .create              = &__create_grafod,
+  .destroy             = &__destroy_grafod,
+  .get_all_vertices    = &__get_all_vertices_grafod,
+  .total_vertices      = &__total_vertices_grafod,
   .insert_aresta       = &__insert_aresta_grafod,
   .define_info_aresta  = &__define_info_aresta_grafod,
   .get_info_aresta     = &__get_info_aresta_grafod,
@@ -331,5 +360,4 @@ const struct GrafoD_t GrafoD_t = { //
   .get_info_vertice    = &__get_info_vertice_grafod,
   .remove_vertice      = &__remove_vertice_grafod,
   .adjacentes          = &__adjacentes_grafod,
-  .destroy             = &__destroy_grafod,
 };

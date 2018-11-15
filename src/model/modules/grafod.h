@@ -27,6 +27,16 @@ struct GrafoD_t {
    */
   void (*destroy)(GrafoD this);
 
+  /**
+   * Funcao para retornar o label de todos os vertices existentes
+   */
+  char **(*get_all_vertices)(GrafoD this);
+
+  /**
+   * Funcao para retornar o label de todos os vertices existentes
+   */
+  int (*total_vertices)(GrafoD this);
+
   /* ===== FUNCOES ARESTA ===== */
 
   /**
