@@ -28,42 +28,26 @@ static DVInfo create_dvinfo(char *label, double distancia) {
 }
 
 /**
- * Funcao usada para filtrar itens que nao estão em uma lista
+ * Retorna o Posic do DVInfo de menor distancia na lista vertices
  */
-static int naoEstaEm(const Item item, const void *_outraLista) {
-  Lista outraLista = (const Lista) _outraLista;
-
-  Posic it = Lista_t.get_first(outraLista);
-  while (it) {
-
-    if (item == Lista_t.get(outraLista, it))
-      return 1;
-
-    it = Lista_t.get_next(outraLista, it);
-  }
-
-  return 0;
-}
-
-/**
- * Retona o DVInfo de menor distancia na lista vertices
- */
-static DVInfo pegarMaisProximo(Lista vertices) {
+static Posic pegarMaisProximo(Lista vertices) {
   Posic it = Lista_t.get_first(vertices);
 
-  DVInfo menor = Lista_t.get(vertices, it);
+  Posic pMenor = it;
+  DVInfo menor = Lista_t.get(vertices, pMenor);
 
   while (it) {
     DVInfo atual = Lista_t.get(vertices, it);
 
     if (atual->distancia < menor->distancia) {
+      pMenor = it;
       menor = atual;
     }
     
     it = Lista_t.get_next(vertices, it);
   }
 
-  return menor;
+  return pMenor;
 }
 
 /**
@@ -134,27 +118,25 @@ Lista dijkstra(GrafoD grafo, char *origem, char *destino, double (*get_dist_ares
   Lista vertices = getVertices(labels, GrafoD_t.total_vertices(grafo), origem);
   free(labels);
 
-  Lista visitados = Lista_t.create();
+  Lista nao_visitados = Lista_t.copy(vertices);
 
   DVInfo target;
 
   // Enquanto todos nao forem visitados
-  while (Lista_t.length(visitados) < Lista_t.length(vertices)) {
+  while (Lista_t.length(nao_visitados) > 0) {
 
     // Pegue o nao visitado mais proximo
-    Lista naoVisitados = Lista_t.filter(vertices, visitados, naoEstaEm);
-    DVInfo maisProximo = pegarMaisProximo(naoVisitados);
-    Lista_t.destruir(naoVisitados, 0);
+    Posic pMaisProximo = pegarMaisProximo(nao_visitados);
+    DVInfo maisProximo = Lista_t.get(nao_visitados, pMaisProximo);
 
     // Insira ele a lista de visitados
-    Lista_t.insert(visitados, maisProximo);
+    Lista_t.remove(nao_visitados, pMaisProximo);
 
     // Se cheguei ao alvo para o loop
     if (!strcmp(destino, maisProximo->label)) {
       target = maisProximo;
       break;
     }
-
 
     // Passar por todos os adjacentes atualizando a distancia e o anterior
     Lista adjacentes = GrafoD_t.adjacentes(grafo, maisProximo->label);
@@ -186,7 +168,7 @@ Lista dijkstra(GrafoD grafo, char *origem, char *destino, double (*get_dist_ares
     Lista_t.destruir(adjacentes, 0);
   }
 
-  Lista_t.destruir(visitados, 0);
+  Lista_t.destruir(nao_visitados, 0);
 
   Lista caminho = gerarCaminho(target);
 
