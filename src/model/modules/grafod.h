@@ -27,6 +27,16 @@ struct GrafoD_t {
    */
   void (*destroy)(GrafoD this);
 
+  /**
+   * Funcao para retornar o label de todos os vertices existentes
+   */
+  char **(*get_all_vertices)(GrafoD this);
+
+  /**
+   * Funcao para retornar o label de todos os vertices existentes
+   */
+  int (*total_vertices)(GrafoD this);
+
   /* ===== FUNCOES ARESTA ===== */
 
   /**
@@ -86,7 +96,7 @@ struct GrafoD_t {
   void (*remove_vertice)(GrafoD this, char *node);
 
   /**
-   * Retorna uma lista ligada com todos os vertices adjacentes a node.
+   * Retorna uma lista ligada com os labels de todos os vertices adjacentes a node.
    * O vertice deve existir.
    */
   Lista (*adjacentes)(GrafoD this, char *node);
