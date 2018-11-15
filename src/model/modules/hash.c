@@ -90,8 +90,8 @@ static void __realocar_hashtable(struct HashTable *this, unsigned new_size) {
     HashInfo info_atual = this->table[i];
     if (!info_atual.chave || !info_atual.valor) continue;
 
+    unsigned chave_em_numero = char_to_unsigned(info_atual.chave);
     for (int j = 0; j < new_size; j++) {
-      unsigned chave_em_numero = char_to_unsigned(info_atual.chave);
       unsigned posicao = hash(chave_em_numero, j, new_size);
 
       if (!nova_tabela[posicao].valor) {
@@ -117,10 +117,11 @@ static void __insert_hashtable(HashTable _this, HashInfo info) {
   if (!this)
     return;
 
+  unsigned chave_em_numero = char_to_unsigned(info.chave);
+
   while (1) {
     int i;
     for (i = 0; i < this->size; i++) {
-      unsigned chave_em_numero = char_to_unsigned(info.chave);
 
       int posicao_table = hash(chave_em_numero, i, this->size);
 
@@ -151,8 +152,9 @@ static int __exists_hashtable(HashTable _this, const char chave[]) {
   if (!this)
     return 0;
 
+  unsigned chave_em_numero = char_to_unsigned(chave);
+  
   for (int i = 0; i < this->size; i++) {
-    unsigned chave_em_numero = char_to_unsigned(chave);
 
     int posicao_table = hash(chave_em_numero, i, this->size);
     
@@ -174,8 +176,8 @@ static HashInfo __get_hashtable(HashTable _this, const char chave[]) {
   if (!this)
     return nulo;
 
+  unsigned chave_em_numero = char_to_unsigned(chave);
   for (int i = 0; i < this->size; i++) {
-    unsigned chave_em_numero = char_to_unsigned(chave);
 
     int posicao_table = hash(chave_em_numero, i, this->size);
     
@@ -197,8 +199,8 @@ static void __remove_hashtable(HashTable _this, const char chave[]) {
   if (!this)
     return;
 
+  unsigned chave_em_numero = char_to_unsigned(chave);
   for (int i = 0; i < this->size; i++) {
-    unsigned chave_em_numero = char_to_unsigned(chave);
 
     int posicao_table = hash(chave_em_numero, i, this->size);
 
