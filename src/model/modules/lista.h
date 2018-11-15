@@ -120,6 +120,11 @@ struct Lista_t {
   Item *(*to_array)(Lista lista);
 
   /**
+   * Retorna 1 se a lista contem o item, 0 caso contrario.
+   */
+  int (*contem)(Lista this, Item item);
+
+  /**
    * Destroi a lista.
    */
   void (*destruir)(Lista, void (*)(Item));
