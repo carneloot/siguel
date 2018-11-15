@@ -87,9 +87,7 @@ static GrafoD __create_grafod() {
 static void __destroy_grafod(GrafoD _this) {
   struct GrafoD *this = (struct GrafoD *) _this;
 
-  LOG_PRINT(LOG_STDOUT, "Numero de vertices: %d", this->num_vertices);
-
-  HashTable_t.destroy(this->label_x_vertice, 0, false);
+  HashTable_t.destroy(this->label_x_vertice, destroy_vertice, false);
 
   free(this);
 }

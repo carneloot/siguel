@@ -12,6 +12,8 @@
 #include <model/pessoa.h>
 #include <model/utils.h>
 #include <model/modules/logger.h>
+
+#include <model/mapa_viario/aresta.h>
 #include <model/mapa_viario/vertice.h>
 
 #include "controlador.r"
@@ -166,11 +168,13 @@ Controlador cria_controlador() {
   for (i = 0; i < TABELAS_TOTAL; i++)
     this->tabelas[i] = HashTable_t.create(73);
 
-  for (i = 0; i < 11; i++)
+  for (i = 0; i < 11; i++) {
     this->registradores[i] = Ponto2D_t.new(0, 0);
+  }
 
-  this->mapa_viario = GrafoD_t.create();
+  this->mapa_viario          = GrafoD_t.create();
   this->vertices_mapa_viario = KDTree_t.create(2, equalVertices, compareXVertice, compareYVertice);
+  this->arestas_mapa_viario  = Lista_t.create();
 
   return (void *) this;
 }
@@ -452,6 +456,7 @@ void destruir_controlador(Controlador c) {
 
   GrafoD_t.destroy(this->mapa_viario);
   KDTree_t.destroy(this->vertices_mapa_viario, &destroy_vertice_info);
+  Lista_t.destruir(this->arestas_mapa_viario, &destroy_aresta_info);
 
   free(c);
 }

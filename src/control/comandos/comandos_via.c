@@ -65,5 +65,7 @@ int comando_via_e(void *_this, void *_controlador) {
   GrafoD_t.insert_aresta(controlador->mapa_viario, label_origem, label_destino);
   GrafoD_t.define_info_aresta(controlador->mapa_viario, label_origem, label_destino, aresta_info);
 
+  Lista_t.insert(controlador->arestas_mapa_viario, aresta_info);
+
   return 1;
 }
