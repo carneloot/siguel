@@ -5,7 +5,6 @@
 #include <string.h>
 
 #include "hash.h"
-#include "kdtree.h"
 
 #include <model/modules/logger.h>
 
@@ -71,6 +70,7 @@ static void destroy_vertice(void *_this) {
 struct GrafoD {
   int num_vertices;
 
+  Lista vertices;
   HashTable label_x_vertice;
 };
 
@@ -79,6 +79,7 @@ static GrafoD __create_grafod() {
 
   this->num_vertices = 0;
 
+  this->vertices = Lista_t.create();
   this->label_x_vertice = HashTable_t.create(199);
   
   return this;
@@ -87,6 +88,7 @@ static GrafoD __create_grafod() {
 static void __destroy_grafod(GrafoD _this) {
   struct GrafoD *this = (struct GrafoD *) _this;
 
+  Lista_t.destruir(this->vertices, NULL);
   HashTable_t.destroy(this->label_x_vertice, destroy_vertice, false);
 
   free(this);
@@ -242,6 +244,7 @@ static void __insert_vertice_grafod(GrafoD _this, char *node) {
     .valor = vertice,
   };
 
+  Lista_t.insert(this->vertices, vertice);
   HashTable_t.insert(this->label_x_vertice, info);
 
   this->num_vertices++;
@@ -297,11 +300,11 @@ static void __remove_vertice_grafod(GrafoD _this, char *node) {
   destroy_vertice(vertice);
 }
 
-static void __adicionar_lista(const void *_vertice, void *_lista) {
-  const struct Vertice *vertice = (const struct Vertice *) _vertice;
+static void __adicionar_lista(const void *_aresta, void *_lista) {
+  const struct Aresta *aresta = (const struct Aresta *) _aresta;
   Lista lista = _lista;
 
-  Lista_t.insert(lista, vertice->label);
+  Lista_t.insert(lista, aresta->label_destino);
 }
 
 static Lista __adjacentes_grafod(GrafoD _this, char *node) {
@@ -309,7 +312,9 @@ static Lista __adjacentes_grafod(GrafoD _this, char *node) {
 
   Lista lista = Lista_t.create();
 
-  HashTable_t.map(this->label_x_vertice, lista, __adicionar_lista);
+  struct Vertice *vertice = HashTable_t.get(this->label_x_vertice, node).valor;
+
+  HashTable_t.map(vertice->arestas, lista, __adicionar_lista);
 
   return lista;
 }

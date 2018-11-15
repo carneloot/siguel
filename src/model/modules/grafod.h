@@ -86,7 +86,7 @@ struct GrafoD_t {
   void (*remove_vertice)(GrafoD this, char *node);
 
   /**
-   * Retorna uma lista ligada com todos os vertices adjacentes a node.
+   * Retorna uma lista ligada com os labels de todos os vertices adjacentes a node.
    * O vertice deve existir.
    */
   Lista (*adjacentes)(GrafoD this, char *node);
