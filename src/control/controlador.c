@@ -254,6 +254,8 @@ int executar_proximo_comando(Controlador c) {
 
   this->linha_atual++;
 
+  LOG_PRINT(LOG_FILE, "Executando comando \"%s\".", comando->string);
+
   int result = comando->executar(comando, c);
   
   destruir_comando(comando);
@@ -309,8 +311,6 @@ void gerar_fila_execucao(Controlador _this) {
         continue;
       }
       
-      LOG_PRINT(LOG_FILE, "Comando inserido: \"%s\"", linha);
-
       Lista_t.insert(this->fila_execucao, (Item) comando);
 
       free(linha);

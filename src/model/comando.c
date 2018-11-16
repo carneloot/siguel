@@ -85,16 +85,18 @@ Comando cria_comando(char *entrada, char *arq) {
   int h, i;
   char *linha, *item;
 
-  struct Comando *this;
-  this = (struct Comando *) malloc(sizeof(struct Comando));
+  struct Comando *this = (struct Comando *) malloc(sizeof(struct Comando));
+
+  this->string = calloc(strlen(entrada) + 1, sizeof(char));
+  strcpy(this->string, entrada);
 
   this->num_param = conta_params(entrada);
 
-  linha = (char *) malloc((strlen(entrada) + 1) * sizeof(char));
+  linha = (char *) calloc(strlen(entrada) + 1, sizeof(char));
+  strcpy(linha, entrada);
 
   /* Coloca os parametros no vetor de strings this->params */
-  this->params = (char **) malloc(this->num_param * sizeof(char *));
-  strcpy(linha, entrada);
+  this->params = (char **) calloc(this->num_param, sizeof(char *));
 
   h = 0;
 
@@ -114,6 +116,7 @@ Comando cria_comando(char *entrada, char *arq) {
   // Se nao achar o comando, quer dizer que ele nao faz nada, então retorna nulo
   if (i == NUM_COMANDOS) {
     free(linha);
+    free(this->string);
     free(this->params);
     free(this);
     return NULL;
@@ -136,10 +139,10 @@ Comando cria_comando(char *entrada, char *arq) {
 }
 
 void destruir_comando(Comando c) {
-  struct Comando *this;
+  struct Comando *this = (struct Comando *) c;
   int i;
 
-  this = (struct Comando *) c;
+  free(this->string);
 
   for (i = 0; i < this->num_param; i++) {
     free(this->params[i]);
