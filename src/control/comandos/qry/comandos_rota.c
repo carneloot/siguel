@@ -5,6 +5,7 @@
 #include <model/mapa_viario/aresta.h>
 #include <model/utils.h>
 #include <model/modules/dijkstra.h>
+#include <model/SVG.h>
 
 #include <float.h>
 #include <stdlib.h>
@@ -36,7 +37,7 @@ static double get_distancia_aresta(void *_aresta_info) {
 
 static double get_velocidade_media_aresta(void *_aresta_info) {
   ArestaInfo aresta_info = (ArestaInfo) _aresta_info;
-  return 1.0 / aresta_info->velocidade_media;
+  return 100.0 / aresta_info->velocidade_media;
 }
 
 static Lista get_caminho(GrafoD grafo, VerticeInfo origem_info, VerticeInfo destino_info, bool distancia) {
@@ -47,6 +48,43 @@ static Lista get_caminho(GrafoD grafo, VerticeInfo origem_info, VerticeInfo dest
   caminho = dijkstra(grafo, origem_info->id, destino_info->id, funcao);
 
   return caminho;
+}
+
+static void desenhar_caminho_svg(SVG svg, Lista caminho, GrafoD mapa, char *cor) {
+
+  char *label_first         = Lista_t.get(caminho, Lista_t.get_first(caminho));
+  VerticeInfo vertice_first = GrafoD_t.get_info_vertice(mapa, label_first);
+  Ponto2D posicao_inicio    = vertice_first->pos;
+
+  posicao_inicio.x += 10;
+  posicao_inicio.y -= 10;
+
+  escreve_texto(svg, "inicio", posicao_inicio, 25, cor);
+
+  Posic it = Lista_t.get_first(caminho);
+
+  while (Lista_t.get_next(caminho, it)) {
+    Posic next_it = Lista_t.get_next(caminho, it);
+
+    char *label      = Lista_t.get(caminho, it);
+    char *label_next = Lista_t.get(caminho, next_it);
+
+    VerticeInfo vertice      = GrafoD_t.get_info_vertice(mapa, label);
+    VerticeInfo vertice_next = GrafoD_t.get_info_vertice(mapa, label_next);
+
+    desenha_linha(svg, vertice->pos, vertice_next->pos, 1, 5, cor);
+    
+    it = next_it;
+  }
+
+  char *label_last         = Lista_t.get(caminho, Lista_t.get_last(caminho));
+  VerticeInfo vertice_last = GrafoD_t.get_info_vertice(mapa, label_last);
+  Ponto2D posicao_fim   = vertice_last->pos;
+
+  posicao_fim.x += 10;
+  posicao_fim.y -= 10;
+
+  escreve_texto(svg, "fim", posicao_fim, 25, cor);
 }
 
 /**
@@ -63,8 +101,8 @@ static Lista get_caminho(GrafoD grafo, VerticeInfo origem_info, VerticeInfo dest
  */
 
 int comando_qry_p(void *_this, void *_controlador) {
-  struct Comando *this = _this;
-  struct Controlador *controlador = _controlador;
+  // struct Comando *this = _this;
+  // struct Controlador *controlador = _controlador;
 
   return 1;
 }
@@ -117,6 +155,21 @@ int comando_qry_sp(void *_this, void *_controlador) {
     distancia = (this->params[1][0] == 'D');
   }
 
+  SVG svg_saida;
+
+  if (pictorica) {
+    char *path = format_string("%s%s-%s.svg",
+      controlador->dir_saida,
+      controlador->nome_base,
+      sufixo);
+
+    svg_saida = cria_SVG(path, controlador->max_qry.x, controlador->max_qry.y);
+
+    free(path);
+
+    desenhar_elementos(controlador, svg_saida);
+  }
+
   for (int i = 0; i < total_registradores - 1; i++) {
     int r1 = strtol(this->params[offset_total + 1 + i]     + 1, NULL, 10);
     int r2 = strtol(this->params[offset_total + 1 + i + 1] + 1, NULL, 10);
@@ -129,7 +182,21 @@ int comando_qry_sp(void *_this, void *_controlador) {
 
     Lista caminho = get_caminho(controlador->mapa_viario, origem_info, destino_info, distancia);
 
+    if (pictorica) {
+      desenhar_caminho_svg(
+        svg_saida,
+        caminho,
+        controlador->mapa_viario,
+        cor[i % 2]);
+    }
+
     Lista_t.destruir(caminho, 0);
+  }
+
+  if (pictorica) {
+    salva_SVG(svg_saida);
+
+    destruir_SVG(svg_saida);
   }
 
   return 1;
