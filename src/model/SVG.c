@@ -25,13 +25,13 @@ static void desenhar_grid(SVG _this) {
   for (float x = 0; x < this->max.x; x += OFFSET) {
     start = Ponto2D_t.new(x, 0);
     end   = Ponto2D_t.new(x, this->max.y);
-    desenha_linha(this, start, end, 0.4, "black");
+    desenha_linha(this, start, end, 0.4, 1, "black");
   }
 
   for (float y = 0; y < this->max.y; y += OFFSET) {
     start = Ponto2D_t.new(0, y);
     end   = Ponto2D_t.new(this->max.x, y);
-    desenha_linha(this, start, end, 0.4, "black");
+    desenha_linha(this, start, end, 0.4, 1, "black");
   }
 }
 
@@ -126,7 +126,7 @@ void escreve_texto(SVG s, char *texto, Ponto2D pos, float tamanho, char *cor) {
     texto);
 }
 
-void desenha_linha(SVG s, Ponto2D a, Ponto2D b, float opacity, char *cor) {
+void desenha_linha(SVG s, Ponto2D a, Ponto2D b, float opacity, double tamanho, char *cor) {
   struct SVG *this;
 
   this = (struct SVG *) s;
@@ -134,12 +134,13 @@ void desenha_linha(SVG s, Ponto2D a, Ponto2D b, float opacity, char *cor) {
   escrever_linha(
     this->saida,
     "<line x1=\"%.1f\" y1=\"%.1f\" x2=\"%.1f\" y2=\"%.1f\" "
-    "style=\"stroke:%s;stroke-width:;opacity:%.1f\" />\n",
+    "style=\"stroke:%s;stroke-width:%.1f;opacity:%.1f\" />\n",
     a.x,
     a.y,
     b.x,
     b.y,
     (!!cor) ? cor : "black",
+    tamanho,
     opacity);
 }
 

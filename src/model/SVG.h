@@ -21,7 +21,7 @@ void desenha_asset(SVG this, Ponto2D pos, Ponto2D size, char *nome);
 void escreve_texto(
   SVG this, char *texto, Ponto2D pos, float tamanho, char *cor);
 
-void desenha_linha(SVG this, Ponto2D a, Ponto2D b, float opacity, char *cor);
+void desenha_linha(SVG this, Ponto2D a, Ponto2D b, float opacity, double tamanho, char *cor);
 
 void desenha_desenhavel(SVG this, Desenhavel desenhavel);
 
