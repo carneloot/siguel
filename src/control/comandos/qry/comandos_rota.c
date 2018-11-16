@@ -11,6 +11,7 @@
 #include <stdlib.h>
 #include <stdbool.h>
 
+/** Funcao auxiliar da get_vertice_by_ponto */
 double __distancia_vertice_ponto(const Item _vertice_info, const Item _ponto, int dim) {
   VerticeInfo vertice_info = (VerticeInfo) _vertice_info;
 
@@ -26,10 +27,14 @@ double __distancia_vertice_ponto(const Item _vertice_info, const Item _ponto, in
   return DBL_MAX;
 }
 
+/**
+ * Retorna o vertice mais proximo do ponto passado
+ */
 static VerticeInfo get_vertice_by_ponto(KDTree vertices, Ponto2D ponto) {
   return KDTree_t.nearest_neighbor(vertices, &ponto, __distancia_vertice_ponto).point1;
 }
 
+/** FUNCOES PARA USAR NA HORA DE ACHAR O CAMINHO */
 static double get_distancia_aresta(void *_aresta_info) {
   ArestaInfo aresta_info = (ArestaInfo) _aresta_info;
   return aresta_info->comprimento;
@@ -40,6 +45,10 @@ static double get_velocidade_media_aresta(void *_aresta_info) {
   return 100.0 / aresta_info->velocidade_media;
 }
 
+/**
+ * Retorna o caminho de origem_info até destino_info.
+ * Se distancia for true usa a distancia, senao usa a velocidade
+ */
 static Lista get_caminho(GrafoD grafo, VerticeInfo origem_info, VerticeInfo destino_info, bool distancia) {
   Lista caminho;
 
@@ -50,16 +59,26 @@ static Lista get_caminho(GrafoD grafo, VerticeInfo origem_info, VerticeInfo dest
   return caminho;
 }
 
+/**
+ * Escreve o texto no local do vertice indicado por label
+ */
+static void escrever_texto_vertice(SVG svg, GrafoD grafo, char *label, char *texto, char *cor) {
+  VerticeInfo vertice = GrafoD_t.get_info_vertice(grafo, label);
+  Ponto2D posicao     = vertice->pos;
+
+  posicao.x += 10;
+  posicao.y -= 10;
+
+  escreve_texto(svg, texto, posicao, 25, cor);
+}
+
+/**
+ * Desenha linhas entre os vertices indicados por caminho de cor cor
+ */
 static void desenhar_caminho_svg(SVG svg, Lista caminho, GrafoD mapa, char *cor) {
 
-  char *label_first         = Lista_t.get(caminho, Lista_t.get_first(caminho));
-  VerticeInfo vertice_first = GrafoD_t.get_info_vertice(mapa, label_first);
-  Ponto2D posicao_inicio    = vertice_first->pos;
-
-  posicao_inicio.x += 10;
-  posicao_inicio.y -= 10;
-
-  escreve_texto(svg, "inicio", posicao_inicio, 25, cor);
+  char *label_first = Lista_t.get(caminho, Lista_t.get_first(caminho));
+  escrever_texto_vertice(svg, mapa, label_first, "inicio", cor);
 
   Posic it = Lista_t.get_first(caminho);
 
@@ -77,14 +96,8 @@ static void desenhar_caminho_svg(SVG svg, Lista caminho, GrafoD mapa, char *cor)
     it = next_it;
   }
 
-  char *label_last         = Lista_t.get(caminho, Lista_t.get_last(caminho));
-  VerticeInfo vertice_last = GrafoD_t.get_info_vertice(mapa, label_last);
-  Ponto2D posicao_fim   = vertice_last->pos;
-
-  posicao_fim.x += 10;
-  posicao_fim.y -= 10;
-
-  escreve_texto(svg, "fim", posicao_fim, 25, cor);
+  char *label_last = Lista_t.get(caminho, Lista_t.get_last(caminho));
+  escrever_texto_vertice(svg, mapa, label_last, "fim", cor);
 }
 
 /**
@@ -158,10 +171,15 @@ int comando_qry_sp(void *_this, void *_controlador) {
   SVG svg_saida;
 
   if (pictorica) {
-    char *path = format_string("%s%s-%s.svg",
+    char *qry_nome = get_nome(controlador->extras[e_qry]);
+
+    char *path = format_string("%s%s-%s-%s.svg",
       controlador->dir_saida,
       controlador->nome_base,
+      qry_nome,
       sufixo);
+
+    free(qry_nome);
 
     svg_saida = cria_SVG(path, controlador->max_qry.x, controlador->max_qry.y);
 
