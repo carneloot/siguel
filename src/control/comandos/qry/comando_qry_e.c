@@ -25,7 +25,7 @@ int comando_qry_e(void *_this, void *_controlador) {
 
   char **params = this->params;
 
-  int  numero_registrador = strtol( params[0], NULL, 10 );
+  int  numero_registrador = strtol( params[0] + 1, NULL, 10 );
 
   char *cep          = params[1];
   char *char_face    = params[2];

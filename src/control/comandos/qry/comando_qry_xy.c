@@ -16,7 +16,7 @@ int comando_qry_xy(void *_this, void *_controlador) {
 
   char **params = this->params;
 
-  int numero_registrador    = strtol(params[0], NULL, 10);
+  int numero_registrador    = strtol(params[0] + 1, NULL, 10);
   double x                  = strtod(params[1], NULL);
   double y                  = strtod(params[2], NULL);
 
