@@ -2,8 +2,6 @@
 // Entrada: r x y
 // Armazena a posição (x,y) no registrador r
 
-
-
 #include <model/comando.r>
 #include <control/controlador.r>
 

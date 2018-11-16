@@ -3,13 +3,10 @@
 /* Armazena em r a posição geográfica do endereço
    Cep face num*/
 
-
-
-
 /*
-    Procurar x e y da quadra
-    Adicionar baseado na face e número
-    Guardar no registrador
+  Criar endereço
+  Pegar coordenadas do endereço
+  Guardar no registrador
 */
 
 #include <model/comando.r>
@@ -41,7 +38,6 @@ int comando_qry_e(void *_this, void *_controlador) {
     case 'L': face = FACE_LESTE; break;
     case 'O': face = FACE_OESTE; break;
   }
-
 
   Endereco endereco;
   endereco = cria_endereco( cep, face, numero);
