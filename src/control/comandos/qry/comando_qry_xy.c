@@ -16,9 +16,9 @@ int comando_qry_xy(void *_this, void *_controlador) {
 
   char **params = this->params;
 
-  int numero_registrador = atoi(params[0]);
-  int x                  = atoi(params[1]);
-  int y                  = atoi(params[2]);
+  int numero_registrador    = strtol(params[0], NULL, 10);
+  double x                  = strtod(params[1], NULL);
+  double y                  = strtod(params[2], NULL);
 
   Ponto2D ponto = Ponto2D_t.new(x, y);
   controlador->registradores[numero_registrador] = ponto;

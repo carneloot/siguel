@@ -25,11 +25,11 @@ int comando_qry_e(void *_this, void *_controlador) {
 
   char **params = this->params;
 
-  int  numero_registrador = atoi( params[0] );
+  int  numero_registrador = strtol( params[0], NULL, 10 );
 
-  char *cep     = params[1];
+  char *cep          = params[1];
   char *char_face    = params[2];
-  int  numero   = atoi( params[3] );
+  int  numero        = strtol( params[3], NULL, 10 );
   int  face;
 
   switch( char_face[0] ){
