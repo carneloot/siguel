@@ -4,6 +4,7 @@
 #include <model/mapa_viario/vertice.h>
 #include <model/mapa_viario/aresta.h>
 #include <model/utils.h>
+#include <model/modules/dijkstra.h>
 
 #include <float.h>
 #include <stdlib.h>
@@ -26,6 +27,26 @@ double __distancia_vertice_ponto(const Item _vertice_info, const Item _ponto, in
 
 static VerticeInfo get_vertice_by_ponto(KDTree vertices, Ponto2D ponto) {
   return KDTree_t.nearest_neighbor(vertices, &ponto, __distancia_vertice_ponto).point1;
+}
+
+static double get_distancia_aresta(void *_aresta_info) {
+  ArestaInfo aresta_info = (ArestaInfo) _aresta_info;
+  return aresta_info->comprimento;
+}
+
+static double get_velocidade_media_aresta(void *_aresta_info) {
+  ArestaInfo aresta_info = (ArestaInfo) _aresta_info;
+  return 1.0 / aresta_info->velocidade_media;
+}
+
+static Lista get_caminho(GrafoD grafo, VerticeInfo origem_info, VerticeInfo destino_info, bool distancia) {
+  Lista caminho;
+
+  double (*funcao)(void *) = (distancia == true) ? get_distancia_aresta : get_velocidade_media_aresta;
+
+  caminho = dijkstra(grafo, origem_info->id, destino_info->id, funcao);
+
+  return caminho;
 }
 
 /**
@@ -74,6 +95,8 @@ int comando_qry_sp(void *_this, void *_controlador) {
 
   char *sufixo, *cor[2];
 
+  int offset_total = 2;
+
   int total_registradores;
 
   if (pictorica) {
@@ -81,25 +104,32 @@ int comando_qry_sp(void *_this, void *_controlador) {
 
     distancia = (this->params[2][0] == 'D');
 
-    total_registradores = strtol(this->params[3], NULL, 10);
+    offset_total++;
+    
+    total_registradores = strtol(this->params[offset_total], NULL, 10);
 
-    cor[0] = this->params[3 + total_registradores];
-    cor[1] = this->params[3 + total_registradores + 1];
+    cor[0] = this->params[4 + total_registradores];
+    cor[1] = this->params[4 + total_registradores + 1];
   } else {
-    distancia = (this->params[1][0] == 'D');
 
-    total_registradores = strtol(this->params[2], NULL, 10);
+    total_registradores = strtol(this->params[offset_total], NULL, 10);
+
+    distancia = (this->params[1][0] == 'D');
   }
 
   for (int i = 0; i < total_registradores - 1; i++) {
-    int r1 = strtol(this->params[3 + total_registradores + i]     + 1, NULL, 10);
-    int r2 = strtol(this->params[3 + total_registradores + i + 1] + 1, NULL, 10);
+    int r1 = strtol(this->params[offset_total + 1 + i]     + 1, NULL, 10);
+    int r2 = strtol(this->params[offset_total + 1 + i + 1] + 1, NULL, 10);
 
     Ponto2D pos_origem  = controlador->registradores[r1];
     Ponto2D pos_destino = controlador->registradores[r2];
 
     VerticeInfo origem_info  = get_vertice_by_ponto(controlador->vertices_mapa_viario, pos_origem);
     VerticeInfo destino_info = get_vertice_by_ponto(controlador->vertices_mapa_viario, pos_destino);
+
+    Lista caminho = get_caminho(controlador->mapa_viario, origem_info, destino_info, distancia);
+
+    Lista_t.destruir(caminho, 0);
   }
 
   return 1;
