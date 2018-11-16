@@ -560,7 +560,7 @@ void desenhar_vertice(const Item _vertice, unsigned profundidade, va_list list) 
   VerticeInfo vertice = (VerticeInfo) _vertice;
   SVG svg = va_arg(list, SVG);
 
-  Figura fig_vertice = cria_circulo(vertice->pos.x, vertice->pos.y, 7, "transparent", "black");
+  Figura fig_vertice = cria_circulo(vertice->pos.x, vertice->pos.y, 5, "black", "transparent");
 
   desenha_figura(svg, fig_vertice, 0.8, FIG_BORDA_SOLIDA);
 

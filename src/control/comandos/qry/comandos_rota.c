@@ -7,6 +7,10 @@
 #include <model/modules/dijkstra.h>
 #include <model/SVG.h>
 
+#ifdef DEBUG
+#include <model/figura.h>
+#endif
+
 #include <float.h>
 #include <stdlib.h>
 #include <stdbool.h>
@@ -42,7 +46,13 @@ static double get_distancia_aresta(void *_aresta_info) {
 
 static double get_velocidade_media_aresta(void *_aresta_info) {
   ArestaInfo aresta_info = (ArestaInfo) _aresta_info;
-  return 100.0 / aresta_info->velocidade_media;
+  if (aresta_info->comprimento == 0)
+    return 0;
+  else if (aresta_info->velocidade_media == 0)
+    return DBL_MAX;
+  else
+    return aresta_info->comprimento / aresta_info->velocidade_media;
+  return DBL_MAX;
 }
 
 /**
@@ -91,7 +101,7 @@ static void desenhar_caminho_svg(SVG svg, Lista caminho, GrafoD mapa, char *cor)
     VerticeInfo vertice      = GrafoD_t.get_info_vertice(mapa, label);
     VerticeInfo vertice_next = GrafoD_t.get_info_vertice(mapa, label_next);
 
-    desenha_linha(svg, vertice->pos, vertice_next->pos, 1, 5, cor);
+    desenha_linha(svg, vertice->pos, vertice_next->pos, 0.8, 5, cor);
     
     it = next_it;
   }
@@ -186,6 +196,10 @@ int comando_qry_sp(void *_this, void *_controlador) {
     free(path);
 
     desenhar_elementos(controlador, svg_saida);
+
+    #ifdef DEBUG
+    desenhar_mapa_viario(controlador, svg_saida);
+    #endif
   }
 
   for (int i = 0; i < total_registradores - 1; i++) {
@@ -201,6 +215,17 @@ int comando_qry_sp(void *_this, void *_controlador) {
     Lista caminho = get_caminho(controlador->mapa_viario, origem_info, destino_info, distancia);
 
     if (pictorica) {
+      #ifdef DEBUG
+      Figura ponto1 = cria_circulo(pos_origem.x,  pos_origem.y,  2, cor[i % 2], "transparent");
+      Figura ponto2 = cria_circulo(pos_destino.x, pos_destino.y, 2, cor[(i + 1) % 2], "transparent");
+
+      desenha_figura(svg_saida, ponto1, 1, FIG_BORDA_SOLIDA);
+      desenha_figura(svg_saida, ponto2, 1, FIG_BORDA_SOLIDA);
+
+      destruir_figura(ponto1);
+      destruir_figura(ponto2);
+      #endif
+
       desenhar_caminho_svg(
         svg_saida,
         caminho,
