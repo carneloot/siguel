@@ -65,7 +65,7 @@ int comando_a(void *_this, void *_controlador) {
     char *cor        = get_cor_borda(figura);
     double distancia = distancia_figuras(figura, figura2);
 
-    desenha_linha(svg_saida, pos, pos2, 1, cor);
+    desenha_linha(svg_saida, pos, pos2, 1, 1, cor);
 
     saida = format_string("%.1f", distancia);
 
