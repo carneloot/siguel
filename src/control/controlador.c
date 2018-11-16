@@ -357,6 +357,11 @@ void finalizar_arquivos(Controlador c) {
 
   desenhar_elementos(c, s);
 
+  #ifdef DEBUG
+  if (this->extras[e_via])
+    desenhar_mapa_viario(this, s);
+  #endif
+
   iterator = Lista_t.get_first(this->saida_svg_qry);
   while (iterator) {
     desenha_desenhavel(s, Lista_t.get(this->saida_svg_qry, iterator));
@@ -465,6 +470,37 @@ void destruir_controlador(Controlador c) {
 
 /** METODOS PRIVADOS */
 
+static void escrever_txt_final(void *c) {
+  struct Controlador *this;
+  char *full_path;
+  Arquivo arq;
+
+  this = (struct Controlador *) c;
+
+  if (!this->nome_base)
+    return;
+    
+  LOG_PRINT(LOG_FILE, "Escrevendo txt final.");
+
+  full_path     = format_string(
+    "%s%s.txt", this->dir_saida, this->nome_base);
+
+  arq = abrir_arquivo(full_path, ALTERACAO);
+
+  free(full_path);
+
+  Posic iterator = Lista_t.get_first(this->saida);
+
+  while (iterator) {
+    escrever_linha(arq, (char *) Lista_t.get(this->saida, iterator));
+    iterator = Lista_t.get_next(this->saida, iterator);
+  }
+
+  escrever_linha(arq, "\n\n");
+
+  fechar_arquivo(arq);
+}
+
 void desenhar_todas_figuras(void *c, void *s) {
   struct Controlador *this;
 
@@ -505,37 +541,6 @@ void desenhar_sobreposicoes(void *c, void *s) {
   }
 }
 
-static void escrever_txt_final(void *c) {
-  struct Controlador *this;
-  char *full_path;
-  Arquivo arq;
-
-  this = (struct Controlador *) c;
-
-  if (!this->nome_base)
-    return;
-    
-  LOG_PRINT(LOG_FILE, "Escrevendo txt final.");
-
-  full_path     = format_string(
-    "%s%s.txt", this->dir_saida, this->nome_base);
-
-  arq = abrir_arquivo(full_path, ALTERACAO);
-
-  free(full_path);
-
-  Posic iterator = Lista_t.get_first(this->saida);
-
-  while (iterator) {
-    escrever_linha(arq, (char *) Lista_t.get(this->saida, iterator));
-    iterator = Lista_t.get_next(this->saida, iterator);
-  }
-
-  escrever_linha(arq, "\n\n");
-
-  fechar_arquivo(arq);
-}
-
 void desenhar_elementos(void *_this, void *svg) {
   struct Controlador *this = (struct Controlador *) _this;
   
@@ -549,4 +554,36 @@ void desenhar_elementos(void *_this, void *svg) {
 
     KDTree_t.passe_simetrico(arvore_atual, desenharElementoSVG, svg);
   }
+}
+
+void desenhar_vertice(const Item _vertice, unsigned profundidade, va_list list) {
+  VerticeInfo vertice = (VerticeInfo) _vertice;
+  SVG svg = va_arg(list, SVG);
+
+  Figura fig_vertice = cria_circulo(vertice->pos.x, vertice->pos.y, 7, "transparent", "black");
+
+  desenha_figura(svg, fig_vertice, 0.8, FIG_BORDA_SOLIDA);
+
+  destruir_figura(fig_vertice);
+}
+
+void desenhar_mapa_viario(void *_this, void *svg) {
+  struct Controlador *this = (struct Controlador *) _this;
+  
+  LOG_PRINT(LOG_FILE, "Desenhando mapa viario.");
+
+  KDTree_t.passe_simetrico(this->vertices_mapa_viario, desenhar_vertice, svg);
+
+  Posic it = Lista_t.get_first(this->arestas_mapa_viario);
+  while (it) {
+    ArestaInfo aresta = Lista_t.get(this->arestas_mapa_viario, it);
+
+    VerticeInfo origem  = GrafoD_t.get_info_vertice(this->mapa_viario, aresta->origem);
+    VerticeInfo destino = GrafoD_t.get_info_vertice(this->mapa_viario, aresta->destino);
+
+    desenha_linha(svg, origem->pos, destino->pos, 0.8, 3, "black");
+
+    it = Lista_t.get_next(this->arestas_mapa_viario, it);
+  }
+
 }

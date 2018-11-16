@@ -68,10 +68,12 @@ struct Controlador {
   Lista arestas_mapa_viario;
 };
 
-extern void desenhar_todas_figuras(void *c, void *svg);
+extern void desenhar_todas_figuras(void *controlador, void *svg);
 
-extern void desenhar_sobreposicoes(void *c, void *svg);
+extern void desenhar_sobreposicoes(void *controlador, void *svg);
 
-extern void desenhar_elementos(void *this, void *svg);
+extern void desenhar_elementos(void *controlador, void *svg);
+
+extern void desenhar_mapa_viario(void *controlador, void *svg);
 
 #endif /* __CONTROLADOR_R__ */
