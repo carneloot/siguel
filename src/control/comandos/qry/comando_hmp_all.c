@@ -33,6 +33,16 @@ static Pair hidrante_mais_proximo(
     ponto, distancia);
 }
 
+/**
+ * Comando: hmp?
+ * Params:  id
+ * Qual é o hidrante mais próximo da rádio-base
+ * identificada por id?
+ * SAIDA:arquivo .txt: dados dos hidrante, da rádio-
+ * base e distancia entre eles
+ * arquivo .svg: traçar uma linha tracejada entre o
+ * hidrante e a rádio-base
+ */
 int comando_qry_hmp(void *_this, void *_controlador) {
   struct Comando *this            = (struct Comando *) _this;
   struct Controlador *controlador = (struct Controlador *) _controlador;
@@ -67,6 +77,17 @@ int comando_qry_hmp(void *_this, void *_controlador) {
   return 1;
 }
 
+/**
+ * Comando: hmpe?
+ * Params:  cep face num
+ * Qual é o hidrante mais próximo do endereço
+ * fornecido nos parâmetros?
+ * SAIDA: arquivo .txt: mostrar todos os dados sobre
+ * o hidrante e a distância.
+ * arquivo .svg:colocar um X na posição do endereço
+ * e traçar uma linha tracejada entre o X e o
+ * hidrante.
+ */
 int comando_qry_hmpe(void *_this, void *_controlador) {
   struct Comando *this            = (struct Comando *) _this;
   struct Controlador *controlador = (struct Controlador *) _controlador;

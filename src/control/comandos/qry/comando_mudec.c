@@ -11,6 +11,13 @@
 
 #include "svg_linha.h"
 
+/**
+ * Comando: mudec
+ * Params:  cnpj cep face num
+ * O estabelecimento identificado por cnpj muda-se
+ * para novo endereço. Similar ao mud. Obs. traçar
+ * linha com cor diferente da de mud.
+ */
 int comando_qry_mudec(void *_this, void *_controlador) {
   struct Comando *this            = (struct Comando *) _this;
   struct Controlador *controlador = (struct Controlador *) _controlador;

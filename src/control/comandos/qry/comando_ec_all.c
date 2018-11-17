@@ -10,6 +10,18 @@
 
 static void *__controlador = NULL;
 
+static int contemCep(const Item item, const void *other) {
+  Comercio comercio = item;
+  const char *cep   = other;
+
+  char *cep_comercio = comercio_get_endereco(comercio)->cep;
+
+  if (!cep_comercio)
+    return 1;
+
+  return strcmp(cep, cep_comercio);
+}
+
 static int compararDentro(void * const comercio, const void *outro) {
   const Ponto2D *pontos = outro;
   Ponto2D pos  = pontos[0];
@@ -75,6 +87,15 @@ Lista __get_comercios_area(Lista comercios, Ponto2D pos, Ponto2D size) {
   return comercios_na_area;
 }
 
+/**
+ * Comando: tecq?
+ * Params:   cep
+ * Lista os tipos de estabelecimentos comerciais de
+ * uma dada quadra.
+ * SAIDA: arquivo .txt =>mostrar, para cada tipo de
+ * estabelecimento comercial, listar o nome dos
+ * estabelecimentos daquele tipo.
+ */
 int comando_qry_tecq(void *_this, void *_controlador) {
   struct Comando     *this        = _this;
   struct Controlador *controlador = _controlador;
@@ -137,6 +158,12 @@ int comando_qry_tecq(void *_this, void *_controlador) {
   return 1;
 }
 
+/**
+ * Comando: tecr?
+ * Params:  x y larg alt
+ * Quais são os tipos de estabelecimentos comerciais
+ * existentes numa dada região.
+ */
 int comando_qry_tecr(void *_this, void *_controlador) {
   struct Comando     *this        = _this;
   struct Controlador *controlador = _controlador;
@@ -178,6 +205,12 @@ int comando_qry_tecr(void *_this, void *_controlador) {
   return 1;
 }
 
+/**
+ * Comando: ecr?
+ * Params:  tp [ x y larg alt]
+ * Lista os estabelecimentos comerciais de um da
+ * tipo de, se presente, uma determinada região.
+ */
 int comando_qry_ecr(void *_this, void *_controlador) {
   struct Comando     *this        = _this;
   struct Controlador *controlador = _controlador;
@@ -236,6 +269,45 @@ int comando_qry_ecr(void *_this, void *_controlador) {
   }
   
   Lista_t.destruir(comercios_tipo, 0);
+
+  return 1;
+}
+
+/**
+ * Comando: ecq?
+ * Params:   cep
+ * Lista os estabelecimentos de uma determinada
+ * quadra.
+ * SAIDA: arquivo .txt =>mostrar cnpj, nome, tipo e
+ * endereço de cada estabelecimento comercial.
+ */
+int comando_qry_ecq(void *_this, void *_controlador) {
+  struct Comando *this            = (struct Comando *) _this;
+  struct Controlador *controlador = (struct Controlador *) _controlador;
+
+  char *cep = this->params[0];
+
+  Lista comercios = controlador->comercios;
+
+  Posic it = Lista_t.get_first(comercios);
+  it = Lista_t.search(comercios, it, cep, contemCep);
+
+  if (it)
+    Lista_t.insert(controlador->saida, 
+      format_string("Comercios na quadra %s.\n", cep));
+
+  while (it) {
+    Comercio comercio = Lista_t.get(comercios, it);
+
+    char *tipo_desc = HashTable_t.get(controlador->tabelas[TIPO_X_DESCRICAO], comercio_get_tipo(comercio)).valor;
+    char *info_comercio = comercio_get_info(comercio, tipo_desc);
+
+    Lista_t.insert(controlador->saida, format_string("\t%s\n", info_comercio));
+
+    free(info_comercio);
+
+    it = Lista_t.search(comercios, Lista_t.get_next(comercios, it), cep, contemCep);
+  }
 
   return 1;
 }

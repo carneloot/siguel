@@ -11,6 +11,16 @@
 
 #include "svg_linha.h"
 
+/**
+ * Comando: mud
+ * Params:  cpf cep face num compl
+ * A pessoa identificada por cpf muda-se para o
+ * endereço determinado pelos parâmetros.
+ * SAIDAS: arquivo .txt. Mostrar os dados da pessoa
+ * (nome, etc), o endereço antigo e o novo endereço.
+ * arquivo. svg: traça uma seta (linha grossa) da
+ * endereço antigo ao endereço novo.
+ */
 int comando_qry_mud(void *_this, void *_controlador) {
   struct Comando *this            = (struct Comando *) _this;
   struct Controlador *controlador = (struct Controlador *) _controlador;

@@ -7,6 +7,14 @@
 
 #include <stdlib.h>
 
+/**
+ * Comando: e
+ * Params:  cnpj codt cep face num nome
+ * Insere um novo estabelecimento comercial
+ * de um determinado tipo (codt), localizado
+ * em um dado endereço (cep,face,num), que
+ * possui um dado cnpj e tem um dado nome.
+ */
 int comando_ec_e(void *_this, void *_controlador) {
   struct Comando *this            = (struct Comando *) _this;
   struct Controlador *controlador = (struct Controlador *) _controlador;

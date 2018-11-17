@@ -3,6 +3,14 @@
 
 #include <model/pessoa.h>
 
+/**
+ * Comando: p
+ * Params:  cpf nome sobrenome sexo nasc
+ * Insere pessoa identificada por cpf,
+ * nomeada (nome,sobrenome), de um
+ * certo sexo (M,F), nascida numa
+ * determinada data (dd/mm/aaaa)
+ */
 int comando_pm_p(void *_this, void *_controlador) {
   struct Comando *this            = (struct Comando *) _this;
   struct Controlador *controlador = (struct Controlador *) _controlador;

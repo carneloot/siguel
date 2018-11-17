@@ -11,6 +11,15 @@ int procurarComercio(void * const com1, const void *com2) {
   return !(com1 == com2);
 }
 
+/**
+ * Comando: fec
+ * Params:  cnpj
+ * O estabelecimento comercial identificado por cnpj
+ * fechou. Os dados a cerca dele devem ser
+ * removidos.
+ * SAIDA: arquivo .txt. Mostrar os dados dos
+ * estabelecimento fechado
+ */
 int comando_qry_fec(void *_this, void *_controlador) {
   struct Comando *this            = (struct Comando *) _this;
   struct Controlador *controlador = (struct Controlador *) _controlador;

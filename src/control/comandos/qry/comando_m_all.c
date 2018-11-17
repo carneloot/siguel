@@ -51,6 +51,43 @@ static void __reportar_pessoas(Lista pessoas, struct Controlador *controlador) {
   }
 }
 
+static Lista __quadras_dentro(KDTree arvore, Figura figura) {
+
+  Ponto2D pA = get_pos(figura);
+
+  Ponto2D pB = pA;
+  pB.y += get_h(figura);
+  pB.x += get_w(figura);
+
+  Lista quadras = KDTree_t.range_search(arvore, elemento_dentro_rect, &pA, &pB);
+
+  Posic it = Lista_t.get_first(quadras);
+  Posic next_it;
+  while (it) {
+    next_it = Lista_t.get_next(quadras, it);
+
+    Elemento quadra = Lista_t.get(quadras, it);
+    Figura figura_elemento = get_figura_elemento(quadra);
+
+    if (!dentro_figura(figura, figura_elemento))
+      Lista_t.remove(quadras, it);
+
+    destruir_figura(figura_elemento);
+
+    it = next_it;
+  }
+
+  return quadras;
+}
+
+/**
+ * Comando: m?
+ * Params:  cep
+ * Moradores da quadra cujo cep é cep. Mostra
+ * mensagem de erro se quadra não existir.
+ * SAIDA: arquivo .txt => listar o nome, endereço,
+ * celular e operadora dos moradores da quadra.
+ */
 int comando_qry_m(void *_this, void *_controlador) {
   struct Comando *this            = (struct Comando *) _this;
   struct Controlador *controlador = (struct Controlador *) _controlador;
@@ -83,35 +120,15 @@ int comando_qry_m(void *_this, void *_controlador) {
   return 1;
 }
 
-static Lista __quadras_dentro(KDTree arvore, Figura figura) {
-
-  Ponto2D pA = get_pos(figura);
-
-  Ponto2D pB = pA;
-  pB.y += get_h(figura);
-  pB.x += get_w(figura);
-
-  Lista quadras = KDTree_t.range_search(arvore, elemento_dentro_rect, &pA, &pB);
-
-  Posic it = Lista_t.get_first(quadras);
-  Posic next_it;
-  while (it) {
-    next_it = Lista_t.get_next(quadras, it);
-
-    Elemento quadra = Lista_t.get(quadras, it);
-    Figura figura_elemento = get_figura_elemento(quadra);
-
-    if (!dentro_figura(figura, figura_elemento))
-      Lista_t.remove(quadras, it);
-
-    destruir_figura(figura_elemento);
-
-    it = next_it;
-  }
-
-  return quadras;
-}
-
+/**
+ * Comando: mr?
+ * Params:   x y larg alt
+ * Moradores das quadras que estão inteiramente
+ * dentro da região determinada.
+ * SAIDA: arquivo .txt => para cada quadra da
+ * região, produzir uma saida similar a da consulta
+ * m?.
+ */
 int comando_qry_mr(void *_this, void *_controlador) {
   struct Comando *this            = (struct Comando *) _this;
   struct Controlador *controlador = (struct Controlador *) _controlador;

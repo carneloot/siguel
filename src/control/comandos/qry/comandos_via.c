@@ -13,7 +13,6 @@
  *             coordenadas [x,y]
  * 
  */
-
 int comando_via_v(void *_this, void *_controlador) {
   struct Comando *this = _this;
   struct Controlador *controlador = _controlador;
@@ -44,7 +43,6 @@ int comando_via_v(void *_this, void *_controlador) {
  *             esta ausência é indicada por um hífen (-)
  * 
  */
-
 int comando_via_e(void *_this, void *_controlador) {
   struct Comando *this = _this;
   struct Controlador *controlador = _controlador;

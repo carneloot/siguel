@@ -77,6 +77,19 @@ static void reportar_elementos(
   }
 }
 
+/**
+ * Comando: q?
+ * Params:  x y larg alt
+ * Reporta as quadras e equipamentos
+ * urbanos que estejam inteiramente dentro da
+ * retângulo determinado pelos parâmetros do
+ * comando.
+ * Saída: arquivo.txt: todos os dados sobre as
+ * quadras e equipamentos urbanos
+ * selecionados.
+ * arquivo.svg: traçar o retângulo da região
+ * de busca com linhas pontilhadas.
+ */
 int comando_qzin(void *_this, void *_controlador) {
   struct Comando *this            = (struct Comando *) _this;
   struct Controlador *controlador = (struct Controlador *) _controlador;
@@ -136,6 +149,12 @@ int comando_qzin(void *_this, void *_controlador) {
   return 1;
 }
 
+/**
+ * Comando: Q?
+ * Params:  raio x y
+ * Similar a q?. A região de busca é dada pelo
+ * círculo com centro x,y e raio raio.
+ */
 int comando_qzao(void *_this, void *_controlador) {
   struct Comando *this            = (struct Comando *) _this;
   struct Controlador *controlador = (struct Controlador *) _controlador;

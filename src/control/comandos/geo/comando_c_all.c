@@ -7,6 +7,12 @@
 #include <model/elemento.h>
 #include <model/utils.h>
 
+/**
+ * Comando: c[qhts]
+ * Params:  cstrok cfill
+ * Cores do preenchimento e da borda dos (as)
+ * quadras/hidrantes/semaforos/torres de celular
+ */
 static int comando_c_all(void *_this, void *_controlador, int elemento_id) {
   struct Comando *this            = (struct Comando *) _this;
   struct Controlador *controlador = (struct Controlador *) _controlador;

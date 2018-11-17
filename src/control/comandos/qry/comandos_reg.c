@@ -21,7 +21,6 @@
  *             registrador r2
  * 
  */
-
 int search_tp(void * const _comercio, const void *_tp) {
   Comercio comercio = _comercio;
   const char *tp = (const char *) _tp;
@@ -78,7 +77,6 @@ int comando_reg_tp(void *_this, void *_controlador) {
  * Parametros: r cpf
  * Descricao:  Armazena no registrador r a posição geográfica da residência do morador de cpf cpf
  */
-
 int comando_reg_m(void *_this, void *_controlador) {
   struct Comando *this = (struct Comando *) _this;
   struct Controlador *controlador = (struct Controlador *) _controlador;
@@ -108,7 +106,6 @@ int comando_reg_m(void *_this, void *_controlador) {
  * Descricao:  Armazena no registrador r a posição geográfica
  *             do equipamento urbano cujo identificador é id
  */
-
 int comando_reg_g(void *_this, void *_controlador) {
   struct Comando *this = (struct Comando *) _this;
   struct Controlador *controlador = (struct Controlador *) _controlador;
@@ -136,8 +133,8 @@ int comando_reg_g(void *_this, void *_controlador) {
 }
 
 /**
- * Comando @xy
- * Entrada: r x y
+ * Comando: @xy
+ * Params: r x y
  * Armazena a posição (x,y) no registrador r
  */
 int comando_reg_xy(void *_this, void *_controlador) {
@@ -157,8 +154,8 @@ int comando_reg_xy(void *_this, void *_controlador) {
 }
 
 /** 
- * Comando @e
- * Entrada: r cep face num
+ * Comando: @e
+ * Params:  r cep face num
  * Armazena em r a posição geográfica do endereço
  *   Cep face num
  */

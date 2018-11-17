@@ -127,6 +127,16 @@ static void __remover_elementos(
 
 }
 
+/**
+ * Comando: dpr
+ * Params:  x y larg alt
+ * Desapropria região.
+ * Apagar quadras, hidrantes, etc dentro da região;
+ * etc A pessoa não morre, mas deixa de ser morador.
+ * SAIDA: arquivo .txt => listar o que foi removido
+ * arquivo .svg => elementos removidos não devem
+ * aparecer.
+ */
 int comando_qry_dpr(void *_this, void *_controlador) {
   struct Comando     *this        = _this;
   struct Controlador *controlador = _controlador;

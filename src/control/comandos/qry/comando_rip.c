@@ -18,6 +18,22 @@ int procurarPessoa(void * const pessoa1, const void *pessoa2) {
   return !(pessoa1 == pessoa2);
 }
 
+/**
+ * Comando: rip
+ * Params:  cpf
+ * Infelizmente pessoa identificada por cpf morreu.
+ * Todos os dados armazenados sobre ela devem ser
+ * apagados (dados pessoais, dados sobre moradia,
+ * etc).
+ * SAIDA: arquivo .txt => imprimir os dados
+ * removidos de cada uma das estruturas. Por
+ * exemplo:
+ * RIP: José Silva, portador CPF, do sexo
+ * Masculino, nascido à 01/01/1920, residia no
+ * endereço CEP/NUM/FACE.....
+ * arquivo .svg: colocar um losango preto, com um
+ * cruz branca no interior na residência do defunto
+ */
 int comando_qry_rip(void *_this, void *_controlador) {
   struct Comando *this            = (struct Comando *) _this;
   struct Controlador *controlador = (struct Controlador *) _controlador;

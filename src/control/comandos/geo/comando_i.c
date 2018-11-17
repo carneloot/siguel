@@ -9,6 +9,12 @@
 #include <model/utils.h>
 #include "../funcoes_checagem.h"
 
+/**
+ * Comando: i
+ * Params:  j x y
+ * O ponto (x,y) é interno à j-ésima forma 
+ * geométrica?7
+ */
 int comando_i(void *_this, void *_controlador) {
   struct Comando *this            = (struct Comando *) _this;
   struct Controlador *controlador = (struct Controlador *) _controlador;

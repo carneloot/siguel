@@ -4,6 +4,16 @@
 #include <model/elemento.h>
 #include "../funcoes_checagem.h"
 
+/**
+ * Comando: cc
+ * Params:  ( cep | id ) cstrk cfill
+ * Muda as cores do contorno e do
+ * preenchimento da quadra identificada por
+ * cep ou do equipamento urbano
+ * identificado por id.
+ * Saída: arquivo.svg: quadra ou equipamento
+ * pintados com as novas cores.
+ */
 int comando_cc(void *_this, void *_controlador) {
   struct Comando *this            = (struct Comando *) _this;
   struct Controlador *controlador = (struct Controlador *) _controlador;

@@ -8,6 +8,13 @@
 #include <model/modules/logger.h>
 #include <model/utils.h>
 
+/**
+ * Comando: m
+ * Params:  cpf cep face num compl
+ * Informa que um dada pessoa (cpf)
+ * mora num dado endereço
+ * (cep,face,num,compl)
+ */
 int comando_pm_m(void *_this, void *_controlador) {
   struct Comando *this            = (struct Comando *) _this;
   struct Controlador *controlador = (struct Controlador *) _controlador;

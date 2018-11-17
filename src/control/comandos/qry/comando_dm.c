@@ -12,6 +12,19 @@
 #include <model/utils.h>
 #include "svg_custom.h"
 
+/**
+ * Comando: dm?
+ * Params:   cpf
+ * Imprime todos os dados do morador identificado
+ * pelo cpf.
+ * SAIDA: arquivo .txt => dados pessoais, seu
+ * endereço, o número de seu celular (se houver) e
+ * respectiva operadora, e coordenada geográfica de
+ * onde mora.
+ * arquivo .svg => colocar um circulo (ou retângulo,
+ * ou outra forma geométrica) no lugar onde mora
+ * com seu cpf
+ */
 int comando_qry_dm(void *_this, void *_controlador) {
   struct Comando *this            = (struct Comando *) _this;
   struct Controlador *controlador = (struct Controlador *) _controlador;

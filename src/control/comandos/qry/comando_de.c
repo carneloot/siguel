@@ -12,6 +12,18 @@
 
 #include "svg_custom.h"
 
+/**
+ * Comadno: de?
+ * Params:   cnpj
+ * Imprime todos os dados do estabelecimento
+ * comercial identificado por cnpj.
+ * SAIDA: arquivo .txt => dados do estabelecimento
+ * (nome, descrição do tipo, etc), endereço e
+ * coordenada geográfica.
+ * arquivo .svg => colocar um circulo (ou retângulo,
+ * ou outra forma geométrica) na coordenada
+ * geográfica do estabelimento.
+ */
 int comando_qry_de(void *_this, void *_controlador) {
   struct Comando *this            = (struct Comando *) _this;
   struct Controlador *controlador = (struct Controlador *) _controlador;
