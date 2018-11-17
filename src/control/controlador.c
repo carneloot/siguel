@@ -3,6 +3,7 @@
 #include <stdarg.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <float.h>
 #include <string.h>
 
 #include <model/SVG.h>
@@ -581,7 +582,11 @@ void desenhar_mapa_viario(void *_this, void *svg) {
     VerticeInfo origem  = GrafoD_t.get_info_vertice(this->mapa_viario, aresta->origem);
     VerticeInfo destino = GrafoD_t.get_info_vertice(this->mapa_viario, aresta->destino);
 
-    desenha_linha(svg, origem->pos, destino->pos, 0.8, 3, "black");
+    if (aresta->comprimento == DBL_MAX && aresta->velocidade_media == 0) {
+      desenha_linha(svg, origem->pos, destino->pos, 0.8, 3, "red");
+    } else {
+      desenha_linha(svg, origem->pos, destino->pos, 0.8, 3, "black");
+    }
 
     it = Lista_t.get_next(this->arestas_mapa_viario, it);
   }
