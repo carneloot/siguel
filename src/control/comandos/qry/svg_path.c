@@ -46,6 +46,7 @@ char *print_path(void *_this) {
   
   char *resultado = format_string(
     "<path d=\"M %s\" stroke='%s' "
+    "marker-mid='url(#arrowhead)' marker-start='url(#arrowhead)' "
     "stroke-width='%.1f' fill='transparent' style='opacity: %.1f' />\n",
     pontos_string,
     this->cor, this->tamanho, this->opacity

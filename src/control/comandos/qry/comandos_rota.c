@@ -89,9 +89,6 @@ static void escrever_texto_vertice(SVG svg, GrafoD grafo, char *label, char *tex
  */
 static void desenhar_caminho_svg(SVG svg, Lista caminho, GrafoD mapa, char *cor) {
 
-  char *label_first = Lista_t.get(caminho, Lista_t.get_first(caminho));
-  escrever_texto_vertice(svg, mapa, label_first, "inicio", cor);
-
   Lista pontos = Lista_t.create();
 
   Posic it = Lista_t.get_first(caminho);
@@ -110,7 +107,7 @@ static void desenhar_caminho_svg(SVG svg, Lista caminho, GrafoD mapa, char *cor)
     it = Lista_t.get_next(caminho, it);
   }
 
-  void *path = cria_path(pontos, 5, 0.8, cor);
+  void *path = cria_path(pontos, 5, 1, cor);
 
   Desenhavel desenhavel = cria_desenhavel(path, print_path, free_path);
 
@@ -120,8 +117,6 @@ static void desenhar_caminho_svg(SVG svg, Lista caminho, GrafoD mapa, char *cor)
 
   Lista_t.destruir(pontos, free);
 
-  char *label_last = Lista_t.get(caminho, Lista_t.get_last(caminho));
-  escrever_texto_vertice(svg, mapa, label_last, "fim", cor);
 }
 
 /**
@@ -212,7 +207,7 @@ int comando_qry_sp(void *_this, void *_controlador) {
     desenhar_elementos(controlador, svg_saida);
 
     #ifdef DEBUG
-    // desenhar_mapa_viario(controlador, svg_saida);
+    desenhar_mapa_viario(controlador, svg_saida);
     #endif
   }
 

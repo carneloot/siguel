@@ -562,7 +562,7 @@ void desenhar_vertice(const Item _vertice, unsigned profundidade, va_list list) 
 
   Figura fig_vertice = cria_circulo(vertice->pos.x, vertice->pos.y, 5, "black", "transparent");
 
-  desenha_figura(svg, fig_vertice, 0.8, FIG_BORDA_SOLIDA);
+  desenha_figura(svg, fig_vertice, 0.6, FIG_BORDA_SOLIDA);
 
   destruir_figura(fig_vertice);
 }
@@ -581,7 +581,7 @@ void desenhar_mapa_viario(void *_this, void *svg) {
     VerticeInfo origem  = GrafoD_t.get_info_vertice(this->mapa_viario, aresta->origem);
     VerticeInfo destino = GrafoD_t.get_info_vertice(this->mapa_viario, aresta->destino);
 
-    desenha_linha(svg, origem->pos, destino->pos, 0.8, 3, "black");
+    desenha_linha(svg, origem->pos, destino->pos, 0.6, 3, "black");
 
     it = Lista_t.get_next(this->arestas_mapa_viario, it);
   }

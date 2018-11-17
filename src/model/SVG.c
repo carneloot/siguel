@@ -52,6 +52,15 @@ SVG cria_SVG(char *path, double max_width, double max_height) {
     max_width,
     max_height);
 
+  escrever_linha(
+    this->saida,
+    "<defs>"
+    "<marker id='arrowhead' orient='auto' markerWidth='2' markerHeight='4' refX='0.1' refY='2'>"
+    "<path d='M0,0 V4 L2,2 Z' style='fill:black;' />"
+    "</marker>"
+    "</defs>"
+  );
+
   return (SVG) this;
 }
 
