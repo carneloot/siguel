@@ -7,10 +7,15 @@
 #define PORC_TOTALIDADE 0.7
 #define SOMA_REALLOC 5
 
+struct HashInfo {
+  char *chave;
+  void *valor;
+};
+
 struct HashTable {
   unsigned size;
   unsigned count;
-  HashInfo *table;
+  struct HashInfo *table;
 };
 
 static HashTable __create_hashtable(int tamanho) {
@@ -69,7 +74,7 @@ static unsigned hash(unsigned chave, unsigned i, unsigned size) {
   return ((hash1(chave, size) + i * hash2(chave, size)) % size);
 }
 
-static unsigned char_to_unsigned(const char chave[]) {
+static unsigned char_to_unsigned(char *chave) {
   unsigned soma;
   int tam = strlen(chave);
   soma    = 0;
@@ -84,10 +89,10 @@ static unsigned char_to_unsigned(const char chave[]) {
 static void __realocar_hashtable(struct HashTable *this, unsigned new_size) {
   assert(new_size > this->size); // Novo tamanho deve ser maior que o tamanho anterior
 
-  HashInfo *nova_tabela = calloc(new_size, sizeof(*nova_tabela));
+  struct HashInfo *nova_tabela = calloc(new_size, sizeof(*nova_tabela));
 
   for (int i = 0; i < this->size; i++) {
-    HashInfo info_atual = this->table[i];
+    struct HashInfo info_atual = this->table[i];
     if (!info_atual.chave || !info_atual.valor) continue;
 
     unsigned chave_em_numero = char_to_unsigned(info_atual.chave);
@@ -111,13 +116,13 @@ static int __passou_limite_hashtable(struct HashTable *this) {
   return (porcentagem >= PORC_TOTALIDADE);
 }
 
-static void __insert_hashtable(HashTable _this, HashInfo info) {
+static void __insert_hashtable(HashTable _this, char *chave, void *valor) {
   struct HashTable *this = (struct HashTable *) _this;
 
   if (!this)
     return;
 
-  unsigned chave_em_numero = char_to_unsigned(info.chave);
+  unsigned chave_em_numero = char_to_unsigned(chave);
 
   while (1) {
     int i;
@@ -126,7 +131,8 @@ static void __insert_hashtable(HashTable _this, HashInfo info) {
       int posicao_table = hash(chave_em_numero, i, this->size);
 
       if (!this->table[posicao_table].valor) {
-        this->table[posicao_table] = info;
+        this->table[posicao_table].chave = chave;
+        this->table[posicao_table].valor = valor;
         this->count++;
         break;
       }
@@ -146,7 +152,7 @@ static void __insert_hashtable(HashTable _this, HashInfo info) {
     __realocar_hashtable(this, this->size * 2);
 }
 
-static int __exists_hashtable(HashTable _this, const char chave[]) {
+static int __exists_hashtable(HashTable _this, char *chave) {
   struct HashTable *this = (struct HashTable *) _this;
 
   if (!this)
@@ -158,7 +164,7 @@ static int __exists_hashtable(HashTable _this, const char chave[]) {
 
     int posicao_table = hash(chave_em_numero, i, this->size);
     
-    HashInfo info = this->table[posicao_table];
+    struct HashInfo info = this->table[posicao_table];
 
     if (info.valor)
       if (!strcmp(info.chave, chave))
@@ -168,32 +174,30 @@ static int __exists_hashtable(HashTable _this, const char chave[]) {
   return 0;
 }
 
-static HashInfo __get_hashtable(HashTable _this, const char chave[]) {
+static void *__get_hashtable(HashTable _this, char *chave) {
   struct HashTable *this = (struct HashTable *) _this;
 
-  HashInfo nulo = {.chave = NULL, .valor = NULL};
-
   if (!this)
-    return nulo;
+    return NULL;
 
   unsigned chave_em_numero = char_to_unsigned(chave);
   for (int i = 0; i < this->size; i++) {
 
     int posicao_table = hash(chave_em_numero, i, this->size);
     
-    HashInfo info = this->table[posicao_table];
+    struct HashInfo info = this->table[posicao_table];
 
     if (info.valor) {
       if (strcmp(info.chave, chave))
         continue;
-      return info;
+      return info.valor;
     }
   }
 
-  return nulo;
+  return NULL;
 }
 
-static void __remove_hashtable(HashTable _this, const char chave[]) {
+static void __remove_hashtable(HashTable _this, char *chave) {
   struct HashTable *this = (struct HashTable *) _this;
 
   if (!this)
@@ -232,7 +236,7 @@ static void __print_hashtable(
 }
 
 static void __map_hashtable(
-  HashTable _this, void *other, void (*map_function)(const void *valor, void *other)) {
+  HashTable _this, void *other, void (*map_function)(void *valor, void *other)) {
   struct HashTable *this = (struct HashTable *) _this;
 
   for (int i = 0; i < this->size; i++) {
