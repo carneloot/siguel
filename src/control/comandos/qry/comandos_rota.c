@@ -16,6 +16,7 @@
 #include <float.h>
 #include <stdlib.h>
 #include <stdbool.h>
+#include <string.h>
 
 /** Funcao auxiliar da get_vertice_by_ponto */
 double __distancia_vertice_ponto(const Item _vertice_info, const Item _ponto, int dim) {
@@ -46,15 +47,16 @@ static double get_distancia_aresta(void *_aresta_info) {
   return aresta_info->comprimento;
 }
 
-static double get_velocidade_media_aresta(void *_aresta_info) {
+static double get_tempo_aresta(void *_aresta_info) {
   ArestaInfo aresta_info = (ArestaInfo) _aresta_info;
+
   if (aresta_info->comprimento == 0)
     return 0;
-  else if (aresta_info->velocidade_media == 0)
+
+  if (aresta_info->velocidade_media == 0)
     return DBL_MAX;
-  else
-    return aresta_info->comprimento / aresta_info->velocidade_media;
-  return DBL_MAX;
+
+  return aresta_info->comprimento / aresta_info->velocidade_media;
 }
 
 /**
@@ -64,7 +66,7 @@ static double get_velocidade_media_aresta(void *_aresta_info) {
 static Lista get_caminho(GrafoD grafo, VerticeInfo origem_info, VerticeInfo destino_info, bool distancia) {
   Lista caminho;
 
-  double (*funcao)(void *) = (distancia == true) ? get_distancia_aresta : get_velocidade_media_aresta;
+  double (*funcao)(void *) = (distancia == true) ? get_distancia_aresta : get_tempo_aresta;
 
   caminho = dijkstra(grafo, origem_info->id, destino_info->id, funcao);
 
@@ -116,6 +118,39 @@ static void desenhar_caminho_svg(SVG svg, Lista caminho, GrafoD mapa, char *cor)
   desenhavel_destruir(desenhavel);
 
   Lista_t.destruir(pontos, free);
+
+}
+
+/**
+ * Coloca na saida strings com os nomes das ruas do caminho passado.
+ */
+static void escrever_caminho_txt(Lista saida, Lista caminho, GrafoD mapa) {
+  Posic it = Lista_t.get_first(caminho);
+
+  char *ultima_rua = ".";
+
+  while (Lista_t.get_next(caminho, it)) {
+    Posic next_it = Lista_t.get_next(caminho, it);
+
+    char *label      = Lista_t.get(caminho, it);
+    char *label_next = Lista_t.get(caminho, next_it);
+
+    ArestaInfo rua = GrafoD_t.get_info_aresta(mapa, label, label_next);
+
+    char *saida_txt = format_string("\tsiga pela rua %s\n", rua->nome);
+
+    // Se a rua atual for diferente da ultima, mostra
+    if (strcmp(rua->nome, ".")        == 0 ||
+        strcmp(rua->nome, ultima_rua) == 0
+    ) {
+      free(saida_txt);
+    } else {
+      Lista_t.insert(saida, saida_txt);
+      ultima_rua = rua->nome;
+    }
+    
+    it = next_it;
+  }
 
 }
 
@@ -209,11 +244,16 @@ int comando_qry_sp(void *_this, void *_controlador) {
     #ifdef DEBUG
     desenhar_mapa_viario(controlador, svg_saida);
     #endif
+  } else {
+    Lista_t.insert(controlador->saida,
+      format_string("Rota gerada: \n"));
   }
 
+  offset_total++;
+
   for (int i = 0; i < total_registradores - 1; i++) {
-    int r1 = strtol(this->params[offset_total + 1 + i]     + 1, NULL, 10);
-    int r2 = strtol(this->params[offset_total + 1 + i + 1] + 1, NULL, 10);
+    int r1 = strtol(this->params[offset_total + i]     + 1, NULL, 10);
+    int r2 = strtol(this->params[offset_total + i + 1] + 1, NULL, 10);
 
     Ponto2D pos_origem  = controlador->registradores[r1];
     Ponto2D pos_destino = controlador->registradores[r2];
@@ -240,6 +280,8 @@ int comando_qry_sp(void *_this, void *_controlador) {
         caminho,
         controlador->mapa_viario,
         cor[i % 2]);
+    } else {
+      escrever_caminho_txt(controlador->saida, caminho, controlador->mapa_viario);
     }
 
     Lista_t.destruir(caminho, 0);
