@@ -7,6 +7,8 @@
 #include <model/modules/dijkstra.h>
 #include <model/SVG.h>
 
+#include "svg_path.h"
+
 #ifdef DEBUG
 #include <model/figura.h>
 #endif
@@ -90,21 +92,33 @@ static void desenhar_caminho_svg(SVG svg, Lista caminho, GrafoD mapa, char *cor)
   char *label_first = Lista_t.get(caminho, Lista_t.get_first(caminho));
   escrever_texto_vertice(svg, mapa, label_first, "inicio", cor);
 
+  Lista pontos = Lista_t.create();
+
   Posic it = Lista_t.get_first(caminho);
 
-  while (Lista_t.get_next(caminho, it)) {
-    Posic next_it = Lista_t.get_next(caminho, it);
+  while (it) {
+    char *label = Lista_t.get(caminho, it);
 
-    char *label      = Lista_t.get(caminho, it);
-    char *label_next = Lista_t.get(caminho, next_it);
+    VerticeInfo vertice = GrafoD_t.get_info_vertice(mapa, label);
 
-    VerticeInfo vertice      = GrafoD_t.get_info_vertice(mapa, label);
-    VerticeInfo vertice_next = GrafoD_t.get_info_vertice(mapa, label_next);
+    Ponto2D *ponto = calloc(1, sizeof(*ponto));
+    ponto->x = vertice->pos.x;
+    ponto->y = vertice->pos.y;
 
-    desenha_linha(svg, vertice->pos, vertice_next->pos, 0.8, 5, cor);
-    
-    it = next_it;
+    Lista_t.insert(pontos, ponto);
+
+    it = Lista_t.get_next(caminho, it);
   }
+
+  void *path = cria_path(pontos, 5, 0.8, cor);
+
+  Desenhavel desenhavel = cria_desenhavel(path, print_path, free_path);
+
+  desenha_desenhavel(svg, desenhavel);
+
+  desenhavel_destruir(desenhavel);
+
+  Lista_t.destruir(pontos, free);
 
   char *label_last = Lista_t.get(caminho, Lista_t.get_last(caminho));
   escrever_texto_vertice(svg, mapa, label_last, "fim", cor);
@@ -198,7 +212,7 @@ int comando_qry_sp(void *_this, void *_controlador) {
     desenhar_elementos(controlador, svg_saida);
 
     #ifdef DEBUG
-    desenhar_mapa_viario(controlador, svg_saida);
+    // desenhar_mapa_viario(controlador, svg_saida);
     #endif
   }
 
