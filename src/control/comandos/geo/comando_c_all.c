@@ -35,18 +35,18 @@ static int comando_c_all(void *_this, void *_controlador, int elemento_id) {
   return 1;
 }
 
-int comando_cq(void *this, void *controlador) {
+int comando_geo_cq(void *this, void *controlador) {
   return comando_c_all(this, controlador, QUADRA);
 }
 
-int comando_ch(void *this, void *controlador) {
+int comando_geo_ch(void *this, void *controlador) {
   return comando_c_all(this, controlador, HIDRANTE);
 }
 
-int comando_ct(void *this, void *controlador) {
+int comando_geo_ct(void *this, void *controlador) {
   return comando_c_all(this, controlador, RADIO_BASE);
 }
 
-int comando_cs(void *this, void *controlador) {
+int comando_geo_cs(void *this, void *controlador) {
   return comando_c_all(this, controlador, SEMAFORO);
 }

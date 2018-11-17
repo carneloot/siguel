@@ -90,7 +90,7 @@ static void reportar_elementos(
  * arquivo.svg: traçar o retângulo da região
  * de busca com linhas pontilhadas.
  */
-int comando_qzin(void *_this, void *_controlador) {
+int comando_qry_qzin(void *_this, void *_controlador) {
   struct Comando *this            = (struct Comando *) _this;
   struct Controlador *controlador = (struct Controlador *) _controlador;
 
@@ -155,7 +155,7 @@ int comando_qzin(void *_this, void *_controlador) {
  * Similar a q?. A região de busca é dada pelo
  * círculo com centro x,y e raio raio.
  */
-int comando_qzao(void *_this, void *_controlador) {
+int comando_qry_qzao(void *_this, void *_controlador) {
   struct Comando *this            = (struct Comando *) _this;
   struct Controlador *controlador = (struct Controlador *) _controlador;
 

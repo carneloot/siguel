@@ -17,7 +17,7 @@
  * comandos d* e D* devem efetivamente ter
  * sido removidos.
  */
-int comando_crd(void *_this, void *_controlador) {
+int comando_qry_crd(void *_this, void *_controlador) {
   struct Comando *this            = (struct Comando *) _this;
   struct Controlador *controlador = (struct Controlador *) _controlador;
 

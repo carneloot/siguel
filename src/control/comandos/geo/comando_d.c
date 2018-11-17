@@ -15,7 +15,7 @@
  * Qual é a distância entre os centro de massa
  * das formas geométricas i e j?
  */
-int comando_d(void *_this, void *_controlador) {
+int comando_geo_d(void *_this, void *_controlador) {
   struct Comando *this            = (struct Comando *) _this;
   struct Controlador *controlador = (struct Controlador *) _controlador;
 

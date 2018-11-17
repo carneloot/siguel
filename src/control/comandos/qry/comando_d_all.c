@@ -107,7 +107,7 @@ static void remover_elementos(
  * t pode ser qualquer combinação: h
  * (hidrante), s (semaforo), r (rádio-base)
  */
-int comando_dlezin(void *_this, void *_controlador) {
+int comando_qry_dlezin(void *_this, void *_controlador) {
   struct Comando *this            = (struct Comando *) _this;
   struct Controlador *controlador = (struct Controlador *) _controlador;
 
@@ -148,7 +148,7 @@ int comando_dlezin(void *_this, void *_controlador) {
  * urbamos do tipo t dentro da região.
  * (Reporta o id, não mostra no .svg)
  */
-int comando_dlezao(void *_this, void *_controlador) {
+int comando_qry_dlezao(void *_this, void *_controlador) {
   struct Comando *this            = (struct Comando *) _this;
   struct Controlador *controlador = (struct Controlador *) _controlador;
 
@@ -215,7 +215,7 @@ int comando_dlezao(void *_this, void *_controlador) {
  * região da consulta; as quadras removidas
  * não devem aparecer
  */
-int comando_dzin(void *_this, void *_controlador) {
+int comando_qry_dzin(void *_this, void *_controlador) {
   struct Comando *this            = (struct Comando *) _this;
   struct Controlador *controlador = (struct Controlador *) _controlador;
 
@@ -276,7 +276,7 @@ int comando_dzin(void *_this, void *_controlador) {
  * Quadras removidas não devem ser
  * mostradas no .svg.
  */
-int comando_dzao(void *_this, void *_controlador) {
+int comando_qry_dzao(void *_this, void *_controlador) {
   struct Comando *this            = (struct Comando *) _this;
   struct Controlador *controlador = (struct Controlador *) _controlador;
 

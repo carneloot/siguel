@@ -14,7 +14,7 @@
  * Saída: arquivo.svg: quadra ou equipamento
  * pintados com as novas cores.
  */
-int comando_cc(void *_this, void *_controlador) {
+int comando_qry_cc(void *_this, void *_controlador) {
   struct Comando *this            = (struct Comando *) _this;
   struct Controlador *controlador = (struct Controlador *) _controlador;
 

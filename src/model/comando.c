@@ -13,59 +13,65 @@
 #define EXPAND_AS_JUMPTABLE(a, b) {b, a},
 #define EXPAND_AS_SIZE_STRUCT(a, b) uint8_t a;
 #define COMMAND_TABLE(ENTRY)    \
-  ENTRY(       comando_nx,    "geo/nx") \
-  ENTRY(        comando_c,     "geo/c") \
-  ENTRY(        comando_r,     "geo/r") \
-  ENTRY(        comando_o,     "geo/o") \
-  ENTRY(        comando_i,     "geo/i") \
-  ENTRY(        comando_d,     "geo/d") \
-  ENTRY(        comando_a,     "geo/a") \
-  ENTRY(     comando_hash,     "geo/#") \
-  ENTRY(        comando_q,     "geo/q") \
-  ENTRY(        comando_h,     "geo/h") \
-  ENTRY(        comando_s,     "geo/s") \
-  ENTRY(        comando_t,     "geo/t") \
-  ENTRY(       comando_cq,    "geo/cq") \
-  ENTRY(       comando_ch,    "geo/ch") \
-  ENTRY(       comando_cs,    "geo/cs") \
-  ENTRY(       comando_ct,    "geo/ct") \
-  ENTRY(     comando_qzin,    "qry/q?") \
-  ENTRY(     comando_qzao,    "qry/Q?") \
-  ENTRY(     comando_dzin,    "qry/dq") \
-  ENTRY(     comando_dzao,    "qry/Dq") \
-  ENTRY(   comando_dlezin,   "qry/dle") \
-  ENTRY(   comando_dlezao,   "qry/Dle") \
-  ENTRY(       comando_cc,    "qry/cc") \
-  ENTRY(      comando_crd,  "qry/crd?") \
-  ENTRY(      comando_crb,  "qry/crb?") \
-  ENTRY(    comando_qry_m,    "qry/m?") \
-  ENTRY(   comando_qry_mr,   "qry/mr?") \
-  ENTRY(   comando_qry_dm,   "qry/dm?") \
-  ENTRY(   comando_qry_de,   "qry/de?") \
-  ENTRY(  comando_qry_rip,   "qry/rip") \
-  ENTRY(  comando_qry_fec,   "qry/fec") \
-  ENTRY(  comando_qry_mud,   "qry/mud") \
-  ENTRY(comando_qry_mudec, "qry/mudec") \
-  ENTRY(  comando_qry_ecr,  "qry/ecr?") \
-  ENTRY( comando_qry_tecr, "qry/tecr?") \
-  ENTRY(  comando_qry_ecq,  "qry/ecq?") \
-  ENTRY( comando_qry_tecq, "qry/tecq?") \
-  ENTRY(  comando_qry_hmp,  "qry/hmp?") \
-  ENTRY( comando_qry_hmpe, "qry/hmpe?") \
-  ENTRY(  comando_qry_dpr,   "qry/dpr") \
-  ENTRY(    comando_qry_p,    "qry/p?") \
-  ENTRY(   comando_qry_sp,   "qry/sp?") \
-  ENTRY(    comando_reg_m,   "qry/@m?") \
-  ENTRY(    comando_reg_g,   "qry/@g?") \
-  ENTRY(   comando_reg_tp,  "qry/@tp?") \
-  ENTRY(    comando_reg_e,   "qry/@e?") \
-  ENTRY(   comando_reg_xy,   "qry/@xy") \
-  ENTRY(     comando_ec_t,      "ec/t") \
-  ENTRY(     comando_ec_e,      "ec/e") \
-  ENTRY(     comando_pm_p,      "pm/p") \
-  ENTRY(     comando_pm_m,      "pm/m") \
-  ENTRY(    comando_via_v,     "via/v") \
-  ENTRY(    comando_via_e,     "via/e")
+  /* ARQUIVOS .GEO */                    \
+  ENTRY(    comando_geo_nx,    "geo/nx") \
+  ENTRY(     comando_geo_c,     "geo/c") \
+  ENTRY(     comando_geo_r,     "geo/r") \
+  ENTRY(     comando_geo_o,     "geo/o") \
+  ENTRY(     comando_geo_i,     "geo/i") \
+  ENTRY(     comando_geo_d,     "geo/d") \
+  ENTRY(     comando_geo_a,     "geo/a") \
+  ENTRY(  comando_geo_hash,     "geo/#") \
+  ENTRY(     comando_geo_q,     "geo/q") \
+  ENTRY(     comando_geo_h,     "geo/h") \
+  ENTRY(     comando_geo_s,     "geo/s") \
+  ENTRY(     comando_geo_t,     "geo/t") \
+  ENTRY(    comando_geo_cq,    "geo/cq") \
+  ENTRY(    comando_geo_ch,    "geo/ch") \
+  ENTRY(    comando_geo_cs,    "geo/cs") \
+  ENTRY(    comando_geo_ct,    "geo/ct") \
+  /* ARQUIVOS .QRY */                    \
+  ENTRY(  comando_qry_qzin,    "qry/q?") \
+  ENTRY(  comando_qry_qzao,    "qry/Q?") \
+  ENTRY(  comando_qry_dzin,    "qry/dq") \
+  ENTRY(  comando_qry_dzao,    "qry/Dq") \
+  ENTRY(comando_qry_dlezin,   "qry/dle") \
+  ENTRY(comando_qry_dlezao,   "qry/Dle") \
+  ENTRY(    comando_qry_cc,    "qry/cc") \
+  ENTRY(   comando_qry_crd,  "qry/crd?") \
+  ENTRY(   comando_qry_crb,  "qry/crb?") \
+  ENTRY(     comando_qry_m,    "qry/m?") \
+  ENTRY(    comando_qry_mr,   "qry/mr?") \
+  ENTRY(    comando_qry_dm,   "qry/dm?") \
+  ENTRY(    comando_qry_de,   "qry/de?") \
+  ENTRY(   comando_qry_rip,   "qry/rip") \
+  ENTRY(   comando_qry_fec,   "qry/fec") \
+  ENTRY(   comando_qry_mud,   "qry/mud") \
+  ENTRY( comando_qry_mudec, "qry/mudec") \
+  ENTRY(   comando_qry_ecr,  "qry/ecr?") \
+  ENTRY(  comando_qry_tecr, "qry/tecr?") \
+  ENTRY(   comando_qry_ecq,  "qry/ecq?") \
+  ENTRY(  comando_qry_tecq, "qry/tecq?") \
+  ENTRY(   comando_qry_hmp,  "qry/hmp?") \
+  ENTRY(  comando_qry_hmpe, "qry/hmpe?") \
+  ENTRY(   comando_qry_dpr,   "qry/dpr") \
+  ENTRY(     comando_qry_p,    "qry/p?") \
+  ENTRY(    comando_qry_sp,   "qry/sp?") \
+  ENTRY(     comando_reg_m,   "qry/@m?") \
+  ENTRY(     comando_reg_g,   "qry/@g?") \
+  ENTRY(    comando_reg_tp,  "qry/@tp?") \
+  ENTRY(     comando_reg_e,   "qry/@e?") \
+  ENTRY(    comando_reg_xy,   "qry/@xy") \
+  /* ARQUIVOS .EC */                     \
+  ENTRY(      comando_ec_t,      "ec/t") \
+  ENTRY(      comando_ec_e,      "ec/e") \
+  /* ARQUIVOS .PM */                     \
+  ENTRY(      comando_pm_p,      "pm/p") \
+  ENTRY(      comando_pm_m,      "pm/m") \
+  /* ARQUIVOS .VIA */                    \
+  ENTRY(     comando_via_v,     "via/v") \
+  ENTRY(     comando_via_e,     "via/e") \
+
 
 COMMAND_TABLE(EXPAND_AS_DECLARATION)
 

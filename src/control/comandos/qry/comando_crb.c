@@ -35,7 +35,7 @@ double distanciaElementos(const Item _this, const Item _other, int dim) {
  * a rádio-base destacando-a; arquivo.txt:
  * reportar id das torres e a distância.
  */
-int comando_crb(void *_this, void *_controlador) {
+int comando_qry_crb(void *_this, void *_controlador) {
   struct Controlador *controlador = (struct Controlador *) _controlador;
 
   char *saida;

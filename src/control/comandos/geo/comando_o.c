@@ -15,7 +15,7 @@
  * As formas geométricas cujos
  * indentificadores são j e k se sobrepõem?
  */
-int comando_o(void *_this, void *_controlador) {
+int comando_geo_o(void *_this, void *_controlador) {
   struct Comando *this            = (struct Comando *) _this;
   struct Controlador *controlador = (struct Controlador *) _controlador;
 

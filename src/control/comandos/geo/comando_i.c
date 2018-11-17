@@ -15,7 +15,7 @@
  * O ponto (x,y) é interno à j-ésima forma 
  * geométrica?7
  */
-int comando_i(void *_this, void *_controlador) {
+int comando_geo_i(void *_this, void *_controlador) {
   struct Comando *this            = (struct Comando *) _this;
   struct Controlador *controlador = (struct Controlador *) _controlador;
 

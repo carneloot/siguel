@@ -25,7 +25,7 @@
  * figura i. Próximo a cada linha deve ser
  * escrito o seu comprimento.
  */
-int comando_a(void *_this, void *_controlador) {
+int comando_geo_a(void *_this, void *_controlador) {
   struct Comando *this            = (struct Comando *) _this;
   struct Controlador *controlador = (struct Controlador *) _controlador;
 
