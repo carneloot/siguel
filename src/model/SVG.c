@@ -13,29 +13,37 @@ struct SVG {
   Ponto2D max;
 };
 
+
 #ifdef DEBUG
 
-#define OFFSET 100
+#define GARANTIA_TAMANHO 100
+#define OFFSET_GRID 100
 
 static void desenhar_grid(SVG _this) {
   struct SVG *this = (struct SVG *) _this;
   Ponto2D start, end;
 
+  escreve_comentario(this, "GRID");
 
-  for (float x = 0; x < this->max.x; x += OFFSET) {
+  for (float x = 0; x < this->max.x; x += OFFSET_GRID) {
     start = Ponto2D_t.new(x, 0);
     end   = Ponto2D_t.new(x, this->max.y);
     desenha_linha(this, start, end, 0.4, 1, "black");
   }
 
-  for (float y = 0; y < this->max.y; y += OFFSET) {
+  for (float y = 0; y < this->max.y; y += OFFSET_GRID) {
     start = Ponto2D_t.new(0, y);
     end   = Ponto2D_t.new(this->max.x, y);
     desenha_linha(this, start, end, 0.4, 1, "black");
   }
 }
 
+#else
+
+#define GARANTIA_TAMANHO 0
+
 #endif
+
 
 SVG cria_SVG(char *path, double max_width, double max_height) {
   struct SVG *this;
@@ -43,14 +51,14 @@ SVG cria_SVG(char *path, double max_width, double max_height) {
   this = (struct SVG *) malloc(sizeof(struct SVG));
 
   this->saida = abrir_arquivo(path, ESCRITA);
-  this->max   = Ponto2D_t.new(max_width, max_height);
+  this->max   = Ponto2D_t.new(max_width + GARANTIA_TAMANHO, max_height + GARANTIA_TAMANHO);
 
   escrever_linha(
     this->saida,
     "<svg width=\"%.1f\" height=\"%.1f\" "
     "xmlns=\"http://www.w3.org/2000/svg\">\n",
-    max_width,
-    max_height);
+    this->max.x,
+    this->max.y);
 
   escrever_linha(
     this->saida,
@@ -58,7 +66,7 @@ SVG cria_SVG(char *path, double max_width, double max_height) {
     "<marker id='arrowhead' orient='auto' markerWidth='2' markerHeight='4' refX='0.1' refY='2'>"
     "<path d='M0,0 V4 L2,2 Z' style='fill:black;' />"
     "</marker>"
-    "</defs>"
+    "</defs>\n"
   );
 
   return (SVG) this;
@@ -76,6 +84,10 @@ void desenha_figura(SVG s, Figura f, float opacity, int is_dashed) {
 
 void desenha_elemento(SVG this, Elemento e) {
   Figura figura = get_figura_elemento(e);
+
+  escreve_comentario(this, "%s: %s",
+    get_tipo_string_elemento(get_tipo_elemento(e)), get_cep_elemento(e)
+  );
 
   desenha_figura(this, figura, 0.4, FIG_BORDA_SOLIDA);
 
@@ -133,6 +145,21 @@ void escreve_texto(SVG s, char *texto, Ponto2D pos, float tamanho, char *cor) {
     cor,
     tamanho,
     texto);
+}
+
+void escreve_comentario(SVG _this, char *_texto, ...) {
+  struct SVG * this = (struct SVG *) _this;
+
+  char *texto = format_string("<!-- %s -->\n", _texto);
+
+  va_list args;
+  va_start(args, _texto);
+  
+  escrever_linha_args(this->saida, texto, args);
+
+  va_end(args);
+
+  free(texto);
 }
 
 void desenha_linha(SVG s, Ponto2D a, Ponto2D b, float opacity, double tamanho, char *cor) {
