@@ -13,29 +13,36 @@ struct SVG {
   Ponto2D max;
 };
 
+
 #ifdef DEBUG
 
-#define OFFSET 100
+#define GARANTIA_TAMANHO 100
+#define OFFSET_GRID 100
 
 static void desenhar_grid(SVG _this) {
   struct SVG *this = (struct SVG *) _this;
   Ponto2D start, end;
 
 
-  for (float x = 0; x < this->max.x; x += OFFSET) {
+  for (float x = 0; x < this->max.x; x += OFFSET_GRID) {
     start = Ponto2D_t.new(x, 0);
     end   = Ponto2D_t.new(x, this->max.y);
     desenha_linha(this, start, end, 0.4, 1, "black");
   }
 
-  for (float y = 0; y < this->max.y; y += OFFSET) {
+  for (float y = 0; y < this->max.y; y += OFFSET_GRID) {
     start = Ponto2D_t.new(0, y);
     end   = Ponto2D_t.new(this->max.x, y);
     desenha_linha(this, start, end, 0.4, 1, "black");
   }
 }
 
+#else
+
+#define GARANTIA_TAMANHO 0
+
 #endif
+
 
 SVG cria_SVG(char *path, double max_width, double max_height) {
   struct SVG *this;
@@ -43,14 +50,14 @@ SVG cria_SVG(char *path, double max_width, double max_height) {
   this = (struct SVG *) malloc(sizeof(struct SVG));
 
   this->saida = abrir_arquivo(path, ESCRITA);
-  this->max   = Ponto2D_t.new(max_width, max_height);
+  this->max   = Ponto2D_t.new(max_width + GARANTIA_TAMANHO, max_height + GARANTIA_TAMANHO);
 
   escrever_linha(
     this->saida,
     "<svg width=\"%.1f\" height=\"%.1f\" "
     "xmlns=\"http://www.w3.org/2000/svg\">\n",
-    max_width,
-    max_height);
+    this->max.x,
+    this->max.y);
 
   escrever_linha(
     this->saida,
@@ -133,6 +140,12 @@ void escreve_texto(SVG s, char *texto, Ponto2D pos, float tamanho, char *cor) {
     cor,
     tamanho,
     texto);
+}
+
+void escreve_comentario(SVG _this, char *texto) {
+  struct SVG * this = (struct SVG *) _this;
+  
+  escrever_linha(this->saida, "<!-- %s -->\n", texto);
 }
 
 void desenha_linha(SVG s, Ponto2D a, Ponto2D b, float opacity, double tamanho, char *cor) {
