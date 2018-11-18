@@ -1,8 +1,12 @@
 NAME='mcchafrao'
 
 echo "Criando arquivo \"$NAME.zip\" para enviar."
+
 # Cria pasta
 mkdir -p $NAME
+
+# Remove o .zip antigo
+rm -f $NAME.zip
 
 # Copia os arquivos necessarios
 cp -r src $NAME/
