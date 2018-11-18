@@ -123,7 +123,6 @@ void escrever_linha(Arquivo a, const char *entrada, ...) {
 
 void escrever_linha_args(Arquivo a, const char *entrada, va_list args) {
   struct Arquivo *this;
-  va_list args;
 
   this = (struct Arquivo *) a;
 
