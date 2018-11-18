@@ -30,8 +30,7 @@ int comando_pm_m(void *_this, void *_controlador) {
     return 0;
   }
 
-  HashInfo info = HashTable_t.get(tabela, cpf);
-  Pessoa pessoa = info.valor;
+  Pessoa pessoa = HashTable_t.get(tabela, cpf);
 
   int face   = char_to_face(params[2][0]);
   int numero = strtol(params[3], NULL, 10);
@@ -41,11 +40,7 @@ int comando_pm_m(void *_this, void *_controlador) {
   pessoa_set_endereco(pessoa, cep, face, numero, complemento);
 
   // Adicionar na tabela CPF_X_CEP
-  HashInfo info_cpf_cep;
-  info_cpf_cep.chave = pessoa_get_cpf(pessoa);
-  info_cpf_cep.valor = pessoa_get_cep(pessoa);
-
-  HashTable_t.insert(controlador->tabelas[CPF_X_CEP], info_cpf_cep);
+  HashTable_t.insert(controlador->tabelas[CPF_X_CEP], pessoa_get_cpf(pessoa), pessoa_get_cep(pessoa));
 
   return 1;
 }

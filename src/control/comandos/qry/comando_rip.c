@@ -47,8 +47,7 @@ int comando_qry_rip(void *_this, void *_controlador) {
     return 1;
   }
 
-  HashInfo hash_info = HashTable_t.get(tabela, cpf);
-  Pessoa pessoa = hash_info.valor;
+  Pessoa pessoa = HashTable_t.get(tabela, cpf);
 
   Lista pessoas = controlador->pessoas;
   Posic posic   = Lista_t.get_first(pessoas);

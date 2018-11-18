@@ -78,12 +78,7 @@ static Lista __get_elementos_dentro(KDTree arvore, Ponto2D pos, Ponto2D size, en
 }
 
 static void __adicionarHashComercio(void * const comercio, const void *tabela) {
-  HashInfo info = {
-    .chave = comercio_get_cnpj(comercio),
-    .valor = comercio
-  };
-
-  HashTable_t.insert((HashTable) tabela, info);
+  HashTable_t.insert((HashTable) tabela, comercio_get_cnpj(comercio), comercio);
 }
 
 static int __pessoaDentro(void * const pessoa, const void *cep_quadra) {

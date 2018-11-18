@@ -97,11 +97,7 @@ int comando_geo_q(void *_this, void *_controlador) {
   KDTree_t.insert(controlador->elementos[QUADRA], elemento);
 
   // Inserir na HashTable a quadra
-  HashInfo info;
-  info.chave = get_cep_elemento(elemento);
-  info.valor = elemento;
-
-  HashTable_t.insert(controlador->tabelas[CEP_X_QUADRA], info);
+  HashTable_t.insert(controlador->tabelas[CEP_X_QUADRA], get_cep_elemento(elemento), elemento);
 
   Ponto2D new_max = Ponto2D_t.add(size, pos);
   new_max         = Ponto2D_t.add_scalar(new_max, 4);
@@ -133,12 +129,7 @@ int comando_geo_h(void *_this, void *_controlador) {
 
   KDTree_t.insert(controlador->elementos[HIDRANTE], elemento);
 
-  HashInfo info = {
-    .chave = get_id_elemento(elemento),
-    .valor = elemento
-  };
-
-  HashTable_t.insert(controlador->tabelas[ID_X_HIDRANTE], info);
+  HashTable_t.insert(controlador->tabelas[ID_X_HIDRANTE], get_id_elemento(elemento), elemento);
 
   Ponto2D new_max = Ponto2D_t.add_scalar(pos, RAIO_EQUIPAMENTOS + 4);
 
@@ -169,12 +160,7 @@ int comando_geo_s(void *_this, void *_controlador) {
 
   KDTree_t.insert(controlador->elementos[SEMAFORO], elemento);
 
-  HashInfo info = {
-    .chave = get_id_elemento(elemento),
-    .valor = elemento
-  };
-
-  HashTable_t.insert(controlador->tabelas[ID_X_SEMAFORO], info);
+  HashTable_t.insert(controlador->tabelas[ID_X_SEMAFORO], get_id_elemento(elemento), elemento);
 
   Ponto2D new_max = Ponto2D_t.add_scalar(pos, RAIO_EQUIPAMENTOS + 4);
 
@@ -205,11 +191,7 @@ int comando_geo_t(void *_this, void *_controlador) {
 
   KDTree_t.insert(controlador->elementos[RADIO_BASE], elemento);
 
-  HashInfo info = {
-    .chave = get_id_elemento(elemento),
-    .valor = elemento
-  };
-  HashTable_t.insert(controlador->tabelas[ID_X_RADIO], info);
+  HashTable_t.insert(controlador->tabelas[ID_X_RADIO], get_id_elemento(elemento), elemento);
 
   Ponto2D new_max = Ponto2D_t.add_scalar(pos, RAIO_EQUIPAMENTOS + 4);
 

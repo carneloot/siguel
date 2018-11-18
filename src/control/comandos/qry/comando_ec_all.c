@@ -130,7 +130,7 @@ int comando_qry_tecq(void *_this, void *_controlador) {
   // Passar printando os tipos
   char **tipos_it = tipos;
   while (*tipos_it) {
-    char *tipo_desc = HashTable_t.get(controlador->tabelas[TIPO_X_DESCRICAO], *tipos_it).valor;
+    char *tipo_desc = HashTable_t.get(controlador->tabelas[TIPO_X_DESCRICAO], *tipos_it);
 
     Lista_t.insert(controlador->saida, 
       format_string("\t%s:\n", tipo_desc));
@@ -192,7 +192,7 @@ int comando_qry_tecr(void *_this, void *_controlador) {
   // Printar os tipos na area
   char **tipos_it = tipos;
   while (!!*tipos_it) {
-    char *tipo_desc = HashTable_t.get(controlador->tabelas[TIPO_X_DESCRICAO], *tipos_it).valor;
+    char *tipo_desc = HashTable_t.get(controlador->tabelas[TIPO_X_DESCRICAO], *tipos_it);
 
     Lista_t.insert(controlador->saida, 
       format_string("\t%s\n", tipo_desc));
@@ -230,7 +230,7 @@ int comando_qry_ecr(void *_this, void *_controlador) {
     comercios = Lista_t.copy(controlador->comercios);
   }
 
-  char *tipo_desc = HashTable_t.get(controlador->tabelas[TIPO_X_DESCRICAO], tipo).valor;
+  char *tipo_desc = HashTable_t.get(controlador->tabelas[TIPO_X_DESCRICAO], tipo);
 
   // Filtra somente os comercios com o tipo passado
   Lista comercios_tipo = Lista_t.filter(comercios, tipo, compararTIPO);
@@ -299,7 +299,7 @@ int comando_qry_ecq(void *_this, void *_controlador) {
   while (it) {
     Comercio comercio = Lista_t.get(comercios, it);
 
-    char *tipo_desc = HashTable_t.get(controlador->tabelas[TIPO_X_DESCRICAO], comercio_get_tipo(comercio)).valor;
+    char *tipo_desc = HashTable_t.get(controlador->tabelas[TIPO_X_DESCRICAO], comercio_get_tipo(comercio));
     char *info_comercio = comercio_get_info(comercio, tipo_desc);
 
     Lista_t.insert(controlador->saida, format_string("\t%s\n", info_comercio));

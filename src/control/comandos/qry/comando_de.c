@@ -39,11 +39,9 @@ int comando_qry_de(void *_this, void *_controlador) {
     return 1;
   }
 
-  HashInfo info = HashTable_t.get(tabela, cnpj);
+  Comercio comercio = HashTable_t.get(tabela, cnpj);
 
-  Comercio comercio = info.valor;
-
-  char *tipo_desc = HashTable_t.get(controlador->tabelas[TIPO_X_DESCRICAO], comercio_get_tipo(comercio)).valor;
+  char *tipo_desc = HashTable_t.get(controlador->tabelas[TIPO_X_DESCRICAO], comercio_get_tipo(comercio));
 
   char *info_comercio = comercio_get_info(comercio, tipo_desc);
   strcat(info_comercio, "\n");

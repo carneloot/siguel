@@ -30,12 +30,7 @@ int comando_pm_p(void *_this, void *_controlador) {
 
   Lista_t.insert(controlador->pessoas, pessoa);
 
-  HashInfo info;
-
-  info.chave = pessoa_get_cpf(pessoa);
-  info.valor = pessoa;
-
-  HashTable_t.insert(controlador->tabelas[CPF_X_PESSOA], info);
+  HashTable_t.insert(controlador->tabelas[CPF_X_PESSOA], pessoa_get_cpf(pessoa), pessoa);
 
   return 1;
 }

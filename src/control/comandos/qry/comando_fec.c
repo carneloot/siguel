@@ -33,8 +33,7 @@ int comando_qry_fec(void *_this, void *_controlador) {
     return 1;
   }
 
-  HashInfo hash_info = HashTable_t.get(tabela, cnpj);
-  Comercio comercio = hash_info.valor;
+  Comercio comercio = HashTable_t.get(tabela, cnpj);
 
   Lista comercios = controlador->comercios;
   Posic posic   = Lista_t.get_first(comercios);
@@ -49,7 +48,7 @@ int comando_qry_fec(void *_this, void *_controlador) {
   Lista_t.remove(comercios, posic);
 
   // Mostrar informacoes
-  char *tipo_desc = HashTable_t.get(controlador->tabelas[TIPO_X_DESCRICAO], comercio_get_tipo(comercio)).valor;
+  char *tipo_desc = HashTable_t.get(controlador->tabelas[TIPO_X_DESCRICAO], comercio_get_tipo(comercio));
   char *info_comercio = comercio_get_info(comercio, tipo_desc);
   char *rip_message = format_string(
     "Nota de fechamento de comercio:\n\t%s\n", info_comercio);

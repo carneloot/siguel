@@ -120,7 +120,7 @@ static int __total_vertices_grafod(GrafoD _this) {
   return this->num_vertices;
 }
 
-static void __imprimir_aresta_dot(const void *_aresta, void *_fp) {
+static void __imprimir_aresta_dot(void *_aresta, void *_fp) {
   struct Aresta *aresta = (struct Aresta *) _aresta;
   FILE *fp = (FILE *) _fp;
 
@@ -167,17 +167,12 @@ static void __insert_aresta_grafod(GrafoD _this, char *origem, char *destino) {
     return;
   }
 
-  struct Vertice *vertice_origem  = HashTable_t.get(this->label_x_vertice, origem).valor;
-  struct Vertice *vertice_destino = HashTable_t.get(this->label_x_vertice, destino).valor;
+  struct Vertice *vertice_origem  = HashTable_t.get(this->label_x_vertice, origem);
+  struct Vertice *vertice_destino = HashTable_t.get(this->label_x_vertice, destino);
 
   struct Aresta *aresta = create_aresta(NULL, vertice_origem->label, vertice_destino->label);
 
-  HashInfo info = {
-    .chave = vertice_destino->label,
-    .valor = aresta
-  };
-
-  HashTable_t.insert(vertice_origem->arestas, info);
+  HashTable_t.insert(vertice_origem->arestas, vertice_destino->label, aresta);
 
 }
 
@@ -194,7 +189,7 @@ static void __define_info_aresta_grafod(GrafoD _this, char *origem, char *destin
     return;
   }
 
-  struct Vertice *vertice_origem = HashTable_t.get(this->label_x_vertice, origem).valor;
+  struct Vertice *vertice_origem = HashTable_t.get(this->label_x_vertice, origem);
 
   if (!HashTable_t.exists(vertice_origem->arestas, destino)) {
     LOG_ERRO(
@@ -204,7 +199,7 @@ static void __define_info_aresta_grafod(GrafoD _this, char *origem, char *destin
     return;
   }
 
-  struct Aresta *aresta = HashTable_t.get(vertice_origem->arestas, destino).valor;
+  struct Aresta *aresta = HashTable_t.get(vertice_origem->arestas, destino);
 
   aresta->info = info;
 }
@@ -222,7 +217,7 @@ static InfoG __get_info_aresta_grafod(GrafoD _this, char *origem, char *destino)
     return NULL;
   }
 
-  struct Vertice *vertice_origem = HashTable_t.get(this->label_x_vertice, origem).valor;
+  struct Vertice *vertice_origem = HashTable_t.get(this->label_x_vertice, origem);
 
   if (!HashTable_t.exists(vertice_origem->arestas, destino)) {
     LOG_ERRO(
@@ -232,7 +227,7 @@ static InfoG __get_info_aresta_grafod(GrafoD _this, char *origem, char *destino)
     return NULL;
   }
 
-  struct Aresta *aresta = HashTable_t.get(vertice_origem->arestas, destino).valor;
+  struct Aresta *aresta = HashTable_t.get(vertice_origem->arestas, destino);
 
   return aresta->info;
 }
@@ -250,7 +245,7 @@ static void __remove_aresta_grafod(GrafoD _this, char *origem, char *destino) {
     return;
   }
 
-  struct Vertice *vertice_origem = HashTable_t.get(this->label_x_vertice, origem).valor;
+  struct Vertice *vertice_origem = HashTable_t.get(this->label_x_vertice, origem);
 
   if (!HashTable_t.exists(vertice_origem->arestas, destino)) {
     LOG_ERRO(
@@ -260,7 +255,7 @@ static void __remove_aresta_grafod(GrafoD _this, char *origem, char *destino) {
     return;
   }
 
-  struct Aresta *aresta = HashTable_t.get(vertice_origem->arestas, destino).valor;
+  struct Aresta *aresta = HashTable_t.get(vertice_origem->arestas, destino);
 
   HashTable_t.remove(vertice_origem->arestas, destino);
 
@@ -280,7 +275,7 @@ static bool __adjacente_grafod(GrafoD _this, char *origem, char *destino) {
     return false;
   }
 
-  struct Vertice *vertice_origem = HashTable_t.get(this->label_x_vertice, origem).valor;
+  struct Vertice *vertice_origem = HashTable_t.get(this->label_x_vertice, origem);
 
   return HashTable_t.exists(vertice_origem->arestas, destino);
 }
@@ -297,13 +292,8 @@ static void __insert_vertice_grafod(GrafoD _this, char *node) {
 
   struct Vertice *vertice = create_vertice(NULL, node);
 
-  HashInfo info = {
-    .chave = vertice->label,
-    .valor = vertice,
-  };
-
   Lista_t.insert(this->vertices, vertice);
-  HashTable_t.insert(this->label_x_vertice, info);
+  HashTable_t.insert(this->label_x_vertice, vertice->label, vertice);
 
   this->num_vertices++;
 }
@@ -316,7 +306,7 @@ static void __define_info_vertice_grafod(GrafoD _this, char *node, InfoG info) {
     return;
   }
 
-  struct Vertice *vertice = HashTable_t.get(this->label_x_vertice, node).valor;
+  struct Vertice *vertice = HashTable_t.get(this->label_x_vertice, node);
 
   vertice->info = info;
 }
@@ -329,7 +319,7 @@ static InfoG __get_info_vertice_grafod(GrafoD _this, char *node) {
     return NULL;
   }
 
-  struct Vertice *vertice = HashTable_t.get(this->label_x_vertice, node).valor;
+  struct Vertice *vertice = HashTable_t.get(this->label_x_vertice, node);
 
   return vertice->info;
 }
@@ -342,7 +332,7 @@ static void __remove_vertice_grafod(GrafoD _this, char *node) {
     return;
   }
 
-  struct Vertice *vertice = HashTable_t.get(this->label_x_vertice, node).valor;
+  struct Vertice *vertice = HashTable_t.get(this->label_x_vertice, node);
 
   // Checar se tem alguma ligacao saindo dele
   if (HashTable_t.length(vertice->arestas) != 0) {
@@ -358,7 +348,7 @@ static void __remove_vertice_grafod(GrafoD _this, char *node) {
   destroy_vertice(vertice);
 }
 
-static void __adicionar_lista(const void *_aresta, void *_lista) {
+static void __adicionar_lista(void *_aresta, void *_lista) {
   const struct Aresta *aresta = (const struct Aresta *) _aresta;
   Lista lista = _lista;
 
@@ -370,7 +360,7 @@ static Lista __adjacentes_grafod(GrafoD _this, char *node) {
 
   Lista lista = Lista_t.create();
 
-  struct Vertice *vertice = HashTable_t.get(this->label_x_vertice, node).valor;
+  struct Vertice *vertice = HashTable_t.get(this->label_x_vertice, node);
 
   HashTable_t.map(vertice->arestas, lista, __adicionar_lista);
 

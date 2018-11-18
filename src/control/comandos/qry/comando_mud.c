@@ -36,8 +36,7 @@ int comando_qry_mud(void *_this, void *_controlador) {
     return 1;
   } 
 
-  HashInfo hash_info = HashTable_t.get(tabela_pessoa, cpf);
-  Pessoa pessoa = hash_info.valor;
+  Pessoa pessoa = HashTable_t.get(tabela_pessoa, cpf);
 
   char *cep   = this->params[1];
   int face    = char_to_face(this->params[2][0]);
@@ -50,11 +49,7 @@ int comando_qry_mud(void *_this, void *_controlador) {
   HashTable_t.remove(tabela_cep, cpf);
   pessoa_set_endereco(pessoa, cep, face, numero, compl);
 
-  HashInfo new_info = {
-    .chave = pessoa_get_cpf(pessoa),
-    .valor = pessoa_get_cep(pessoa)
-  };
-  HashTable_t.insert(tabela_cep, new_info);
+  HashTable_t.insert(tabela_cep, pessoa_get_cpf(pessoa), pessoa_get_cep(pessoa));
 
   Ponto2D pos_atual = endereco_get_coordenada(pessoa_get_endereco(pessoa), controlador);
   char *info_endereco_atual = endereco_get_info(pessoa_get_endereco(pessoa));

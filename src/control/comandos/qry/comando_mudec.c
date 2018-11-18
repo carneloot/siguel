@@ -33,15 +33,14 @@ int comando_qry_mudec(void *_this, void *_controlador) {
     return 1;
   } 
 
-  HashInfo hash_info = HashTable_t.get(tabela, cnpj);
-  Comercio comercio = hash_info.valor;
+  Comercio comercio = HashTable_t.get(tabela, cnpj);
 
   char *cep   = this->params[1];
   int face    = char_to_face(this->params[2][0]);
   int numero  = strtol(this->params[3], NULL, 10);
 
   Ponto2D pos_antiga  = endereco_get_coordenada(comercio_get_endereco(comercio), controlador);
-  char *tipo_desc = HashTable_t.get(controlador->tabelas[TIPO_X_DESCRICAO], comercio_get_tipo(comercio)).valor;
+  char *tipo_desc = HashTable_t.get(controlador->tabelas[TIPO_X_DESCRICAO], comercio_get_tipo(comercio));
   char *info_comercio = comercio_get_info(
     comercio, tipo_desc);
 
