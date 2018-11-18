@@ -32,6 +32,10 @@ int comando_pm_m(void *_this, void *_controlador) {
 
   Pessoa pessoa = HashTable_t.get(tabela, cpf);
 
+  if (pessoa_get_endereco(pessoa) != NULL) {
+    HashTable_t.remove(controlador->tabelas[CPF_X_CEP], cpf);
+  }
+
   int face   = char_to_face(params[2][0]);
   int numero = strtol(params[3], NULL, 10);
   char *cep  = params[1];
