@@ -5,6 +5,7 @@
 #include <model/mapa_viario/aresta.h>
 #include <model/utils.h>
 #include <model/modules/dijkstra.h>
+#include <model/modules/logger.h>
 #include <model/SVG.h>
 
 #include "svg_path.h"
@@ -263,28 +264,43 @@ int comando_qry_sp(void *_this, void *_controlador) {
 
     Lista caminho = get_caminho(controlador->mapa_viario, origem_info, destino_info, distancia);
 
-    if (pictorica) {
-      #ifdef DEBUG
-      Figura ponto1 = cria_circulo(pos_origem.x,  pos_origem.y,  2, cor[i % 2], "transparent");
-      Figura ponto2 = cria_circulo(pos_destino.x, pos_destino.y, 2, cor[(i + 1) % 2], "transparent");
+    if (caminho == NULL) {
+      if (pictorica) {
 
-      desenha_figura(svg_saida, ponto1, 1, FIG_BORDA_SOLIDA);
-      desenha_figura(svg_saida, ponto2, 1, FIG_BORDA_SOLIDA);
+        escreve_texto(svg_saida, "Caminho inexistente", pos_origem, 20, cor[i % 2]);
 
-      destruir_figura(ponto1);
-      destruir_figura(ponto2);
-      #endif
-
-      desenhar_caminho_svg(
-        svg_saida,
-        caminho,
-        controlador->mapa_viario,
-        cor[i % 2]);
+      } else {
+        Lista_t.insert(controlador->saida,
+          format_string("Nao foi possivel gerar um caminho de \"%s\" ate \"%s\".",
+          origem_info->id, destino_info->id));
+      }
+      LOG_PRINT(LOG_STDOUT, "Nao foi possivel gerar um caminho de \"%s\" ate \"%s\".", origem_info->id, destino_info->id);
     } else {
-      escrever_caminho_txt(controlador->saida, caminho, controlador->mapa_viario);
+
+      if (pictorica) {
+        #ifdef DEBUG
+        Figura ponto1 = cria_circulo(pos_origem.x,  pos_origem.y,  10, cor[i % 2], "transparent");
+        Figura ponto2 = cria_circulo(pos_destino.x, pos_destino.y, 10, cor[(i + 1) % 2], "transparent");
+
+        desenha_figura(svg_saida, ponto1, 1, FIG_BORDA_SOLIDA);
+        desenha_figura(svg_saida, ponto2, 1, FIG_BORDA_SOLIDA);
+
+        destruir_figura(ponto1);
+        destruir_figura(ponto2);
+        #endif
+
+        desenhar_caminho_svg(
+          svg_saida,
+          caminho,
+          controlador->mapa_viario,
+          cor[i % 2]);
+      } else {
+        escrever_caminho_txt(controlador->saida, caminho, controlador->mapa_viario);
+      }
+
+      Lista_t.destruir(caminho, 0);
     }
 
-    Lista_t.destruir(caminho, 0);
   }
 
   if (pictorica) {

@@ -4,6 +4,9 @@
 #include <string.h>
 #include <float.h>
 
+#include <model/modules/hash.h>
+#include <model/modules/logger.h>
+
 /**
  * Struct feita para guardar as informacoes do vertice
  * [D]ijkstra [V]ertice [Info]
@@ -30,24 +33,25 @@ static DVInfo create_dvinfo(char *label, double distancia) {
 /**
  * Retorna o Posic do DVInfo de menor distancia na lista vertices
  */
-static Posic pegarMaisProximo(Lista vertices) {
-  Posic it = Lista_t.get_first(vertices);
+static void maisProximoAux(void *_info, void *_pResult) {
+  DVInfo info = (DVInfo) _info;
+  DVInfo *pResult = (DVInfo *) _pResult;
+  DVInfo result = *pResult;
 
-  Posic pMenor = it;
-  DVInfo menor = Lista_t.get(vertices, pMenor);
-
-  while (it) {
-    DVInfo atual = Lista_t.get(vertices, it);
-
-    if (atual->distancia < menor->distancia) {
-      pMenor = it;
-      menor = atual;
-    }
-    
-    it = Lista_t.get_next(vertices, it);
+  if (result == NULL) {
+    *pResult = info;
+  } else if (info->distancia < result->distancia) {
+    *pResult = info;
   }
+  
+}
 
-  return pMenor;
+static DVInfo pegarMaisProximo(HashTable vertices) {
+  DVInfo info = NULL;
+
+  HashTable_t.map(vertices, &info, maisProximoAux);
+
+  return info;
 }
 
 /**
@@ -55,8 +59,9 @@ static Posic pegarMaisProximo(Lista vertices) {
  * Recebe um vetor com todos os labels do grafo
  * e o label do vertice inicial, para setar a distancia como 0
  */
-static Lista getVertices(char **labels, int tamanho, char *inicial) {
-  Lista vertices = Lista_t.create();
+static HashTable getVertices(char **labels, int tamanho, char *inicial) {
+  int tamanho_hash = (int) (tamanho / 0.7) + 1;
+  HashTable vertices = HashTable_t.create(tamanho_hash);
 
   for (int i = 0; i < tamanho; i++) {
     char *label = labels[i];
@@ -66,20 +71,10 @@ static Lista getVertices(char **labels, int tamanho, char *inicial) {
     if (!strcmp(label, inicial))
       info->distancia = 0;
 
-    Lista_t.insert(vertices, info);
+    HashTable_t.insert(vertices, info->label, info);
   }
 
   return vertices;
-}
-
-/**
- * Funcao auxiliar para encontrar o DVInfo com o mesmo label passado
- */
-static int labelIgual(const Item _info, const void *_label) {
-  DVInfo info = (DVInfo) _info;
-  char *label = (char *) _label;
-
-  return strcmp(info->label, label);
 }
 
 /**
@@ -102,6 +97,10 @@ static void gerarCaminhoRec(DVInfo atual, Lista lista) {
  * Recebe o DVInfo do destino.
  */
 static Lista gerarCaminho(DVInfo target) {
+
+  if (target->anterior == NULL)
+    return NULL;
+    
   Lista lista = Lista_t.create();
 
   gerarCaminhoRec(target, lista);
@@ -113,43 +112,56 @@ static Lista gerarCaminho(DVInfo target) {
  * Funcao do Dijkstra em si. Baseado no algoritmo encontrado no site do Geeks for Geeks
  */
 Lista dijkstra(GrafoD grafo, char *origem, char *destino, double (*get_dist_aresta)(void *aresta_info)) {
-
   char **labels = GrafoD_t.get_all_vertices(grafo);
-  Lista vertices = getVertices(labels, GrafoD_t.total_vertices(grafo), origem);
+  HashTable vertices = getVertices(labels, GrafoD_t.total_vertices(grafo), origem);
   free(labels);
 
-  Lista nao_visitados = Lista_t.copy(vertices);
+  LOG_PRINT(LOG_FILE, "Dijkstra: gerando caminho de \"%s\" ate \"%s\".", origem, destino);
 
-  DVInfo target;
+  HashTable naoVisitados = HashTable_t.create(HashTable_t.length(vertices));
+  HashTable visitados    = HashTable_t.create(HashTable_t.length(vertices));
+
+  // Insere o inicial no naoVisitados
+  DVInfo inicial = pegarMaisProximo(vertices);
+  HashTable_t.insert(naoVisitados, inicial->label, inicial);
+
+  // Salva o target separadamente
+  DVInfo target = HashTable_t.get(vertices, destino);
 
   // Enquanto todos nao forem visitados
-  while (Lista_t.length(nao_visitados) > 0) {
+  while (HashTable_t.length(naoVisitados) > 0) {
 
     // Pegue o nao visitado mais proximo
-    Posic pMaisProximo = pegarMaisProximo(nao_visitados);
-    DVInfo maisProximo = Lista_t.get(nao_visitados, pMaisProximo);
+    DVInfo maisProximo = pegarMaisProximo(naoVisitados);
 
-    // Insira ele a lista de visitados
-    Lista_t.remove(nao_visitados, pMaisProximo);
+    // Tira do naoVisitados e coloca no visitados
+    HashTable_t.remove(naoVisitados, maisProximo->label);
+    HashTable_t.insert(visitados, maisProximo->label, maisProximo);
 
     // Se cheguei ao alvo para o loop
     if (!strcmp(destino, maisProximo->label)) {
-      target = maisProximo;
       break;
     }
 
     // Passar por todos os adjacentes atualizando a distancia e o anterior
     Lista adjacentes = GrafoD_t.adjacentes(grafo, maisProximo->label);
 
-    Posic it = Lista_t.get_first(adjacentes);
-
-    while (it) {
+    for (Posic it = Lista_t.get_first(adjacentes); it != NULL; it = Lista_t.get_next(adjacentes, it)) {
       char *adjacenteLabel  = Lista_t.get(adjacentes, it);
 
+      // Se já foi visitado, nao tem porque testar
+      if (HashTable_t.exists(visitados, adjacenteLabel)) {
+        continue;
+      }
+
       // Pega o DVInfo do vertice atual do loop
-      Posic pInfoAtual = Lista_t.search(vertices, Lista_t.get_first(vertices), adjacenteLabel, labelIgual);
-      DVInfo infoAtual = Lista_t.get(vertices, pInfoAtual);
-      
+      DVInfo infoAdjacente = HashTable_t.get(vertices, adjacenteLabel);
+
+      // Se ainda nao esta marcado para ser visitado, marcar
+      if (!HashTable_t.exists(naoVisitados, adjacenteLabel)) {
+        HashTable_t.insert(naoVisitados, infoAdjacente->label, infoAdjacente);
+      }
+
       // Pega a informacao da aresta entre o mais proximo e o atual do loop
       void *infoAresta = GrafoD_t.get_info_aresta(grafo, maisProximo->label, adjacenteLabel);
 
@@ -157,22 +169,23 @@ Lista dijkstra(GrafoD grafo, char *origem, char *destino, double (*get_dist_ares
       double novaDist = maisProximo->distancia + get_dist_aresta(infoAresta);
 
       // Se a nova distancia for menor do que a distancia atual, substitui
-      if (novaDist < infoAtual->distancia) {
-        infoAtual->distancia = novaDist;
-        infoAtual->anterior  = maisProximo;
+      if (novaDist < infoAdjacente->distancia) {
+        infoAdjacente->distancia = novaDist;
+        infoAdjacente->anterior  = maisProximo;
       }
 
-      it = Lista_t.get_next(adjacentes, it);
     }
 
     Lista_t.destruir(adjacentes, 0);
   }
 
-  Lista_t.destruir(nao_visitados, 0);
-
+  // Gera o caminho com base no target
   Lista caminho = gerarCaminho(target);
 
-  Lista_t.destruir(vertices, free);
+  // Destrir auxiliares
+  HashTable_t.destroy(visitados, NULL, 0);
+  HashTable_t.destroy(naoVisitados, NULL, 0);
+  HashTable_t.destroy(vertices, free, 0);
 
   return caminho;
 }
