@@ -527,6 +527,8 @@ void desenhar_sobreposicoes(void *c, void *s) {
   if (!Lista_t.length(this->sobreposicoes))
     return;
 
+  escreve_comentario(s, "INICIO SOBREPOSICOES");
+
   /* Calcular retangulo das sobreposicoes */
   Posic iterator = Lista_t.get_first(this->sobreposicoes);
 
@@ -540,6 +542,8 @@ void desenhar_sobreposicoes(void *c, void *s) {
 
     iterator = Lista_t.get_next(this->sobreposicoes, iterator);
   }
+
+  escreve_comentario(s, "FIM SOBREPOSICOES");
 }
 
 void desenhar_elementos(void *_this, void *svg) {
