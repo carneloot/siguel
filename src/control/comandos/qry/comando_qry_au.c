@@ -1,5 +1,4 @@
 // Entrada:     placa x y larg alt
-
 /* Descrição:   Carro posicionado em algum lugar da cidade. 
                 As dimensões são representadas pelo retângulo do argumento.
                 O carro é identificado por placa.

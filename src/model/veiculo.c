@@ -77,3 +77,22 @@ char* get_svg_veiculo( Veiculo _this ){
   return format_string( "%s\n%s", svg_figura, svg_placa );
 }
 
+double get_x_veiculo( Veiculo _this ){
+  struct Veiculo* this = _this;
+  return this->pos.x;
+}
+
+double get_y_veiculo( Veiculo _this ){
+  struct Veiculo* this = _this;
+  return this->pos.y;
+}
+
+double get_width_veiculo( Veiculo _this ){
+  struct Veiculo* this = _this;
+  return this->size.x;
+}
+
+double get_height_veiculo( Veiculo _this ){
+  struct Veiculo* this = _this;
+  return this->size.y;
+}

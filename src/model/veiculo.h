@@ -27,4 +27,12 @@ Figura get_figura_veiculo( Veiculo this );
 
 char* get_svg_veiculo( Veiculo this );
 
+double get_x_veiculo( Veiculo this );
+
+double get_y_veiculo( Veiculo this );
+
+double get_width_veiculo( Veiculo this );
+
+double get_height_veiculo( Veiculo this );
+
 #endif /* __CARRO_H__ */
