@@ -563,6 +563,10 @@ void desenhar_vertice(const Item _vertice, unsigned profundidade, va_list list) 
 
   Figura fig_vertice = cria_circulo(vertice->pos.x, vertice->pos.y, 5, "black", "transparent");
 
+  char *comentario = format_string("VERTICE: \"%s\"", vertice->id);
+  escreve_comentario(svg, comentario);
+  free(comentario);
+  
   desenha_figura(svg, fig_vertice, 0.6, FIG_BORDA_SOLIDA);
 
   destruir_figura(fig_vertice);
@@ -581,6 +585,10 @@ void desenhar_mapa_viario(void *_this, void *svg) {
 
     VerticeInfo origem  = GrafoD_t.get_info_vertice(this->mapa_viario, aresta->origem);
     VerticeInfo destino = GrafoD_t.get_info_vertice(this->mapa_viario, aresta->destino);
+
+    char *comentario = format_string("ARESTA \"%s\" -> \"%s\"", origem->id, destino->id);
+    escreve_comentario(svg, comentario);
+    free(comentario);
 
     if (aresta->comprimento == DBL_MAX && aresta->velocidade_media == 0) {
       desenha_linha(svg, origem->pos, destino->pos, 0.6, 3, "red");
