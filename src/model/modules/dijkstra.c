@@ -5,6 +5,7 @@
 #include <float.h>
 
 #include <model/modules/hash.h>
+#include <model/modules/logger.h>
 
 /**
  * Struct feita para guardar as informacoes do vertice
@@ -96,6 +97,10 @@ static void gerarCaminhoRec(DVInfo atual, Lista lista) {
  * Recebe o DVInfo do destino.
  */
 static Lista gerarCaminho(DVInfo target) {
+
+  if (target->anterior == NULL)
+    return NULL;
+    
   Lista lista = Lista_t.create();
 
   gerarCaminhoRec(target, lista);
@@ -110,6 +115,8 @@ Lista dijkstra(GrafoD grafo, char *origem, char *destino, double (*get_dist_ares
   char **labels = GrafoD_t.get_all_vertices(grafo);
   HashTable vertices = getVertices(labels, GrafoD_t.total_vertices(grafo), origem);
   free(labels);
+
+  LOG_PRINT(LOG_FILE, "Dijkstra: gerando caminho de \"%s\" ate \"%s\".", origem, destino);
 
   HashTable naoVisitados = HashTable_t.create(HashTable_t.length(vertices));
   HashTable visitados    = HashTable_t.create(HashTable_t.length(vertices));
