@@ -121,9 +121,11 @@ Lista dijkstra(GrafoD grafo, char *origem, char *destino, double (*get_dist_ares
   HashTable naoVisitados = HashTable_t.create(HashTable_t.length(vertices));
   HashTable visitados    = HashTable_t.create(HashTable_t.length(vertices));
 
+  // Insere o inicial no naoVisitados
   DVInfo inicial = pegarMaisProximo(vertices);
   HashTable_t.insert(naoVisitados, inicial->label, inicial);
 
+  // Salva o target separadamente
   DVInfo target = HashTable_t.get(vertices, destino);
 
   // Enquanto todos nao forem visitados
@@ -132,6 +134,7 @@ Lista dijkstra(GrafoD grafo, char *origem, char *destino, double (*get_dist_ares
     // Pegue o nao visitado mais proximo
     DVInfo maisProximo = pegarMaisProximo(naoVisitados);
 
+    // Tira do naoVisitados e coloca no visitados
     HashTable_t.remove(naoVisitados, maisProximo->label);
     HashTable_t.insert(visitados, maisProximo->label, maisProximo);
 
@@ -146,6 +149,7 @@ Lista dijkstra(GrafoD grafo, char *origem, char *destino, double (*get_dist_ares
     for (Posic it = Lista_t.get_first(adjacentes); it != NULL; it = Lista_t.get_next(adjacentes, it)) {
       char *adjacenteLabel  = Lista_t.get(adjacentes, it);
 
+      // Se já foi visitado, nao tem porque testar
       if (HashTable_t.exists(visitados, adjacenteLabel)) {
         continue;
       }
@@ -175,6 +179,7 @@ Lista dijkstra(GrafoD grafo, char *origem, char *destino, double (*get_dist_ares
     Lista_t.destruir(adjacentes, 0);
   }
 
+  // Gera o caminho com base no target
   Lista caminho = gerarCaminho(target);
 
   // Destrir auxiliares
