@@ -40,9 +40,8 @@ int comando_qry_dm(void *_this, void *_controlador) {
     return 1;
   }
 
-  HashInfo info = HashTable_t.get(tabela, cpf);
+  Pessoa pessoa = HashTable_t.get(tabela, cpf);
 
-  Pessoa pessoa = info.valor;
 
   char *info_pessoa = pessoa_get_info(pessoa, controlador);
   strcat(info_pessoa, "\n");

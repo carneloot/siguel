@@ -29,12 +29,7 @@ int comando_ec_e(void *_this, void *_controlador) {
 
   Lista_t.insert(controlador->comercios, comercio);
 
-  HashInfo info;
-
-  info.chave = comercio_get_cnpj(comercio);
-  info.valor = comercio;
-
-  HashTable_t.insert(controlador->tabelas[CNPJ_X_COMERCIO], info);
+  HashTable_t.insert(controlador->tabelas[CNPJ_X_COMERCIO], comercio_get_cnpj(comercio), comercio);
 
   return 1;
 }

@@ -31,7 +31,7 @@ int comando_qry_cc(void *_this, void *_controlador) {
     if (!HashTable_t.exists(tabela, info))
       continue;
 
-    Elemento elemento = HashTable_t.get(tabela, info).valor;
+    Elemento elemento = HashTable_t.get(tabela, info);
 
     set_cor_elemento(elemento, cor);
     set_cor_borda_elemento(elemento, cor_borda);

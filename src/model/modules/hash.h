@@ -3,13 +3,6 @@
 
 #include <stdio.h>
 
-struct HashInfo {
-  char *chave;
-  void *valor;
-};
-
-typedef struct HashInfo HashInfo;
-
 typedef void *HashTable;
 
 struct HashTable_t {
@@ -26,17 +19,17 @@ struct HashTable_t {
   /**
    * Insere valor na hashtable de acordo com a chave
    */
-  void (*insert)(HashTable this, HashInfo info);
+  void (*insert)(HashTable this, char *chave, void *valor);
 
   /**
    * Retorna verdadeiro caso exista um registro com a chave passada.
    */
-  int (*exists)(HashTable this, const char chave[]);
+  int (*exists)(HashTable this, char *chave);
 
   /**
    * Retorna o registro cuja chave é a passada.
   */
-  HashInfo (*get)(HashTable this, const char chave[]);
+  void *(*get)(HashTable this, char *chave);
 
   /**
    * Retorna o numero de casas preenchidas da HashTable
@@ -51,7 +44,7 @@ struct HashTable_t {
   /**
    * A chave nao pode existir mais
    */
-  void (*remove)(HashTable this, const char chave[]);
+  void (*remove)(HashTable this, char *chave);
 
   /**
    * Printa a tabela em fp de acordo com a funcao to_string
@@ -62,7 +55,7 @@ struct HashTable_t {
   /**
    * Mapeia uma funcao pela lista inteira
    */
-  void (*map)(HashTable this, void *other, void (*map_function)(const void *valor, void *other));
+  void (*map)(HashTable this, void *other, void (*map_function)(void *valor, void *other));
 };
 
 extern const struct HashTable_t HashTable_t;
