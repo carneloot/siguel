@@ -34,9 +34,7 @@ Ponto2D endereco_get_coordenada(Endereco this, void *controlador) {
     return Ponto2D_t.new(0,0);
   }
 
-  HashInfo info = HashTable_t.get(tabela_quadras, this->cep);
-
-  Elemento quadra = info.valor;
+  Elemento quadra = HashTable_t.get(tabela_quadras, this->cep);
 
   Ponto2D pos = get_pos(quadra);
 

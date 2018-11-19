@@ -98,7 +98,16 @@ static void remover_elementos(
 
 }
 
-int comando_dlezin(void *_this, void *_controlador) {
+/**
+ * Comando: dle
+ * Params:  t x y larg alt
+ * Semelhante ao dq. Remove equipamentos
+ * urbanos do tipo t dentro da região.
+ * (reporta o id e não mostra no .svg)
+ * t pode ser qualquer combinação: h
+ * (hidrante), s (semaforo), r (rádio-base)
+ */
+int comando_qry_dlezin(void *_this, void *_controlador) {
   struct Comando *this            = (struct Comando *) _this;
   struct Controlador *controlador = (struct Controlador *) _controlador;
 
@@ -132,7 +141,14 @@ int comando_dlezin(void *_this, void *_controlador) {
   return 1;
 }
 
-int comando_dlezao(void *_this, void *_controlador) {
+/**
+ * Comando: Dle
+ * Params:  t x y raio
+ * Semelhante a dle. Remove os equipamentos
+ * urbamos do tipo t dentro da região.
+ * (Reporta o id, não mostra no .svg)
+ */
+int comando_qry_dlezao(void *_this, void *_controlador) {
   struct Comando *this            = (struct Comando *) _this;
   struct Controlador *controlador = (struct Controlador *) _controlador;
 
@@ -183,7 +199,23 @@ int comando_dlezao(void *_this, void *_controlador) {
   return 1;
 }
 
-int comando_dzin(void *_this, void *_controlador) {
+/**
+ * Comando: dq
+ * Params:  x y larg alt
+ * Remove todas quadras que estiverem
+ * inteiramente dentro do retângulo
+ * determinado pelos parâmetros do comando.
+ * Obs. Este comando, em particular, deve
+ * remover uma quadra inserida pelo
+ * comando q com idênticos parâmetros
+ * x,y,larg e alt.
+ * Saída. arquivo .txt: deve apresentar os ceps
+ * das quadras removidas. arquivo .svg: deve
+ * apresentar o retângulo correspondente à
+ * região da consulta; as quadras removidas
+ * não devem aparecer
+ */
+int comando_qry_dzin(void *_this, void *_controlador) {
   struct Comando *this            = (struct Comando *) _this;
   struct Controlador *controlador = (struct Controlador *) _controlador;
 
@@ -234,7 +266,17 @@ int comando_dzin(void *_this, void *_controlador) {
   return 1;
 }
 
-int comando_dzao(void *_this, void *_controlador) {
+/**
+ * Comando: Dq
+ * Params:  x y raio
+ * Remove todas as quadras que estiverem
+ * inteiramente contidas dentro do círculo de
+ * centro em (x,y) e de raio raio.
+ * Reporta no arquivo .txt o cep das quadras.
+ * Quadras removidas não devem ser
+ * mostradas no .svg.
+ */
+int comando_qry_dzao(void *_this, void *_controlador) {
   struct Comando *this            = (struct Comando *) _this;
   struct Controlador *controlador = (struct Controlador *) _controlador;
 

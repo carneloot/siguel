@@ -3,6 +3,14 @@
 
 #include <model/pessoa.h>
 
+/**
+ * Comando: p
+ * Params:  cpf nome sobrenome sexo nasc
+ * Insere pessoa identificada por cpf,
+ * nomeada (nome,sobrenome), de um
+ * certo sexo (M,F), nascida numa
+ * determinada data (dd/mm/aaaa)
+ */
 int comando_pm_p(void *_this, void *_controlador) {
   struct Comando *this            = (struct Comando *) _this;
   struct Controlador *controlador = (struct Controlador *) _controlador;
@@ -22,12 +30,7 @@ int comando_pm_p(void *_this, void *_controlador) {
 
   Lista_t.insert(controlador->pessoas, pessoa);
 
-  HashInfo info;
-
-  info.chave = pessoa_get_cpf(pessoa);
-  info.valor = pessoa;
-
-  HashTable_t.insert(controlador->tabelas[CPF_X_PESSOA], info);
+  HashTable_t.insert(controlador->tabelas[CPF_X_PESSOA], pessoa_get_cpf(pessoa), pessoa);
 
   return 1;
 }

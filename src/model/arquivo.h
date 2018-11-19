@@ -1,6 +1,8 @@
 #ifndef __ARQUIVO_H__
 #define __ARQUIVO_H__
 
+#include <stdarg.h>
+
 /**
  * Serve para guardar e como interface de um arquivo aberto, podendo ser de
  * leitura ou escrita.
@@ -32,6 +34,11 @@ char *ler_arquivo_inteiro(Arquivo this);
  * Escreve em 'a' a string 'entrada'
  */
 void escrever_linha(Arquivo a, const char *entrada, ...);
+
+/**
+ * Escreve uma linha no arquivo, porem uma lista de argumentos eh passada
+ */
+void escrever_linha_args(Arquivo a, const char *entrada, va_list args);
 
 /**
  * Retorna a linha atual do arquivo 'a'

@@ -3,6 +3,7 @@
 #include <stdarg.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <float.h>
 #include <string.h>
 
 #include <model/SVG.h>
@@ -14,6 +15,9 @@
 #include <model/utils.h>
 #include <model/modules/logger.h>
 #include <model/veiculo.h>
+
+#include <model/mapa_viario/aresta.h>
+#include <model/mapa_viario/vertice.h>
 
 #include "controlador.r"
 
@@ -60,11 +64,8 @@ int compareY(const void *_a, const void *_b) {
   return (posA.y - posB.y);
 }
 
-void desenharElementoSVG(const Item _ele, unsigned prof, va_list _list) {
-  va_list list;
-  va_copy(list, _list);
+void desenharElementoSVG(const Item _ele, unsigned prof, va_list list) {
   const Elemento ele = (const Elemento) _ele;
-
   SVG svg = va_arg(list, SVG);
   
   desenha_elemento(svg, ele);
@@ -102,6 +103,29 @@ int elementoDentro(Item _this, int dim, Item rect[]) {
   }
 
   return result;
+}
+
+/** FUNCOES ARVORE DO GRAFO */
+
+int equalVertices(const void *_a, const void *_b) {
+  const VerticeInfo a = (const VerticeInfo) _a;
+  const VerticeInfo b = (const VerticeInfo) _b;
+
+  return (Ponto2D_t.equal(a->pos, b->pos) && !strcmp(a->id, b->id));
+}
+
+int compareXVertice(const void *_a, const void *_b) {
+  const VerticeInfo a = (const VerticeInfo) _a;
+  const VerticeInfo b = (const VerticeInfo) _b;
+
+  return (a->pos.x - b->pos.x);
+}
+
+int compareYVertice(const void *_a, const void *_b) {
+  const VerticeInfo a = (const VerticeInfo) _a;
+  const VerticeInfo b = (const VerticeInfo) _b;
+
+  return (a->pos.y - b->pos.y);
 }
 
 /** METODOS PUBLICOS */
@@ -147,6 +171,14 @@ Controlador cria_controlador() {
 
   for (i = 0; i < TABELAS_TOTAL; i++)
     this->tabelas[i] = HashTable_t.create(73);
+
+  for (i = 0; i < 11; i++) {
+    this->registradores[i] = Ponto2D_t.new(0, 0);
+  }
+
+  this->mapa_viario          = GrafoD_t.create();
+  this->vertices_mapa_viario = KDTree_t.create(2, equalVertices, compareXVertice, compareYVertice);
+  this->arestas_mapa_viario  = Lista_t.create();
 
   return (void *) this;
 }
@@ -226,6 +258,8 @@ int executar_proximo_comando(Controlador c) {
 
   this->linha_atual++;
 
+  LOG_PRINT(LOG_FILE, "Executando comando \"%s\".", comando->string);
+
   int result = comando->executar(comando, c);
   
   destruir_comando(comando);
@@ -281,8 +315,6 @@ void gerar_fila_execucao(Controlador _this) {
         continue;
       }
       
-      LOG_PRINT(LOG_FILE, "Comando inserido: \"%s\"", linha);
-
       Lista_t.insert(this->fila_execucao, (Item) comando);
 
       free(linha);
@@ -332,6 +364,11 @@ void finalizar_arquivos(Controlador c) {
   desenhar_veiculos(c, s);
 
   // Desenhando saida dos comandos
+  #ifdef DEBUG
+  if (this->extras[e_via])
+    desenhar_mapa_viario(this, s);
+  #endif
+
   iterator = Lista_t.get_first(this->saida_svg_qry);
   while (iterator) {
     desenha_desenhavel(s, Lista_t.get(this->saida_svg_qry, iterator));
@@ -429,51 +466,17 @@ void destruir_controlador(Controlador c) {
   HashTable_t.destroy(this->tabelas[CPF_X_PESSOA],     NULL, 0);
   HashTable_t.destroy(this->tabelas[CNPJ_X_COMERCIO],  NULL, 0);
   HashTable_t.destroy(this->tabelas[ID_X_RADIO],       NULL, 0);
+  HashTable_t.destroy(this->tabelas[ID_X_HIDRANTE],    NULL, 0);
+  HashTable_t.destroy(this->tabelas[ID_X_SEMAFORO],    NULL, 0);
+
+  GrafoD_t.destroy(this->mapa_viario);
+  KDTree_t.destroy(this->vertices_mapa_viario, &destroy_vertice_info);
+  Lista_t.destruir(this->arestas_mapa_viario, &destroy_aresta_info);
 
   free(c);
 }
 
 /** METODOS PRIVADOS */
-
-void desenhar_todas_figuras(void *c, void *s) {
-  struct Controlador *this;
-
-  Figura figAtual;
-
-  this = (struct Controlador *) c;
-
-  Posic iterator = Lista_t.get_first(this->figuras);
-
-  while (iterator) {
-    figAtual = Lista_t.get(this->figuras, iterator);
-    desenha_figura(s, figAtual, 0.4, FIG_BORDA_SOLIDA);
-    iterator = Lista_t.get_next(this->figuras, iterator);
-  }
-}
-
-void desenhar_sobreposicoes(void *c, void *s) {
-  struct Controlador *this;
-  Figura figDash;
-
-  this = (struct Controlador *) c;
-
-  if (!Lista_t.length(this->sobreposicoes))
-    return;
-
-  /* Calcular retangulo das sobreposicoes */
-  Posic iterator = Lista_t.get_first(this->sobreposicoes);
-
-  while (iterator) {
-    figDash = (Figura) Lista_t.get(this->sobreposicoes, iterator);
-
-    desenha_figura(s, figDash, 1.0, FIG_BORDA_TRACEJADA);
-    Ponto2D pos = get_pos(figDash);
-    pos.y -= 5;
-    escreve_texto(s, "sobrepoe", pos, 15, "purple");
-
-    iterator = Lista_t.get_next(this->sobreposicoes, iterator);
-  }
-}
 
 static void escrever_txt_final(void *c) {
   struct Controlador *this;
@@ -506,6 +509,50 @@ static void escrever_txt_final(void *c) {
   fechar_arquivo(arq);
 }
 
+void desenhar_todas_figuras(void *c, void *s) {
+  struct Controlador *this;
+
+  Figura figAtual;
+
+  this = (struct Controlador *) c;
+
+  Posic iterator = Lista_t.get_first(this->figuras);
+
+  while (iterator) {
+    figAtual = Lista_t.get(this->figuras, iterator);
+    desenha_figura(s, figAtual, 0.4, FIG_BORDA_SOLIDA);
+    iterator = Lista_t.get_next(this->figuras, iterator);
+  }
+}
+
+void desenhar_sobreposicoes(void *c, void *s) {
+  struct Controlador *this;
+  Figura figDash;
+
+  this = (struct Controlador *) c;
+
+  if (!Lista_t.length(this->sobreposicoes))
+    return;
+
+  escreve_comentario(s, "INICIO SOBREPOSICOES");
+
+  /* Calcular retangulo das sobreposicoes */
+  Posic iterator = Lista_t.get_first(this->sobreposicoes);
+
+  while (iterator) {
+    figDash = (Figura) Lista_t.get(this->sobreposicoes, iterator);
+
+    desenha_figura(s, figDash, 1.0, FIG_BORDA_TRACEJADA);
+    Ponto2D pos = get_pos(figDash);
+    pos.y -= 5;
+    escreve_texto(s, "sobrepoe", pos, 15, "purple");
+
+    iterator = Lista_t.get_next(this->sobreposicoes, iterator);
+  }
+
+  escreve_comentario(s, "FIM SOBREPOSICOES");
+}
+
 void desenhar_elementos(void *_this, void *svg) {
   struct Controlador *this = (struct Controlador *) _this;
   
@@ -536,5 +583,44 @@ void desenhar_veiculos(void *_this, void *svg) {
   struct Controlador* this = _this;
 
   Lista_t.map(this->veiculos, svg, desenha_veiculo);
+
+}
+void desenhar_vertice(const Item _vertice, unsigned profundidade, va_list list) {
+  VerticeInfo vertice = (VerticeInfo) _vertice;
+  SVG svg = va_arg(list, SVG);
+
+  Figura fig_vertice = cria_circulo(vertice->pos.x, vertice->pos.y, 5, "black", "transparent");
+
+  escreve_comentario(svg, "VERTICE: \"%s\"", vertice->id);
+  
+  desenha_figura(svg, fig_vertice, 0.6, FIG_BORDA_SOLIDA);
+
+  destruir_figura(fig_vertice);
+}
+
+void desenhar_mapa_viario(void *_this, void *svg) {
+  struct Controlador *this = (struct Controlador *) _this;
+  
+  LOG_PRINT(LOG_FILE, "Desenhando mapa viario.");
+
+  KDTree_t.passe_simetrico(this->vertices_mapa_viario, desenhar_vertice, svg);
+
+  Posic it = Lista_t.get_first(this->arestas_mapa_viario);
+  while (it) {
+    ArestaInfo aresta = Lista_t.get(this->arestas_mapa_viario, it);
+
+    VerticeInfo origem  = GrafoD_t.get_info_vertice(this->mapa_viario, aresta->origem);
+    VerticeInfo destino = GrafoD_t.get_info_vertice(this->mapa_viario, aresta->destino);
+
+    escreve_comentario(svg, "ARESTA \"%s\" -> \"%s\"", origem->id, destino->id);
+
+    if (aresta->comprimento == DBL_MAX && aresta->velocidade_media == 0) {
+      desenha_linha(svg, origem->pos, destino->pos, 0.6, 3, "red");
+    } else {
+      desenha_linha(svg, origem->pos, destino->pos, 0.6, 3, "black");
+    }
+
+    it = Lista_t.get_next(this->arestas_mapa_viario, it);
+  }
 
 }

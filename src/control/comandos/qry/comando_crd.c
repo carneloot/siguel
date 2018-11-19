@@ -6,7 +6,18 @@
 #include <model/elemento.h>
 #include "../funcoes_checagem.h"
 
-int comando_crd(void *_this, void *_controlador) {
+/**
+ * Comando: crd?
+ * Params:  ( cep | id )
+ * Imprime no arquivo .txt as coordenadas e a
+ * espécie do equipamento urbano de um
+ * determinado cep ou com uma determinada
+ * identificação. Atenção: quadras e
+ * equipamentos que foram removidos por
+ * comandos d* e D* devem efetivamente ter
+ * sido removidos.
+ */
+int comando_qry_crd(void *_this, void *_controlador) {
   struct Comando *this            = (struct Comando *) _this;
   struct Controlador *controlador = (struct Controlador *) _controlador;
 

@@ -28,7 +28,14 @@ double distanciaElementos(const Item _this, const Item _other, int dim) {
   return result;
 }
 
-int comando_crb(void *_this, void *_controlador) {
+/**
+ * Comando: crb?
+ * Determina quais são as duas rádio-bases
+ * mais próximas. Saida: arquivo.svg: circular
+ * a rádio-base destacando-a; arquivo.txt:
+ * reportar id das torres e a distância.
+ */
+int comando_qry_crb(void *_this, void *_controlador) {
   struct Controlador *controlador = (struct Controlador *) _controlador;
 
   char *saida;

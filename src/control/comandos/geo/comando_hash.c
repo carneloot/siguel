@@ -8,7 +8,11 @@
 #include <model/SVG.h>
 #include <model/utils.h>
 
-int comando_hash(void *_this, void *_controlador) {
+/**
+ * Comando: #
+ * Marca o final do arquivo.
+ */
+int comando_geo_hash(void *_this, void *_controlador) {
   struct Controlador *controlador = (struct Controlador *) _controlador;
 
   /* Escrever SVG final */

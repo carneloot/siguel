@@ -9,7 +9,13 @@
 #include <model/utils.h>
 #include "../funcoes_checagem.h"
 
-int comando_d(void *_this, void *_controlador) {
+/**
+ * Comando: d
+ * Params:  i j
+ * Qual é a distância entre os centro de massa
+ * das formas geométricas i e j?
+ */
+int comando_geo_d(void *_this, void *_controlador) {
   struct Comando *this            = (struct Comando *) _this;
   struct Controlador *controlador = (struct Controlador *) _controlador;
 

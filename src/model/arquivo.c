@@ -1,6 +1,5 @@
 #include "arquivo.h"
 
-#include <stdarg.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -118,6 +117,19 @@ void escrever_linha(Arquivo a, const char *entrada, ...) {
   vfprintf(this->arq, entrada, args);
 
   va_end(args);
+
+  this->linha_atual++;
+}
+
+void escrever_linha_args(Arquivo a, const char *entrada, va_list args) {
+  struct Arquivo *this;
+
+  this = (struct Arquivo *) a;
+
+  if (this->modo == LEITURA)
+    return;
+
+  vfprintf(this->arq, entrada, args);
 
   this->linha_atual++;
 }

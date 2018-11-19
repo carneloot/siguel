@@ -9,7 +9,23 @@
 #include <model/utils.h>
 #include "../funcoes_checagem.h"
 
-int comando_a(void *_this, void *_controlador) {
+/**
+ * Comando: a
+ * Params:  i sufixo
+ * Cria um arquivo svg contendo os círculos e
+ * retângulos referentes aos comandos c e r
+ * processados até o momento. Além dos
+ * círculos e retângulos, devem ser traçadas
+ * linhas a partir do centro de massa da figura
+ * de identificador i até o centro de massa de
+ * todas as outras figuras.
+ * O nome do arquivo gerado deve ser
+ * nomebase-sufixo.svg. As linhas devem ser
+ * desenhadas usando a cor da borda da
+ * figura i. Próximo a cada linha deve ser
+ * escrito o seu comprimento.
+ */
+int comando_geo_a(void *_this, void *_controlador) {
   struct Comando *this            = (struct Comando *) _this;
   struct Controlador *controlador = (struct Controlador *) _controlador;
 
@@ -65,7 +81,7 @@ int comando_a(void *_this, void *_controlador) {
     char *cor        = get_cor_borda(figura);
     double distancia = distancia_figuras(figura, figura2);
 
-    desenha_linha(svg_saida, pos, pos2, 1, cor);
+    desenha_linha(svg_saida, pos, pos2, 1, 1, cor);
 
     saida = format_string("%.1f", distancia);
 
