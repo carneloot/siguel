@@ -4,6 +4,7 @@
 struct Comando {
   int num_param;
   char **params;
+  char *string;
   int (*executar)(void *this, void *controlador);
 };
 

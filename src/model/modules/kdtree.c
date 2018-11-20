@@ -102,48 +102,6 @@ static KDTree __find_min_kdtree(KDTree this, unsigned dim) {
   return __find_min_rec_kdtree(this, dim, 0);
 }
 
-static KDTree __maximum_kdtree(KDTree _a, KDTree _b, KDTree _c, unsigned dim) {
-  struct KDTree *a = (struct KDTree *) _a;
-  struct KDTree *b = (struct KDTree *) _b;
-  struct KDTree *c = (struct KDTree *) _c;
-
-  struct KDTree *max  = a;
-  func_compare funcao = a->funcs[dim];
-  if (b && funcao(b->value, max->value) > 0)
-    max = b;
-  if (c && funcao(c->value, max->value) > 0)
-    max = c;
-
-  return max;
-}
-
-static KDTree __find_max_rec_kdtree(KDTree _this, unsigned dim, unsigned prof) {
-  struct KDTree *this = (struct KDTree *) _this;
-
-  if (!_this)
-    return NULL;
-
-  unsigned cd = prof % this->dim;
-
-  // Só pode estar a esquerda se a dimensao for a mesma
-  if (dim == cd) {
-    if (!this->right)
-      return this;
-    return __find_max_rec_kdtree(this->right, dim, prof + 1);
-  }
-
-  // Pode estar em qualquer lado
-  return __maximum_kdtree(
-    this,
-    __find_max_rec_kdtree(this->left, dim, prof + 1),
-    __find_max_rec_kdtree(this->right, dim, prof + 1),
-    dim);
-}
-
-static KDTree __find_max_kdtree(KDTree this, unsigned dim) {
-  return __find_max_rec_kdtree(this, dim, 0);
-}
-
 static KDTree __insert_rec_kdtree(KDTree _this, Item value, unsigned prof) {
   struct KDTree *this = (struct KDTree *) _this;
 
@@ -270,17 +228,23 @@ static void __passe_simetrico_rec_kdtree(
   KDTree _this,
   void (*executar)(const Item item, unsigned prof, va_list list),
   unsigned prof,
-  va_list list) {
+  va_list _list) {
   struct KDTree *this = (struct KDTree *) _this;
 
   if (this->left)
-    __passe_simetrico_rec_kdtree(this->left, executar, prof + 1, list);
+    __passe_simetrico_rec_kdtree(this->left, executar, prof + 1, _list);
 
-  if (this->value)
+  if (this->value) {
+    va_list list;
+    va_copy(list, _list);
+
     executar(this->value, prof, list);
 
+    va_end(list);
+  }
+
   if (this->right)
-    __passe_simetrico_rec_kdtree(this->right, executar, prof + 1, list);
+    __passe_simetrico_rec_kdtree(this->right, executar, prof + 1, _list);
 }
 
 static void __passe_simetrico_kdtree(

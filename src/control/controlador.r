@@ -5,10 +5,12 @@
 #include <model/modules/kdtree.h>
 #include <model/modules/hash.h>
 #include <model/modules/ponto2d.h>
+#include <model/modules/grafod.h>
 
 #define LISTA_EXTRAS \
   X( ec, "-ec") \
   X( pm, "-pm") \
+  X(via,  "-v") \
   X(qry,  "-q")
 
 enum TipoExtras {
@@ -20,11 +22,13 @@ enum TipoExtras {
 
 enum Tabelas {
   TIPO_X_DESCRICAO,
-  CEP_X_QUADRA,
+  CNPJ_X_COMERCIO,
   CPF_X_PESSOA,
   CPF_X_CEP,
-  CNPJ_X_COMERCIO,
+  CEP_X_QUADRA,
   ID_X_RADIO,
+  ID_X_HIDRANTE,
+  ID_X_SEMAFORO,
   TABELAS_TOTAL
 };
 
@@ -55,12 +59,21 @@ struct Controlador {
   Ponto2D max_geo, max_qry;
 
   Lista fila_execucao;
+
+  // O valor padrão dos registradores é (0, 0)
+  Ponto2D registradores[11];
+
+  GrafoD mapa_viario;
+  KDTree vertices_mapa_viario;
+  Lista arestas_mapa_viario;
 };
 
-extern void desenhar_todas_figuras(void *c, void *svg);
+extern void desenhar_todas_figuras(void *controlador, void *svg);
 
-extern void desenhar_sobreposicoes(void *c, void *svg);
+extern void desenhar_sobreposicoes(void *controlador, void *svg);
 
-extern void desenhar_elementos(void *this, void *svg);
+extern void desenhar_elementos(void *controlador, void *svg);
+
+extern void desenhar_mapa_viario(void *controlador, void *svg);
 
 #endif /* __CONTROLADOR_R__ */

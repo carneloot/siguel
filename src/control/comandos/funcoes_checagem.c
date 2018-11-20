@@ -13,10 +13,7 @@ int checar_id_figura(const Item _figura, const void *_id) {
   return !(get_id_figura(figura) == id);
 }
 
-void compararCEP(const Item _ele, unsigned prof, va_list _list) {
-  va_list list;
-  va_copy(list, _list);
-
+void compararCEP(const Item _ele, unsigned prof, va_list list) {
   // CEP, *RESULT
   char *cep          = va_arg(list, char *);
   Elemento *result   = va_arg(list, Elemento *);

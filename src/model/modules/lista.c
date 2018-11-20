@@ -253,6 +253,24 @@ static Item *__to_array_lista(Lista _this) {
   return array;
 }
 
+static int __contem_lista(Lista _this, Item item) {
+  struct Lista *this = (struct Lista *) _this;
+
+  Posic it = __get_first_lista(this);
+
+  while (it) {
+    Item atual = __get_lista(this, it);
+
+    if (atual == item) {
+      return 1;
+    }
+
+    it = __get_next_lista(this, it);
+  }
+
+  return 0;
+}
+
 static void __destruir_lista(Lista lista, void (*destruir_item)(Item item)) {
   if (destruir_item) {
     Posic iterator;
@@ -288,4 +306,5 @@ const struct Lista_t Lista_t = {  //
   .filter        = &__filter_lista,
   .map           = &__map_lista,
   .to_array      = &__to_array_lista,
+  .contem        = &__contem_lista,
   .destruir      = &__destruir_lista};

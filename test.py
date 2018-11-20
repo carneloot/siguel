@@ -3,8 +3,8 @@ from time import time
 import subprocess
 
 BIN_FOLDER   = "./bin"
-TESTS_FOLDER = "./test/t4"
-OUT_FOLDER   = "./out/t4"
+TESTS_FOLDER = "./test/t5"
+OUT_FOLDER   = "./out/t5"
 APP_NAME     = "siguel"
 
 APP_PATH     = "{0}/{1}".format(BIN_FOLDER, APP_NAME)
@@ -13,6 +13,7 @@ RUN_COMMAND  = "{0} -e {1} -o {2} -f {3}"
 QRY_COMMAND  = " -q {0}"
 PM_COMMAND   = " -pm {0}"
 EC_COMMAND   = " -ec {0}"
+VIA_COMMAND  = " -v {0}"
 
 
 def rodar_comando(comando):
@@ -63,7 +64,11 @@ if __name__ == "__main__":
         if os.path.exists(TESTS_FOLDER + "/" + ec_name):
             comando_string += EC_COMMAND.format(ec_name)
 
-        print(comando_string)
+        via_name = file_name + "-v.via"
+        if os.path.exists(TESTS_FOLDER + "/" + via_name):
+            comando_string += VIA_COMMAND.format(via_name)
+
+        # print(comando_string)
         
         query_dir = "{}/{}".format(TESTS_FOLDER, file_name)
 

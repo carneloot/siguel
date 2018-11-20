@@ -45,12 +45,12 @@ INCLUDES := $(shell find $(SRCDIR) -type f -name "*.h")
 OBJECTS  := $(SOURCES:$(SRCDIR)/%.c=$(OBJDIR)/%.o)
 rm       = rm -rf
 
-$(BINDIR)/$(TARGET): $(OBJECTS)
+$(BINDIR)/$(TARGET): $(OBJECTS) $(INCLUDES)
 	@mkdir -p $(dir $@)
 	@$(LINKER) $(OBJECTS) $(LFLAGS) -o $@
 	@echo "Linking complete!"
 
-$(OBJECTS): $(OBJDIR)/%.o : $(SRCDIR)/%.c
+$(OBJECTS): $(OBJDIR)/%.o : $(SRCDIR)/%.c $(SRCDIR)/control/controlador.r
 	@mkdir -p $(dir $@)
 	@$(CC) $(CFLAGS) -c $< -o $@
 	@echo "Compiled \"$<\" successfully!"
@@ -64,11 +64,6 @@ clean:
 remove: clean
 	@$(rm) $(BINDIR)/$(TARGET)
 	@echo "Executable removed!"
-
-.PHONY: clean-test
-clean-test:
-	@$(rm) $(OUTDIR)/***/*.svg $(OUTDIR)/***/*.txt
-	@echo "Tests removed!"
 
 remake: remove $(BINDIR)/$(TARGET)
 	@echo "Remaked!"
