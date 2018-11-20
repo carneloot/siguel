@@ -312,54 +312,36 @@ static struct KDTree *__closest;
 static double __closest_distance;
 
 static void __nearest_neighbor_rec_kdtree(
-  KDTree _this,
+  struct KDTree *this,
   Item value,
   double (*distance)(const Item a, const Item b, int dim),
   unsigned prof) {
-  struct KDTree *this = (struct KDTree *) _this;
 
   if (!this)
     return;
 
-  if (this->value == value)
-    return;
+  double distancia = distance(this->value, value, -1);
 
-  unsigned cd = prof % this->dim;
-
-  KDTree other = NULL;
-
-  if (!__closest) {
-    if (__is_leaf_kdtree(this)) {
-      __closest          = this;
-      __closest_distance = distance(this->value, value, -1);
-      return;
-    }
-
-    if (this->funcs[cd](value, this->value) < 0) {  // Esquerda
-      __nearest_neighbor_rec_kdtree(this->left, value, distance, prof + 1);
-      other = this->right;
-    } else {  // Direita
-      __nearest_neighbor_rec_kdtree(this->right, value, distance, prof + 1);
-      other = this->left;
-    }
-
-    if (!__closest)
-      __nearest_neighbor_rec_kdtree(other, value, distance, prof + 1);
+  if (__closest == NULL || distancia < __closest_distance) {
+    __closest = this;
+    __closest_distance = distancia;
   }
 
-  double dist_atual, dist_dimensao;
+  int currDim = prof % this->dim;
 
-  dist_atual = distance(this->value, value, -1);
+  struct KDTree *other;
 
-  if (dist_atual < __closest_distance) {
-    __closest          = this;
-    __closest_distance = dist_atual;
+  if (this->funcs[currDim](value, this->value) < 0) {
+    __nearest_neighbor_rec_kdtree(this->left, value, distance, prof + 1);
+    other = this->right;
+  } else {
+    __nearest_neighbor_rec_kdtree(this->right, value, distance, prof + 1);
+    other = this->left;
   }
 
-  dist_dimensao = distance(this->value, value, cd);
+  double distanciaDimensao = distance(this->value, value, currDim);
 
-  // Cruza a linha que quebra
-  if (dist_dimensao < __closest_distance)
+  if (distanciaDimensao < __closest_distance)
     __nearest_neighbor_rec_kdtree(other, value, distance, prof + 1);
 }
 

@@ -27,8 +27,8 @@ double __distancia_vertice_ponto(const Item _vertice_info, const Item _ponto, in
   Ponto2D ponto_vertice = vertice_info->pos;
 
   switch (dim) {
-    case 0:  return mod(ponto.x - ponto_vertice.x);
-    case 1:  return mod(ponto.y - ponto_vertice.y);
+    case 0:  return sqr(ponto.x - ponto_vertice.x);
+    case 1:  return sqr(ponto.y - ponto_vertice.y);
     case -1: return Ponto2D_t.dist_squared(ponto, ponto_vertice);
   }
 
@@ -277,8 +277,8 @@ int comando_qry_sp(void *_this, void *_controlador) {
 
       if (pictorica) {
         #ifdef DEBUG
-        Figura ponto1 = cria_circulo(pos_origem.x,  pos_origem.y,  10, cor[i % 2], "transparent");
-        Figura ponto2 = cria_circulo(pos_destino.x, pos_destino.y, 10, cor[(i + 1) % 2], "transparent");
+        Figura ponto1 = cria_circulo(pos_origem.x,  pos_origem.y,  5, cor[i % 2], "transparent");
+        Figura ponto2 = cria_circulo(pos_destino.x, pos_destino.y, 5, cor[(i + 1) % 2], "transparent");
 
         desenha_figura(svg_saida, ponto1, 1, FIG_BORDA_SOLIDA);
         desenha_figura(svg_saida, ponto2, 1, FIG_BORDA_SOLIDA);
