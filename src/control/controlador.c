@@ -358,10 +358,8 @@ void finalizar_arquivos(Controlador c) {
 
   desenhar_elementos(c, s);
 
-  #ifdef DEBUG
   if (this->extras[e_via])
     desenhar_mapa_viario(this, s);
-  #endif
 
   iterator = Lista_t.get_first(this->saida_svg_qry);
   while (iterator) {
@@ -575,6 +573,7 @@ void desenhar_vertice(const Item _vertice, unsigned profundidade, va_list list) 
 }
 
 void desenhar_mapa_viario(void *_this, void *svg) {
+  #ifdef DEBUG
   struct Controlador *this = (struct Controlador *) _this;
   
   LOG_PRINT(LOG_FILE, "Desenhando mapa viario.");
@@ -598,5 +597,5 @@ void desenhar_mapa_viario(void *_this, void *svg) {
 
     it = Lista_t.get_next(this->arestas_mapa_viario, it);
   }
-
+  #endif
 }

@@ -148,6 +148,7 @@ void escreve_texto(SVG s, char *texto, Ponto2D pos, float tamanho, char *cor) {
 }
 
 void escreve_comentario(SVG _this, char *_texto, ...) {
+  #ifdef DEBUG
   struct SVG * this = (struct SVG *) _this;
 
   char *texto = format_string("<!-- %s -->\n", _texto);
@@ -160,6 +161,7 @@ void escreve_comentario(SVG _this, char *_texto, ...) {
   va_end(args);
 
   free(texto);
+  #endif
 }
 
 void desenha_linha(SVG s, Ponto2D a, Ponto2D b, float opacity, double tamanho, char *cor) {
