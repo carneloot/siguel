@@ -246,6 +246,16 @@ int comando_qry_p(void *_this, void *_controlador) {
       escreve_texto(svg_saida, "Caminho inexistente", origem, 20, cor);
     } else {
 
+      #ifdef DEBUG
+      Figura ponto1 = cria_circulo(origem.x,  origem.y,  5, cor, "transparent");
+      Figura ponto2 = cria_circulo(destino.x, destino.y, 5, cor, "transparent");
+
+      desenha_figura(svg_saida, ponto1, 1, FIG_BORDA_SOLIDA);
+      desenha_figura(svg_saida, ponto2, 1, FIG_BORDA_SOLIDA);
+
+      destruir_figura(ponto1);
+      destruir_figura(ponto2);
+      #endif
 
       desenhar_caminho_svg( svg_saida, caminho, controlador->mapa_viario, cor);
 
