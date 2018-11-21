@@ -67,4 +67,6 @@ void set_opacity_figura(Figura this, double opacity);
 
 void set_dashed_figura(Figura this, int dashed);
 
+void set_stroke_size_figura(Figura this, double size);
+
 #endif /* __FIGURA_H__ */

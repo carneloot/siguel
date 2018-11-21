@@ -361,13 +361,14 @@ void finalizar_arquivos(Controlador c) {
 
   desenhar_elementos(c, s);
 
-  desenhar_veiculos(c, s);
-
-  // Desenhando saida dos comandos
   #ifdef DEBUG
   if (this->extras[e_via])
     desenhar_mapa_viario(this, s);
   #endif
+
+  desenhar_veiculos(c, s);
+
+  // Desenhando saida dos comandos
 
   iterator = Lista_t.get_first(this->saida_svg_qry);
   while (iterator) {
@@ -428,7 +429,7 @@ void destruir_controlador(Controlador c) {
   Lista_t.destruir(this->saida, &free);
   Lista_t.destruir(this->saida_svg_qry, desenhavel_destruir);
 
-  Lista_t.destruir(this->veiculos, 0);
+  Lista_t.destruir(this->veiculos, destruir_veiculo);
   Lista_t.destruir(this->figuras, &destruir_figura);
 
   // Sobreposicoes
@@ -571,6 +572,8 @@ void desenhar_elementos(void *_this, void *svg) {
 void desenha_veiculo(const Item _veiculo, const void *_svg) {
   Veiculo veiculo = _veiculo;
   const SVG svg = (const SVG) _svg;
+
+  escreve_comentario(svg, "VEICULO: %s", get_placa_veiculo(veiculo));
 
   Desenhavel desenhavel = cria_desenhavel(veiculo, get_svg_veiculo, NULL);
 

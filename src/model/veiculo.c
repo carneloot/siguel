@@ -27,6 +27,7 @@ Veiculo cria_veiculo( Ponto2D pos, double w, double h, char *placa ) {
   strcpy(this->placa, placa);
 
   this->figura = cria_retangulo(this->pos.x, this->pos.y, this->size.x, this->size.y, COR_VEICULO, COR_BORDA_VEICULO );
+  set_stroke_size_figura(this->figura, 1.0);
   return this;
 }
 
@@ -63,18 +64,34 @@ char* get_placa_veiculo( Veiculo _this ){
 char* get_svg_veiculo( Veiculo _this ){
   struct Veiculo* this = _this;
 
-  Ponto2D pos_texto = Ponto2D_t.new( this->pos.x, this->pos.y + this->size.y );
-  pos_texto.x += 5;
-  pos_texto.y -= 5;
+  bool vertical = false;
 
   char* svg_figura = get_svg_figura( this->figura );
-  char* svg_placa = format_string( 
-    "<text x=\"%.1f\" y=\"%.1f\" "
-    "style=\"fill:%s;font-size:%.1fpx;font-family:sans-serif\">%s</text>\n", 
-    pos_texto.x, pos_texto.y, COR_BORDA_VEICULO, 10, this->placa 
-  );
+  char* svg_placa;
 
-  return format_string( "%s\n%s", svg_figura, svg_placa );
+  vertical = (this->size.x < this->size.y);
+
+  if (vertical) {
+    svg_placa = format_string( 
+      "<text writing-mode=\"tb-rl\" x=\"%.1f\" y=\"%.1f\" "
+      "style=\"fill:%s;font-size:%.1fpx;font-family:sans-serif\">%s</text>\n", 
+      this->pos.x + 2, this->pos.y + 1, COR_BORDA_VEICULO, 2.0, this->placa 
+    );
+  } else {
+    svg_placa = format_string( 
+      "<text x=\"%.1f\" y=\"%.1f\" "
+      "style=\"fill:%s;font-size:%.1fpx;font-family:sans-serif\">%s</text>\n", 
+      this->pos.x + 1, this->pos.y + this->size.y - 1.5,
+      COR_BORDA_VEICULO, 2.0, this->placa 
+    );
+  }
+
+  char *svg_veiculo = format_string( "%s%s", svg_figura, svg_placa );
+
+  free(svg_figura);
+  free(svg_placa);
+
+  return svg_veiculo;
 }
 
 double get_x_veiculo( Veiculo _this ){

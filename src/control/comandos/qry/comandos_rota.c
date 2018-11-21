@@ -241,10 +241,13 @@ int comando_qry_sp(void *_this, void *_controlador) {
     free(path);
 
     desenhar_elementos(controlador, svg_saida);
-
+    
     #ifdef DEBUG
     desenhar_mapa_viario(controlador, svg_saida);
     #endif
+
+    desenhar_veiculos(controlador, svg_saida);
+
   } else {
     Lista_t.insert(controlador->saida,
       format_string("Rota gerada: \n"));
