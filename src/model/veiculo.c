@@ -61,6 +61,11 @@ char* get_placa_veiculo( Veiculo _this ){
   return this->placa;
 }
 
+Figura get_figura_veiculo( Veiculo _this ){
+  struct Veiculo* this = _this;
+  return this->figura;
+}
+
 char* get_svg_veiculo( Veiculo _this ){
   struct Veiculo* this = _this;
 

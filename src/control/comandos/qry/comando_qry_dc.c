@@ -7,13 +7,28 @@
 
 #include <model/veiculo.h>  
 #include <model/modules/sorts.h>
-
-
 #include <model/modules/lista.h>
+#include <model/mapa_viario/aresta.h>
+#include <model/SVG.h>
+#include <model/utils.h>
 
-int compare( Veiculo this, Veiculo other ){
+#include <stdlib.h>
+
+struct Colisao {
+  ArestaInfo aresta_info;
+
+  double comprimento_backup;
+  double velocidade_media_backup;
+
+};
+
+int compare( const void* _this, const void* _other ){
+
+  Veiculo this = (Veiculo) _this;
+  Veiculo other = (Veiculo) _other;
+
   double this_x  = get_x_veiculo(this);
-  double other_x = get_x_veiculo(this);
+  double other_x = get_x_veiculo(other);
 
   if( this_x > other_x ){
     return 1;
@@ -59,7 +74,25 @@ int comando_qry_dc( void* _this, void* _controlador ){
   double this_high;  // y + height
   double other_high; // y + height
 
-  while (i < tamanho){
+  char *nome_qry = get_nome(controlador->extras[e_qry]);
+  char* sufixo = this->params[0];
+  char* path = format_string( "%s%s-%s-%s.svg",
+    controlador->dir_saida,
+    controlador->nome_base,
+    nome_qry,
+    sufixo
+    );
+  
+  free(nome_qry);
+
+  SVG svg_saida = cria_SVG( path, controlador->max_qry.x, controlador->max_qry.y );
+  desenhar_elementos( controlador, svg_saida );
+  desenhar_mapa_viario( controlador, svg_saida );
+  desenhar_veiculos( controlador, svg_saida );
+
+  free(path);
+
+  while (i < (tamanho - 1)){
     this_x     = get_x_veiculo( vetor_veiculos[ i ]);
     other_x    = get_x_veiculo( vetor_veiculos[ j ]);
     this_width = get_width_veiculo( vetor_veiculos[ i ] );
@@ -77,20 +110,24 @@ int comando_qry_dc( void* _this, void* _controlador ){
 
       if( ( other_high > this_x && other_high < this_high) ||
           ( other_y > this_y && other_y < this_high ) ){
-            
+
         // =============================== Sobreposições ===============================
         // Alterar aresta
         // Adicionar retangulo pontilhado à lista de drawables
-        // 
-
+        Figura veiculo_this = get_figura_veiculo( vetor_veiculos[i]);
+        Figura veiculo_other = get_figura_veiculo( vetor_veiculos[j]);
+        Figura fig_colisao = get_rect_sobreposicao( veiculo_this, veiculo_other);
         
+        desenha_figura( svg_saida, fig_colisao, 1, true );
+        destruir_figura(fig_colisao);
       }
+
       // Se sobrepõe em x, o próximo pode sobrepor também
       // então avança-se só o j
       j++;
 
       // Se o j maior que todos, significa que é melhor incrementar o i
-      if( j <= tamanho ){
+      if( j < tamanho ){
         continue;
       }
     }
@@ -98,13 +135,10 @@ int comando_qry_dc( void* _this, void* _controlador ){
     // Se não sobrepõe em x, avançar o i e voltar o j
     i++;
     j = i + 1;
-
   }
 
 
-  // Desenhar svg com os drawables
-  // Limpar a lista de drawables
-
-  
- return 1;
+  salva_SVG( svg_saida );
+  destruir_SVG( svg_saida );
+  return 1;
 }
