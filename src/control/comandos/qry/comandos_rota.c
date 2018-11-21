@@ -218,9 +218,13 @@ int comando_qry_p(void *_this, void *_controlador) {
 
     desenhar_elementos(controlador, svg_saida);
     desenhar_mapa_viario(controlador, svg_saida);
+
     desenhar_caminho_svg( svg_saida, caminho, controlador->mapa_viario, cor);
+
     salva_SVG(svg_saida);
     destruir_SVG(svg_saida);
+
+    Lista_t.destruir(caminho, NULL);
 
     return 1;
   }
@@ -248,8 +252,10 @@ int comando_qry_p(void *_this, void *_controlador) {
     caminho = get_caminho( controlador->mapa_viario, origem_info, destino_info, true );
   }
   Lista_t.insert(controlador->saida, format_string( "Rota gerada pelo comando %s", this->string ) );
+
   escrever_caminho_txt(controlador->saida, caminho, controlador->mapa_viario);
-  Lista_t.destruir( caminho, 0 );
+  
+  Lista_t.destruir( caminho, NULL );
   // ================ VER SE TEM MAIS ALGO PARA COLOCAR AQUI ==============================================
 
   return 1;
