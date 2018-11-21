@@ -36,12 +36,12 @@ int comando_qry_dc( void* _this, void* _controlador ){
 
     criar um svg com tudo
   */
-  Veiculo vetor_veiculos[] = Lista_t.to_array( controlador->veiculos );
+  Veiculo* vetor_veiculos = Lista_t.to_array( controlador->veiculos );
   int tamanho = Lista_t.length( controlador->veiculos );
 
   // Limpar retornar todas as arestas às velocidades originais
 
-  heap_sort(vetor_veiculos, tamanho, comando_qry_dc );
+  heap_sort(vetor_veiculos, tamanho, compare);
 
   // Percorrer o vetor comparando as sobreposições
   int i = 0;
@@ -88,8 +88,9 @@ int comando_qry_dc( void* _this, void* _controlador ){
       // Se sobrepõe em x, o próximo pode sobrepor também
       // então avança-se só o j
       j++;
-      if( !j > tamanho ){
-        // Se o j passou por todos, continuar o i
+
+      // Se o j maior que todos, significa que é melhor incrementar o i
+      if( j <= tamanho ){
         continue;
       }
     }
