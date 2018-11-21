@@ -239,20 +239,22 @@ int comando_qry_p(void *_this, void *_controlador) {
     free(path);
     free(qry_nome);
 
+    desenhar_elementos(controlador, svg_saida);
+    desenhar_mapa_viario(controlador, svg_saida);
+    
     if (caminho == NULL) {
       escreve_texto(svg_saida, "Caminho inexistente", origem, 20, cor);
     } else {
 
-      desenhar_elementos(controlador, svg_saida);
-      desenhar_mapa_viario(controlador, svg_saida);
 
       desenhar_caminho_svg( svg_saida, caminho, controlador->mapa_viario, cor);
+
+      Lista_t.destruir(caminho, NULL);
     }
 
     salva_SVG(svg_saida);
     destruir_SVG(svg_saida);
 
-    Lista_t.destruir(caminho, NULL);
 
     return 1;
   }
