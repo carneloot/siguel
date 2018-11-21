@@ -589,10 +589,15 @@ void desenhar_mapa_viario(void *_this, void *svg) {
 
     escreve_comentario(svg, "ARESTA \"%s\" -> \"%s\"", origem->id, destino->id);
 
+    Ponto2D ponto_medio = Ponto2D_t.add(origem->pos, destino->pos);
+    ponto_medio = Ponto2D_t.mult(ponto_medio, 0.5);
+
     if (aresta->comprimento == DBL_MAX && aresta->velocidade_media == 0) {
-      desenha_linha(svg, origem->pos, destino->pos, 0.6, 3, "red");
+      desenha_linha(svg, origem->pos, ponto_medio, 0.6, 3, "red", true);
+      desenha_linha(svg, ponto_medio, destino->pos, 0.6, 3, "red", false);
     } else {
-      desenha_linha(svg, origem->pos, destino->pos, 0.6, 3, "black");
+      desenha_linha(svg, origem->pos, ponto_medio, 0.6, 3, "black", true);
+      desenha_linha(svg, ponto_medio, destino->pos, 0.6, 3, "black", false);
     }
 
     it = Lista_t.get_next(this->arestas_mapa_viario, it);

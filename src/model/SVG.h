@@ -6,6 +6,8 @@
 #include <model/desenhavel.h>
 #include <model/modules/ponto2d.h>
 
+#include <stdbool.h>
+
 #define ASSETS_FOLDER "./assets/" 
 
 typedef void *SVG;
@@ -23,7 +25,7 @@ void escreve_texto(
 
 void escreve_comentario(SVG this, char *texto, ...);
 
-void desenha_linha(SVG this, Ponto2D a, Ponto2D b, float opacity, double tamanho, char *cor);
+void desenha_linha(SVG this, Ponto2D a, Ponto2D b, float opacity, double tamanho, char *cor, bool seta);
 
 void desenha_desenhavel(SVG this, Desenhavel desenhavel);
 

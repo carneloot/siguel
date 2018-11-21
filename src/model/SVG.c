@@ -28,13 +28,13 @@ static void desenhar_grid(SVG _this) {
   for (float x = 0; x < this->max.x; x += OFFSET_GRID) {
     start = Ponto2D_t.new(x, 0);
     end   = Ponto2D_t.new(x, this->max.y);
-    desenha_linha(this, start, end, 0.4, 1, "black");
+    desenha_linha(this, start, end, 0.4, 1, "black", false);
   }
 
   for (float y = 0; y < this->max.y; y += OFFSET_GRID) {
     start = Ponto2D_t.new(0, y);
     end   = Ponto2D_t.new(this->max.x, y);
-    desenha_linha(this, start, end, 0.4, 1, "black");
+    desenha_linha(this, start, end, 0.4, 1, "black", false);
   }
 }
 
@@ -164,15 +164,16 @@ void escreve_comentario(SVG _this, char *_texto, ...) {
   #endif
 }
 
-void desenha_linha(SVG s, Ponto2D a, Ponto2D b, float opacity, double tamanho, char *cor) {
+void desenha_linha(SVG s, Ponto2D a, Ponto2D b, float opacity, double tamanho, char *cor, bool seta) {
   struct SVG *this;
 
   this = (struct SVG *) s;
 
   escrever_linha(
     this->saida,
-    "<line x1=\"%.1f\" y1=\"%.1f\" x2=\"%.1f\" y2=\"%.1f\" "
+    "<line %sx1=\"%.1f\" y1=\"%.1f\" x2=\"%.1f\" y2=\"%.1f\" "
     "style=\"stroke:%s;stroke-width:%.1f;opacity:%.1f\" />\n",
+    (seta) ? "marker-end=\"url(#arrowhead)\" " : "",
     a.x,
     a.y,
     b.x,
