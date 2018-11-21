@@ -75,19 +75,6 @@ static Lista get_caminho(GrafoD grafo, VerticeInfo origem_info, VerticeInfo dest
 }
 
 /**
- * Escreve o texto no local do vertice indicado por label
- */
-static void escrever_texto_vertice(SVG svg, GrafoD grafo, char *label, char *texto, char *cor) {
-  VerticeInfo vertice = GrafoD_t.get_info_vertice(grafo, label);
-  Ponto2D posicao     = vertice->pos;
-
-  posicao.x += 10;
-  posicao.y -= 10;
-
-  escreve_texto(svg, texto, posicao, 25, cor);
-}
-
-/**
  * Desenha linhas entre os vertices indicados por caminho de cor cor
  */
 static void desenhar_caminho_svg(SVG svg, Lista caminho, GrafoD mapa, char *cor) {
@@ -126,30 +113,65 @@ static void desenhar_caminho_svg(SVG svg, Lista caminho, GrafoD mapa, char *cor)
  * Coloca na saida strings com os nomes das ruas do caminho passado.
  */
 static void escrever_caminho_txt(Lista saida, Lista caminho, GrafoD mapa) {
+
+  char *ultima_rua = NULL;
+
   Posic it = Lista_t.get_first(caminho);
-
-  char *ultima_rua = ".";
-
   while (Lista_t.get_next(caminho, it)) {
     Posic next_it = Lista_t.get_next(caminho, it);
 
+    char *label_prev = Lista_t.get(caminho, Lista_t.get_previous(caminho, it));
     char *label      = Lista_t.get(caminho, it);
     char *label_next = Lista_t.get(caminho, next_it);
 
     ArestaInfo rua = GrafoD_t.get_info_aresta(mapa, label, label_next);
 
-    char *saida_txt = format_string("\tsiga pela rua %s\n", rua->nome);
-
-    // Se a rua atual for diferente da ultima, mostra
-    if (strcmp(rua->nome, ".")        == 0 ||
-        strcmp(rua->nome, ultima_rua) == 0
-    ) {
-      free(saida_txt);
-    } else {
-      Lista_t.insert(saida, saida_txt);
-      ultima_rua = rua->nome;
+    // Ignorar os pontos
+    if (!strcmp(rua->nome, ".")) {
+      it = next_it;
+      continue;
     }
-    
+
+    // Eh o primeiro
+    if (ultima_rua == NULL) {
+      Lista_t.insert(saida, format_string("\tSiga pela rua %s\n", rua->nome));
+
+      ultima_rua = rua->nome;
+      it = next_it;
+      continue;
+    }
+
+    // Se a rua atual for igual a ultima rua, ignorar
+    if (!strcmp(ultima_rua, rua->nome)) {
+      it = next_it;
+      continue;
+    }
+
+    // Vai fazer uma curva
+    VerticeInfo vertice_anterior = GrafoD_t.get_info_vertice(mapa, label_prev);
+    VerticeInfo vertice_atual    = GrafoD_t.get_info_vertice(mapa, label);
+    VerticeInfo vertice_proximo  = GrafoD_t.get_info_vertice(mapa, label_next);
+
+    Ponto2D pos_anterior = vertice_anterior->pos;
+    Ponto2D pos_atual    = vertice_atual->pos;
+    Ponto2D pos_proximo  = vertice_proximo->pos;
+
+    int orientacao = Ponto2D_t.orientation(pos_anterior, pos_atual, pos_proximo);
+
+    // Se a orientacao for zero, esta em linha reta
+    // Logo, nao precisa virar
+    if (orientacao == 0) {
+      it = next_it;
+      continue;
+    }
+
+    char *direcao = (orientacao < 0) ? "esquerda" : "direita";
+
+    char *saida_txt = format_string("\tvire a %s na rua %s\n", direcao, rua->nome);
+
+    Lista_t.insert(saida, saida_txt);
+
+    ultima_rua = rua->nome;
     it = next_it;
   }
 
@@ -189,15 +211,7 @@ int comando_qry_p(void *_this, void *_controlador) {
     VerticeInfo origem_info  = get_vertice_by_ponto(controlador->vertices_mapa_viario, origem);
     VerticeInfo destino_info = get_vertice_by_ponto(controlador->vertices_mapa_viario, destino);
 
-    char *qry_nome = get_nome(controlador->extras[e_qry]);
-
-    char *path = format_string("%s%s-%s-%s.svg",
-      controlador->dir_saida,
-      controlador->nome_base,
-      qry_nome,
-      sufixo);
-
-      char* cor = params[5];
+    char* cor = params[5];
 
     Lista caminho;
 
@@ -210,16 +224,30 @@ int comando_qry_p(void *_this, void *_controlador) {
       caminho = get_caminho(controlador->mapa_viario, origem_info, destino_info, true);
     }
 
+
+    char *qry_nome = get_nome(controlador->extras[e_qry]);
+
+    char *path = format_string("%s%s-%s-%s.svg",
+      controlador->dir_saida,
+      controlador->nome_base,
+      qry_nome,
+      sufixo);
+
     SVG svg_saida;
     svg_saida = cria_SVG(path, controlador->max_qry.x, controlador->max_qry.y);
 
     free(path);
     free(qry_nome);
 
-    desenhar_elementos(controlador, svg_saida);
-    desenhar_mapa_viario(controlador, svg_saida);
+    if (caminho == NULL) {
+      escreve_texto(svg_saida, "Caminho inexistente", origem, 20, cor);
+    } else {
 
-    desenhar_caminho_svg( svg_saida, caminho, controlador->mapa_viario, cor);
+      desenhar_elementos(controlador, svg_saida);
+      desenhar_mapa_viario(controlador, svg_saida);
+
+      desenhar_caminho_svg( svg_saida, caminho, controlador->mapa_viario, cor);
+    }
 
     salva_SVG(svg_saida);
     destruir_SVG(svg_saida);
@@ -251,7 +279,14 @@ int comando_qry_p(void *_this, void *_controlador) {
   }else{
     caminho = get_caminho( controlador->mapa_viario, origem_info, destino_info, true );
   }
-  Lista_t.insert(controlador->saida, format_string( "Rota gerada pelo comando %s", this->string ) );
+
+  if (caminho == NULL) {
+    Lista_t.insert(controlador->saida, format_string("Nao foi possivel gerar um caminho (comando %s):\n", this->string) );
+    return 1;
+  }
+
+
+  Lista_t.insert(controlador->saida, format_string( "Rota gerada pelo comando \"%s\":\n", this->string ) );
 
   escrever_caminho_txt(controlador->saida, caminho, controlador->mapa_viario);
   
