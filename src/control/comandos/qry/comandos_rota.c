@@ -180,16 +180,47 @@ int comando_qry_p(void *_this, void *_controlador) {
   if( eh_pictorico[0] == 'p' ){
     // ================================= É pictórico =================================
     char* sufixo = params[1];
+    int registrador_origem = strtol( params[3] + 1, NULL, 10);
+    int registrador_destino = strtol( params[4] + 1, NULL, 10);
+
+    Ponto2D origem = controlador->registradores[ registrador_origem ]; // ATENÇÃO, CONSIDERANDO OS REGISTRADORES COMO 1-10 JÁ QUE EXISTEM 11 REGISTRADORES
+    Ponto2D destino = controlador->registradores[ registrador_destino ];
+
+    VerticeInfo origem_info  = get_vertice_by_ponto(controlador->vertices_mapa_viario, origem);
+    VerticeInfo destino_info = get_vertice_by_ponto(controlador->vertices_mapa_viario, destino);
+
+    char *qry_nome = get_nome(controlador->extras[e_qry]);
+
+    char *path = format_string("%s%s-%s-%s.svg",
+      controlador->dir_saida,
+      controlador->nome_base,
+      qry_nome,
+      sufixo);
+
+      char* cor = params[5];
+
+    Lista caminho;
 
     char* menor_tempo = params[2];
     if( menor_tempo[0] == 'T'){
-      // TODO ------- Encontrar o caminho de menor tempo ---------------------------
-      
-
-      return 1;
+      // Menor tempo
+      caminho = get_caminho(controlador->mapa_viario, origem_info, destino_info, false);
+    }else{
+      // Menor distâbcia
+      caminho = get_caminho(controlador->mapa_viario, origem_info, destino_info, true);
     }
-    // TODO -------- Encontrar o caminho de menor distância ----------------------------
 
+    SVG svg_saida;
+    svg_saida = cria_SVG(path, controlador->max_qry.x, controlador->max_qry.y);
+
+    free(path);
+    free(qry_nome);
+
+    desenhar_elementos(controlador, svg_saida);
+    desenhar_mapa_viario(controlador, svg_saida);
+    desenhar_caminho_svg( svg_saida, caminho, controlador->mapa_viario, cor);
+    salva_SVG(svg_saida);
+    destruir_SVG(svg_saida);
 
     return 1;
   }
@@ -200,13 +231,27 @@ int comando_qry_p(void *_this, void *_controlador) {
   //  é para pegar o caminho mais curto ou mais rápido
   char* menor_tempo = params[1];
 
-  if( menor_tempo[0] == 'T' ){
-    // TODO ---- Procurar o caminho com o menor tempo----------------------------------
-    return 1;
-  }
+  int registrador_origem = strtol( params[2] + 1, NULL, 10);
+  int registrador_destino = strtol( params[3] + 1, NULL, 10);
 
+  Ponto2D origem = controlador->registradores[ registrador_origem ]; // ATENÇÃO, CONSIDERANDO OS REGISTRADORES COMO 1-10 JÁ QUE EXISTEM 11 REGISTRADORES
+  Ponto2D destino = controlador->registradores[ registrador_destino ];
+
+  VerticeInfo origem_info = get_vertice_by_ponto( controlador->vertices_mapa_viario, origem );
+  VerticeInfo destino_info = get_vertice_by_ponto( controlador->vertices_mapa_viario, destino );
   
-  // TODO-------Procurar caminho mais curto (menor distância)---------------------------------------
+  Lista caminho;
+
+  if( menor_tempo[0] == 'T' ){
+    caminho = get_caminho( controlador->mapa_viario, origem_info, destino_info, false );
+  }else{
+    caminho = get_caminho( controlador->mapa_viario, origem_info, destino_info, true );
+  }
+  Lista_t.insert(controlador->saida, format_string( "Rota gerada pelo comando %s", this->string ) );
+  escrever_caminho_txt(controlador->saida, caminho, controlador->mapa_viario);
+  Lista_t.destruir( caminho, 0 );
+  // ================ VER SE TEM MAIS ALGO PARA COLOCAR AQUI ==============================================
+
   return 1;
 }
 
