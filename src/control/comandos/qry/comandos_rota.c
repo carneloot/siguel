@@ -325,7 +325,7 @@ int comando_qry_sp(void *_this, void *_controlador) {
     desenhar_mapa_viario(controlador, svg_saida);
   } else {
     Lista_t.insert(controlador->saida,
-      format_string("Rota gerada: \n"));
+      format_string("Rota gerada pelo comando \"%s\": \n", this->string));
   }
 
   offset_total++;
