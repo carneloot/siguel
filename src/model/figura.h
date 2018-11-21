@@ -24,7 +24,7 @@ int contem_ponto(Figura f, Ponto2D ponto);
 
 Ponto2D get_centro_massa(Figura f);
 
-Figura get_rect_sobreposicao(Figura f1, Figura f2);
+Figura get_rect_sobreposicao(Figura f1, Figura f2, char* cor_borda);
 
 double distancia_figuras(Figura f, Figura f2);
 

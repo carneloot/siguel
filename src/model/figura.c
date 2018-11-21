@@ -145,7 +145,7 @@ Ponto2D get_centro_massa(Figura f) {
   return result;
 }
 
-Figura get_rect_sobreposicao(Figura f1, Figura f2) {
+Figura get_rect_sobreposicao(Figura f1, Figura f2, char* cor_borda) {
   struct Figura *this  = (struct Figura *) f1;
   struct Figura *other = (struct Figura *) f2;
 
@@ -195,7 +195,7 @@ Figura get_rect_sobreposicao(Figura f1, Figura f2) {
   pos  = Ponto2D_t.sub_scalar(pos, STROKE_SIZE);
   size = Ponto2D_t.add_scalar(size, 2 * STROKE_SIZE);
 
-  return cria_retangulo(pos.x, pos.y, size.x, size.y, "transparent", "purple");
+  return cria_retangulo(pos.x, pos.y, size.x, size.y, "transparent", cor_borda);
 }
 
 double distancia_figuras(Figura this, Figura other) {

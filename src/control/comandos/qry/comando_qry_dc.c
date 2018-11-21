@@ -116,9 +116,10 @@ int comando_qry_dc( void* _this, void* _controlador ){
         // Adicionar retangulo pontilhado à lista de drawables
         Figura veiculo_this = get_figura_veiculo( vetor_veiculos[i]);
         Figura veiculo_other = get_figura_veiculo( vetor_veiculos[j]);
-        Figura fig_colisao = get_rect_sobreposicao( veiculo_this, veiculo_other);
-        
-        desenha_figura( svg_saida, fig_colisao, 1, true );
+        Figura fig_colisao = get_rect_sobreposicao( veiculo_this, veiculo_other, "red");
+
+
+        desenha_figura( svg_saida, fig_colisao, 1, false );
         destruir_figura(fig_colisao);
       }
 
