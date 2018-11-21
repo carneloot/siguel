@@ -63,7 +63,7 @@
   ENTRY(     comando_reg_e,   "qry/@e?") \
   ENTRY(    comando_reg_xy,   "qry/@xy") \
   ENTRY(    comando_qry_au,    "qry/au") \
-  ENTRY(   comando_qry_rau,    "qry/au") \
+  ENTRY(   comando_qry_rau,   "qry/rau") \
   ENTRY(    comando_qry_dc,    "qry/dc") \
   /* ARQUIVOS .EC */                     \
   ENTRY(      comando_ec_t,      "ec/t") \
