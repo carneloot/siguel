@@ -51,6 +51,15 @@ static double __angle_ponto2d(Ponto2D this) {
   return atan2(this.y, this.x);
 }
 
+static int __orientation_ponto2d(Ponto2D a, Ponto2D b, Ponto2D c) {
+  double sigma = (b.y - a.y) / (b.x - a.x);
+  double tau   = (c.y - b.y) / (c.x - b.x);
+
+  double result = sigma - tau;
+
+  return (result == 0) ? 0 : (result > 0) ? 1 : -1;
+}
+
 const struct Ponto2D_t Ponto2D_t = {
   .new          = &__new_ponto2d,
   .equal        = &__equal_ponto2d,
@@ -63,4 +72,5 @@ const struct Ponto2D_t Ponto2D_t = {
   .sub_scalar   = &__sub_scalar_ponto2d,
   .maximo       = &__max_ponto2d,
   .angle        = &__angle_ponto2d,
+  .orientation  = &__orientation_ponto2d,
 };

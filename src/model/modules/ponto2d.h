@@ -29,6 +29,14 @@ struct Ponto2D_t {
   Ponto2D (*maximo)(Ponto2D this, Ponto2D other);
 
   double (*angle)(Ponto2D this);
+
+  /**
+   * Retorna a orientacao entre tres pontos:
+   *  -1: anti-horario (vira a esquerda)
+   *   0: colineares
+   *  +1:horario (vira a direita)
+   */
+  int (*orientation)(Ponto2D a, Ponto2D b, Ponto2D c);
 };
 
 extern const struct Ponto2D_t Ponto2D_t;
