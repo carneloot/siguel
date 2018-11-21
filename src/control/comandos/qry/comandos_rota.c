@@ -224,10 +224,6 @@ int comando_qry_p(void *_this, void *_controlador) {
       caminho = get_caminho(controlador->mapa_viario, origem_info, destino_info, true);
     }
 
-    if (caminho == NULL) {
-      LOG_ERRO("Nao foi possivel gerar um caminho (comando %s):\n", this->string);
-      return 1;
-    }
 
     char *qry_nome = get_nome(controlador->extras[e_qry]);
 
@@ -243,10 +239,15 @@ int comando_qry_p(void *_this, void *_controlador) {
     free(path);
     free(qry_nome);
 
-    desenhar_elementos(controlador, svg_saida);
-    desenhar_mapa_viario(controlador, svg_saida);
+    if (caminho == NULL) {
+      escreve_texto(svg_saida, "Caminho inexistente", origem, 20, cor);
+    } else {
 
-    desenhar_caminho_svg( svg_saida, caminho, controlador->mapa_viario, cor);
+      desenhar_elementos(controlador, svg_saida);
+      desenhar_mapa_viario(controlador, svg_saida);
+
+      desenhar_caminho_svg( svg_saida, caminho, controlador->mapa_viario, cor);
+    }
 
     salva_SVG(svg_saida);
     destruir_SVG(svg_saida);
