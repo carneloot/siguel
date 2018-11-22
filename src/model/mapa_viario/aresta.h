@@ -4,6 +4,8 @@
 #include <model/modules/ponto2d.h>
 
 struct ArestaInfo {
+  Ponto2D pos;
+
   char *nome;
 
   char *origem;
@@ -14,8 +16,6 @@ struct ArestaInfo {
 
   double comprimento;
   double velocidade_media;
-
-  Ponto2D pos;
 };
 
 typedef struct ArestaInfo *ArestaInfo;
