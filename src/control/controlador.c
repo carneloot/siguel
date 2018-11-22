@@ -630,7 +630,7 @@ void desenhar_aresta(const Item _aresta, unsigned profundidade, va_list list) {
 
   escreve_comentario(svg, "ARESTA \"%s\" -> \"%s\"", origem->id, destino->id);
 
-  if (aresta->comprimento == DBL_MAX && aresta->velocidade_media == 0) {
+  if (!get_aresta_valido(aresta)) {
     desenha_linha(svg, origem->pos, aresta->pos, 0.6, 3, "red", true);
     desenha_linha(svg, aresta->pos, destino->pos, 0.6, 3, "red", false);
   } else {
@@ -642,7 +642,7 @@ void desenhar_aresta(const Item _aresta, unsigned profundidade, va_list list) {
 
 void desenhar_mapa_viario(void *_this, void *svg) {
   #ifdef DEBUG
-  
+
   struct Controlador *this = (struct Controlador *) _this;
   
   LOG_PRINT(LOG_FILE, "Desenhando mapa viario.");

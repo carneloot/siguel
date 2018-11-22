@@ -60,3 +60,7 @@ void set_aresta_valido( ArestaInfo this, double velocidade_media, double comprim
   this->comprimento      = comprimento;
   this->velocidade_media = velocidade_media;
 }
+
+bool get_aresta_valido(ArestaInfo this) {
+  return !(this->comprimento == DBL_MAX && this->velocidade_media == 0);
+}

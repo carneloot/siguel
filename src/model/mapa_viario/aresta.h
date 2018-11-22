@@ -3,6 +3,8 @@
 
 #include <model/modules/ponto2d.h>
 
+#include <stdbool.h>
+
 struct ArestaInfo {
   Ponto2D pos;
 
@@ -36,5 +38,7 @@ void destroy_aresta_info(void *this);
 void set_aresta_invalido( ArestaInfo this );
 
 void set_aresta_valido( ArestaInfo this, double velocidade_media, double comprimento );
+
+bool get_aresta_valido(ArestaInfo this);
 
 #endif /* __ARESTA_H__ */
