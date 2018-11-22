@@ -112,10 +112,6 @@ static KDTree __insert_rec_kdtree(KDTree _this, Item value, unsigned prof) {
     return _this;
   }
 
-  // Se o ponto for o mesmo, nao insere
-  if (this->check_equal(value, this->value))
-    return _this;
-
   int indice_func = prof % this->dim;
 
   if (this->funcs[indice_func](value, this->value) < 0) {
