@@ -108,7 +108,7 @@ int comando_qry_dc( void* _this, void* _controlador ){
       this_high    = this_y + this_height;
       other_high   = other_y + other_height;
 
-      if( ( other_high > this_x && other_high < this_high) ||
+      if( ( other_high > this_y && other_high < this_high) ||
           ( other_y > this_y && other_y < this_high ) ){
 
         // =============================== Sobreposições ===============================
