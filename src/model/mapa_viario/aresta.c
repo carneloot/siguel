@@ -18,6 +18,8 @@ ArestaInfo create_aresta_info(
 
   this->comprimento      = comprimento;
   this->velocidade_media = velocidade_media;
+  this->comprimento_backup      = comprimento;
+  this->velocidade_media_backup = velocidade_media;
 
   this->nome            = (char *) calloc(strlen(nome) + 1, sizeof(char));
   this->origem          = (char *) calloc(strlen(origem) + 1, sizeof(char));
@@ -56,9 +58,9 @@ void set_aresta_invalido( ArestaInfo this ){
   this->velocidade_media = 0;
 }
 
-void set_aresta_valido( ArestaInfo this, double velocidade_media, double comprimento ){
-  this->comprimento      = comprimento;
-  this->velocidade_media = velocidade_media;
+void set_aresta_valido( ArestaInfo this ){
+  this->comprimento      = this->comprimento_backup;
+  this->velocidade_media = this->velocidade_media_backup;
 }
 
 bool get_aresta_valido(ArestaInfo this) {

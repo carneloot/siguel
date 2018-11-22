@@ -241,6 +241,7 @@ int comando_qry_p(void *_this, void *_controlador) {
 
     desenhar_elementos(controlador, svg_saida);
     desenhar_mapa_viario(controlador, svg_saida);
+    desenhar_veiculos(controlador, svg_saida);
     
     if (caminho == NULL) {
       escreve_texto(svg_saida, "Caminho inexistente", origem, 20, cor);

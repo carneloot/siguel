@@ -18,6 +18,9 @@ struct ArestaInfo {
 
   double comprimento;
   double velocidade_media;
+
+  double comprimento_backup;
+  double velocidade_media_backup;
 };
 
 typedef struct ArestaInfo *ArestaInfo;
@@ -37,7 +40,7 @@ void destroy_aresta_info(void *this);
 
 void set_aresta_invalido( ArestaInfo this );
 
-void set_aresta_valido( ArestaInfo this, double velocidade_media, double comprimento );
+void set_aresta_valido( ArestaInfo this );
 
 bool get_aresta_valido(ArestaInfo this);
 

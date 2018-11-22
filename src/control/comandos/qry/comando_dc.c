@@ -18,12 +18,9 @@
 struct Colisao {
   ArestaInfo aresta_info;
   Figura figura;
-
-  double comprimento_backup;
-  double velocidade_media_backup;
 };
 
-int compare( const void* _this, const void* _other ){
+static int compare( const void* _this, const void* _other ){
 
   Veiculo this = (Veiculo) _this;
   Veiculo other = (Veiculo) _other;
@@ -63,11 +60,7 @@ int comando_qry_dc( void* _this, void* _controlador ){
       Lista_t.get_first(controlador->colisoes)
     );
 
-    set_aresta_valido( 
-      colisao->aresta_info,
-      colisao->velocidade_media_backup,
-      colisao->comprimento_backup
-    );
+    set_aresta_valido(colisao->aresta_info);
 
     destruir_figura(colisao->figura);
     free(colisao);
@@ -130,8 +123,6 @@ int comando_qry_dc( void* _this, void* _controlador ){
         struct Colisao* this_colisao = malloc( sizeof(struct Colisao) );
 
         this_colisao->aresta_info             = info_aresta;
-        this_colisao->comprimento_backup      = info_aresta->comprimento;
-        this_colisao->velocidade_media_backup = info_aresta->velocidade_media;
         this_colisao->figura                  = fig_colisao;
 
         set_aresta_invalido( info_aresta );
@@ -161,8 +152,7 @@ int comando_qry_dc( void* _this, void* _controlador ){
     controlador->dir_saida,
     controlador->nome_base,
     nome_qry,
-    sufixo
-    );
+    sufixo);
   
   free(nome_qry);
 
@@ -195,5 +185,8 @@ int comando_qry_dc( void* _this, void* _controlador ){
 
   salva_SVG( svg_saida );
   destruir_SVG( svg_saida );
+
+  free(vetor_veiculos);
+
   return 1;
 }
