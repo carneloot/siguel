@@ -10,7 +10,8 @@ ArestaInfo create_aresta_info(
   char *quadra_direita,
   char *quadra_esquerda,
   double comprimento,
-  double velocidade_media) {
+  double velocidade_media,
+  Ponto2D pos) {
 
   ArestaInfo this = calloc(1, sizeof(*this));
 
@@ -22,6 +23,8 @@ ArestaInfo create_aresta_info(
   this->destino         = (char *) calloc(strlen(destino) + 1, sizeof(char));
   this->quadra_direita  = (char *) calloc(strlen(quadra_direita) + 1, sizeof(char));
   this->quadra_esquerda = (char *) calloc(strlen(quadra_esquerda) + 1, sizeof(char));
+
+  this->pos = pos;
 
   strcpy(this->nome, nome);
   strcpy(this->origem, origem);

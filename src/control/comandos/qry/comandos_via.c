@@ -58,17 +58,28 @@ int comando_via_e(void *_this, void *_controlador) {
 
   char *nome_rua = this->params[6];
 
+  VerticeInfo info_origem = GrafoD_t.get_info_vertice( controlador->mapa_viario, label_origem );
+  VerticeInfo info_destino = GrafoD_t.get_info_vertice( controlador->mapa_viario, label_destino );
+
+  Ponto2D pos_origem = info_origem->pos;
+  Ponto2D pos_destino = info_destino->pos;
+
+  Ponto2D pos_aresta = Ponto2D_t.add( pos_origem, pos_destino );
+  pos_aresta = Ponto2D_t.mult( pos_aresta, 0.5 );
+  
+
   ArestaInfo aresta_info = create_aresta_info(
     nome_rua, 
     label_origem, label_destino,
     quadra_direita, quadra_esquerda,
-    comprimento, velocidade_media
+    comprimento, velocidade_media,
+    pos_aresta
   );
 
   GrafoD_t.insert_aresta(controlador->mapa_viario, label_origem, label_destino);
   GrafoD_t.define_info_aresta(controlador->mapa_viario, label_origem, label_destino, aresta_info);
 
-  Lista_t.insert(controlador->arestas_mapa_viario, aresta_info);
+  KDTree_t.insert(controlador->arestas_mapa_viario, aresta_info);
 
   return 1;
 }

@@ -67,7 +67,7 @@ struct Controlador {
 
   GrafoD mapa_viario;
   KDTree vertices_mapa_viario;
-  Lista arestas_mapa_viario;
+  KDTree arestas_mapa_viario;
 };
 
 extern void desenhar_todas_figuras(void *controlador, void *svg);

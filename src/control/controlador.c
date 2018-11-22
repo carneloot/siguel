@@ -128,6 +128,27 @@ int compareYVertice(const void *_a, const void *_b) {
   return (a->pos.y - b->pos.y);
 }
 
+int equalArestas( const void* _this, const void* _other ){
+  ArestaInfo this  = (ArestaInfo) _this;
+  ArestaInfo other = (ArestaInfo) _other;
+  if(strcmp(this->nome, other->nome) == 0){
+    return 1;
+  }
+  return 0;
+}
+
+int compareXAresta( const void* _this, const void* _other ){
+  ArestaInfo this  = (ArestaInfo) _this;
+  ArestaInfo other = (ArestaInfo) _other;
+  return ( this->pos.x - other->pos.x );
+}
+
+int compareYAresta( const void* _this, const void* _other ){
+  ArestaInfo this  = (ArestaInfo) _this;
+  ArestaInfo other = (ArestaInfo) _other;
+  return ( this->pos.y - other->pos.y );
+}
+
 /** METODOS PUBLICOS */
 
 Controlador cria_controlador() {
@@ -178,7 +199,7 @@ Controlador cria_controlador() {
 
   this->mapa_viario          = GrafoD_t.create();
   this->vertices_mapa_viario = KDTree_t.create(2, equalVertices, compareXVertice, compareYVertice);
-  this->arestas_mapa_viario  = Lista_t.create();
+  this->arestas_mapa_viario  = KDTree_t.create(2, equalArestas, compareXAresta, compareYAresta);
 
   return (void *) this;
 }
@@ -472,7 +493,7 @@ void destruir_controlador(Controlador c) {
 
   GrafoD_t.destroy(this->mapa_viario);
   KDTree_t.destroy(this->vertices_mapa_viario, &destroy_vertice_info);
-  Lista_t.destruir(this->arestas_mapa_viario, &destroy_aresta_info);
+  KDTree_t.destroy(this->arestas_mapa_viario, &destroy_aresta_info);
 
   free(c);
 }
@@ -608,7 +629,9 @@ void desenhar_mapa_viario(void *_this, void *svg) {
 
   KDTree_t.passe_simetrico(this->vertices_mapa_viario, desenhar_vertice, svg);
 
-  Posic it = Lista_t.get_first(this->arestas_mapa_viario);
+
+  // ----------------------------------- Arrumar -----------------------------------
+  Posic it = NULL; // Lista_t.get_first(this->arestas_mapa_viario);
   while (it) {
     ArestaInfo aresta = Lista_t.get(this->arestas_mapa_viario, it);
 

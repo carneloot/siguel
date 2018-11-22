@@ -1,6 +1,8 @@
 #ifndef __ARESTA_H__
 #define __ARESTA_H__
 
+#include <model/modules/ponto2d.h>
+
 struct ArestaInfo {
   char *nome;
 
@@ -12,6 +14,8 @@ struct ArestaInfo {
 
   double comprimento;
   double velocidade_media;
+
+  Ponto2D pos;
 };
 
 typedef struct ArestaInfo *ArestaInfo;
@@ -23,7 +27,8 @@ ArestaInfo create_aresta_info(
   char *quadra_direita,
   char *quadra_esquerda,
   double comprimento,
-  double velocidade_media
+  double velocidade_media,
+  Ponto2D pos
 );
 
 void destroy_aresta_info(void *this);
