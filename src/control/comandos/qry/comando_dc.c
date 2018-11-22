@@ -179,18 +179,18 @@ int comando_qry_dc( void* _this, void* _controlador ){
     ArestaInfo info_aresta = colisao->aresta_info;
 
     escreve_comentario(svg_saida,
-      "COLISAO: entre vertices %s e %s",
+      "COLISAO",
       colisao->aresta_info->origem,
       colisao->aresta_info->destino);
     desenha_figura(svg_saida, colisao->figura, 1, false);
 
-    // Teste----------------
+    #ifdef DEBUG
 
     Figura fig_aresta = cria_circulo( info_aresta->pos.x, info_aresta->pos.y, 5, "cyan", "transparent" );
     desenha_figura( svg_saida, fig_aresta, 1, false );
     destruir_figura( fig_aresta );
 
-    // Teste----------------
+    #endif
   }
 
   salva_SVG( svg_saida );
