@@ -57,12 +57,14 @@ static Posic __insert_lista(Lista lista, Item item) {
   return posic;
 }
 
-static void __remove_lista(Lista lista, Posic posicao) {
+static Item __remove_lista(Lista lista, Posic posicao) {
   struct Lista *this  = (struct Lista *) lista;
   struct Posic *posic = (struct Posic *) posicao;
 
   if (!posicao)
-    return;
+    return NULL;
+
+  Item retorno = posic->value;
 
   if (this->start == posic)
     this->start = posic->next;
@@ -79,6 +81,8 @@ static void __remove_lista(Lista lista, Posic posicao) {
   free(posic);
 
   this->size--;
+
+  return retorno;
 }
 
 static Item __get_lista(Lista lista, Posic posicao) {
