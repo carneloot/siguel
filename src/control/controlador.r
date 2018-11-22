@@ -46,6 +46,10 @@ struct Controlador {
   Lista pessoas;
   HashTable tabelas[TABELAS_TOTAL];
 
+  Lista veiculos;
+
+  Lista colisoes;
+  
   Lista figuras;
 
   int linha_atual;
@@ -65,7 +69,7 @@ struct Controlador {
 
   GrafoD mapa_viario;
   KDTree vertices_mapa_viario;
-  Lista arestas_mapa_viario;
+  KDTree arestas_mapa_viario;
 };
 
 extern void desenhar_todas_figuras(void *controlador, void *svg);
@@ -75,5 +79,7 @@ extern void desenhar_sobreposicoes(void *controlador, void *svg);
 extern void desenhar_elementos(void *controlador, void *svg);
 
 extern void desenhar_mapa_viario(void *controlador, void *svg);
+
+extern void desenhar_veiculos(void *this, void *svg);
 
 #endif /* __CONTROLADOR_R__ */

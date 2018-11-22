@@ -2,6 +2,7 @@
 
 #include <stdlib.h>
 #include <string.h>
+#include <float.h>
 
 ArestaInfo create_aresta_info(
   char *nome,
@@ -10,7 +11,8 @@ ArestaInfo create_aresta_info(
   char *quadra_direita,
   char *quadra_esquerda,
   double comprimento,
-  double velocidade_media) {
+  double velocidade_media,
+  Ponto2D pos) {
 
   ArestaInfo this = calloc(1, sizeof(*this));
 
@@ -22,6 +24,8 @@ ArestaInfo create_aresta_info(
   this->destino         = (char *) calloc(strlen(destino) + 1, sizeof(char));
   this->quadra_direita  = (char *) calloc(strlen(quadra_direita) + 1, sizeof(char));
   this->quadra_esquerda = (char *) calloc(strlen(quadra_esquerda) + 1, sizeof(char));
+
+  this->pos = pos;
 
   strcpy(this->nome, nome);
   strcpy(this->origem, origem);
@@ -45,4 +49,14 @@ void destroy_aresta_info(void *_this) {
 
   free(this);
 
+}
+
+void set_aresta_invalido( ArestaInfo this ){
+  this->comprimento      = DBL_MAX;
+  this->velocidade_media = 0;
+}
+
+void set_aresta_valido( ArestaInfo this, double velocidade_media, double comprimento ){
+  this->comprimento      = comprimento;
+  this->velocidade_media = velocidade_media;
 }

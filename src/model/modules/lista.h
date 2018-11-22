@@ -44,7 +44,7 @@ struct Lista_t {
    * Remove o elemento da lista indicado pela posicao. O indicador deixa de ser
    * válido da lista.
    */
-  void (*remove)(Lista, Posic);
+  Item (*remove)(Lista, Posic);
 
   /**
    * Retorna o valor do item que a posicao indica.

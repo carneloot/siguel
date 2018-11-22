@@ -24,7 +24,7 @@ int contem_ponto(Figura f, Ponto2D ponto);
 
 Ponto2D get_centro_massa(Figura f);
 
-Figura get_rect_sobreposicao(Figura f1, Figura f2);
+Figura get_rect_sobreposicao(Figura f1, Figura f2, char* cor_borda);
 
 double distancia_figuras(Figura f, Figura f2);
 
@@ -66,5 +66,7 @@ void set_id_figura(Figura f, int id);
 void set_opacity_figura(Figura this, double opacity);
 
 void set_dashed_figura(Figura this, int dashed);
+
+void set_stroke_size_figura(Figura this, double size);
 
 #endif /* __FIGURA_H__ */

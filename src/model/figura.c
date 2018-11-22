@@ -28,6 +28,8 @@ struct Figura {
 
   enum TipoFigura tipo;
 
+  double stroke_size;
+
   /** DADOS DE CADA TIPO */
   union {
     /** DADOS CIRCULO */
@@ -52,6 +54,8 @@ static struct Figura *__cria_figura(
 
   this->opacity   = 1;
   this->is_dashed = 0;
+
+  this->stroke_size = 2;
 
   this->cor       = trim(cor);
   this->cor_borda = trim(cor_borda);
@@ -141,7 +145,7 @@ Ponto2D get_centro_massa(Figura f) {
   return result;
 }
 
-Figura get_rect_sobreposicao(Figura f1, Figura f2) {
+Figura get_rect_sobreposicao(Figura f1, Figura f2, char* cor_borda) {
   struct Figura *this  = (struct Figura *) f1;
   struct Figura *other = (struct Figura *) f2;
 
@@ -191,7 +195,7 @@ Figura get_rect_sobreposicao(Figura f1, Figura f2) {
   pos  = Ponto2D_t.sub_scalar(pos, STROKE_SIZE);
   size = Ponto2D_t.add_scalar(size, 2 * STROKE_SIZE);
 
-  return cria_retangulo(pos.x, pos.y, size.x, size.y, "transparent", "purple");
+  return cria_retangulo(pos.x, pos.y, size.x, size.y, "transparent", cor_borda);
 }
 
 double distancia_figuras(Figura this, Figura other) {
@@ -249,11 +253,12 @@ char *get_svg_figura(Figura _this) {
     case CIRCULO:
       saida = format_string(
         "<circle cx=\"%.1f\" cy=\"%.1f\" r=\"%.1f\" "
-        "style=\"fill:%s;stroke-width:2;stroke:%s;opacity:%.2f\" %s/>\n",
+        "style=\"fill:%s;stroke-width:%.1f;stroke:%s;opacity:%.2f\" %s/>\n",
         x(this),
         y(this),
         r(this),
         this->cor,
+        this->stroke_size,
         this->cor_borda,
         this->opacity,
         (this->is_dashed) ? DASHED_STRING : "");
@@ -262,12 +267,13 @@ char *get_svg_figura(Figura _this) {
     case RETANGULO:
       saida = format_string(
         "<rect x=\"%.1f\" y=\"%.1f\" width=\"%.1f\" height=\"%.1f\" "
-        "style=\"fill:%s;stroke-width:2;stroke:%s;opacity:%.2f\" %s/>\n",
+        "style=\"fill:%s;stroke-width:%.1f;stroke:%s;opacity:%.2f\" %s/>\n",
         x(this),
         y(this),
         w(this),
         h(this),
         this->cor,
+        this->stroke_size,
         this->cor_borda,
         this->opacity,
         (this->is_dashed) ? DASHED_STRING : "");
@@ -347,4 +353,9 @@ void set_opacity_figura(Figura _this, double opacity) {
 void set_dashed_figura(Figura _this, int dashed) {
   struct Figura * this = (struct Figura *) _this;
   this->is_dashed = dashed;
+}
+
+void set_stroke_size_figura(Figura _this, double size) {
+  struct Figura * this = (struct Figura *) _this;
+  this->stroke_size = size;
 }
