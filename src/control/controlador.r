@@ -47,6 +47,8 @@ struct Controlador {
   HashTable tabelas[TABELAS_TOTAL];
 
   Lista veiculos;
+
+  Lista colisoes;
   
   Lista figuras;
 

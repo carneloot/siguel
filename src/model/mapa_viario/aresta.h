@@ -33,4 +33,8 @@ ArestaInfo create_aresta_info(
 
 void destroy_aresta_info(void *this);
 
+void set_aresta_invalido( ArestaInfo this );
+
+void set_aresta_valido( ArestaInfo this, double velocidade_media, double comprimento );
+
 #endif /* __ARESTA_H__ */

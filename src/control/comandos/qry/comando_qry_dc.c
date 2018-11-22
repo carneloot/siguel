@@ -13,13 +13,13 @@
 #include <model/utils.h>
 
 #include <stdlib.h>
+#include <float.h>
 
 struct Colisao {
   ArestaInfo aresta_info;
 
   double comprimento_backup;
   double velocidade_media_backup;
-
 };
 
 int compare( const void* _this, const void* _other ){
@@ -36,6 +36,20 @@ int compare( const void* _this, const void* _other ){
   return -1;
 }
 
+static double __distancia_vertice_ponto(const Item _aresta_info, const Item _ponto, int dim) {
+  ArestaInfo aresta_info = (ArestaInfo) _aresta_info;
+
+  Ponto2D ponto         = * (Ponto2D *) _ponto;
+  Ponto2D ponto_aresta = aresta_info->pos;
+
+  switch (dim) {
+    case 0:  return sqr(ponto.x - ponto_aresta.x);
+    case 1:  return sqr(ponto.y - ponto_aresta.y);
+    case -1: return Ponto2D_t.dist_squared(ponto, ponto_aresta);
+  }
+
+  return DBL_MAX;
+}
 
 int comando_qry_dc( void* _this, void* _controlador ){
   struct Comando *this = _this;
@@ -55,6 +69,20 @@ int comando_qry_dc( void* _this, void* _controlador ){
   int tamanho = Lista_t.length( controlador->veiculos );
 
   // Limpar retornar todas as arestas às velocidades originais
+  
+  while ( Lista_t.length(controlador->colisoes) > 0 ) {
+    struct Colisao* colisao = Lista_t.remove( 
+      controlador->colisoes,
+      Lista_t.get_first(controlador->colisoes)
+    );
+
+    set_aresta_valido( 
+      colisao->aresta_info,
+      colisao->velocidade_media_backup,
+      colisao->comprimento_backup
+    );
+    free(colisao);
+  }
 
   heap_sort(vetor_veiculos, tamanho, compare);
 
@@ -118,6 +146,19 @@ int comando_qry_dc( void* _this, void* _controlador ){
         Figura veiculo_other = get_figura_veiculo( vetor_veiculos[j]);
         Figura fig_colisao = get_rect_sobreposicao( veiculo_this, veiculo_other, "red");
 
+        Ponto2D colisao_centro = get_centro_massa( fig_colisao );
+
+        Pair par_mais_proximo = KDTree_t.nearest_neighbor( controlador->arestas_mapa_viario, &colisao_centro, __distancia_vertice_ponto );
+        ArestaInfo info_aresta = par_mais_proximo.point1;
+
+        struct Colisao* this_colisao = malloc( sizeof(struct Colisao) );
+
+        this_colisao->aresta_info             = info_aresta;
+        this_colisao->comprimento_backup      = info_aresta->comprimento;
+        this_colisao->velocidade_media_backup = info_aresta->velocidade_media;
+
+        Lista_t.insert( controlador->colisoes, this_colisao );
+        set_aresta_invalido( info_aresta );
 
         desenha_figura( svg_saida, fig_colisao, 1, false );
         destruir_figura(fig_colisao);

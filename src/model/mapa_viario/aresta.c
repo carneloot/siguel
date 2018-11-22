@@ -2,6 +2,7 @@
 
 #include <stdlib.h>
 #include <string.h>
+#include <float.h>
 
 ArestaInfo create_aresta_info(
   char *nome,
@@ -48,4 +49,14 @@ void destroy_aresta_info(void *_this) {
 
   free(this);
 
+}
+
+void set_aresta_invalido( ArestaInfo this ){
+  this->comprimento      = DBL_MAX;
+  this->velocidade_media = 0;
+}
+
+void set_aresta_valido( ArestaInfo this, double velocidade_media, double comprimento ){
+  this->comprimento      = comprimento;
+  this->velocidade_media = velocidade_media;
 }
