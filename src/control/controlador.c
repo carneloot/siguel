@@ -128,22 +128,19 @@ int compareYVertice(const void *_a, const void *_b) {
   return (a->pos.y - b->pos.y);
 }
 
-int equalArestas( const void* _this, const void* _other ){
+int equalArestas( const void* _this, const void* _other ) {
   ArestaInfo this  = (ArestaInfo) _this;
   ArestaInfo other = (ArestaInfo) _other;
-  if(strcmp(this->nome, other->nome) == 0){
-    return 1;
-  }
-  return 0;
+  return (!strcmp(this->nome, other->nome) && Ponto2D_t.equal(this->pos, other->pos));
 }
 
-int compareXAresta( const void* _this, const void* _other ){
+int compareXAresta( const void* _this, const void* _other ) {
   ArestaInfo this  = (ArestaInfo) _this;
   ArestaInfo other = (ArestaInfo) _other;
   return ( this->pos.x - other->pos.x );
 }
 
-int compareYAresta( const void* _this, const void* _other ){
+int compareYAresta( const void* _this, const void* _other ) {
   ArestaInfo this  = (ArestaInfo) _this;
   ArestaInfo other = (ArestaInfo) _other;
   return ( this->pos.y - other->pos.y );
@@ -492,8 +489,8 @@ void destruir_controlador(Controlador c) {
   HashTable_t.destroy(this->tabelas[ID_X_SEMAFORO],    NULL, 0);
 
   GrafoD_t.destroy(this->mapa_viario);
-  KDTree_t.destroy(this->vertices_mapa_viario, &destroy_vertice_info);
-  KDTree_t.destroy(this->arestas_mapa_viario, &destroy_aresta_info);
+  KDTree_t.destroy(this->vertices_mapa_viario, destroy_vertice_info);
+  KDTree_t.destroy(this->arestas_mapa_viario,  destroy_aresta_info);
 
   free(c);
 }
@@ -609,6 +606,7 @@ void desenhar_veiculos(void *_this, void *svg) {
   Lista_t.map(this->veiculos, svg, desenha_veiculo);
 
 }
+
 void desenhar_vertice(const Item _vertice, unsigned profundidade, va_list list) {
   VerticeInfo vertice = (VerticeInfo) _vertice;
   SVG svg = va_arg(list, SVG);
@@ -622,6 +620,24 @@ void desenhar_vertice(const Item _vertice, unsigned profundidade, va_list list) 
   destruir_figura(fig_vertice);
 }
 
+void desenhar_aresta(const Item _aresta, unsigned profundidade, va_list list) {
+  ArestaInfo aresta  = (ArestaInfo) _aresta;
+  SVG svg            = va_arg(list, SVG);
+  GrafoD mapa_viario = va_arg(list, GrafoD);
+
+  VerticeInfo origem  = GrafoD_t.get_info_vertice(mapa_viario, aresta->origem);
+  VerticeInfo destino = GrafoD_t.get_info_vertice(mapa_viario, aresta->destino);
+
+  escreve_comentario(svg, "ARESTA \"%s\" -> \"%s\"", origem->id, destino->id);
+
+  if (aresta->comprimento == DBL_MAX && aresta->velocidade_media == 0) {
+    desenha_linha(svg, origem->pos, destino->pos, 0.6, 3, "red");
+  } else {
+    desenha_linha(svg, origem->pos, destino->pos, 0.6, 3, "black");
+  }
+
+}
+
 void desenhar_mapa_viario(void *_this, void *svg) {
   struct Controlador *this = (struct Controlador *) _this;
   
@@ -629,24 +645,6 @@ void desenhar_mapa_viario(void *_this, void *svg) {
 
   KDTree_t.passe_simetrico(this->vertices_mapa_viario, desenhar_vertice, svg);
 
-
-  // ----------------------------------- Arrumar -----------------------------------
-  Posic it = NULL; // Lista_t.get_first(this->arestas_mapa_viario);
-  while (it) {
-    ArestaInfo aresta = Lista_t.get(this->arestas_mapa_viario, it);
-
-    VerticeInfo origem  = GrafoD_t.get_info_vertice(this->mapa_viario, aresta->origem);
-    VerticeInfo destino = GrafoD_t.get_info_vertice(this->mapa_viario, aresta->destino);
-
-    escreve_comentario(svg, "ARESTA \"%s\" -> \"%s\"", origem->id, destino->id);
-
-    if (aresta->comprimento == DBL_MAX && aresta->velocidade_media == 0) {
-      desenha_linha(svg, origem->pos, destino->pos, 0.6, 3, "red");
-    } else {
-      desenha_linha(svg, origem->pos, destino->pos, 0.6, 3, "black");
-    }
-
-    it = Lista_t.get_next(this->arestas_mapa_viario, it);
-  }
+  KDTree_t.passe_simetrico(this->arestas_mapa_viario, desenhar_aresta, svg, this->mapa_viario);
 
 }
