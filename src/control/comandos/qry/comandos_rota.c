@@ -178,6 +178,19 @@ static void escrever_caminho_txt(Lista saida, Lista caminho, GrafoD mapa) {
 }
 
 /**
+ * Desenha um circulo de cor cor nos ponto passado
+ */
+static void desenhar_circulo(SVG svg, Ponto2D ponto, char *cor) {
+  #ifdef DEBUG
+  Figura ponto1 = cria_circulo(ponto.x,  ponto.y,  5, cor, "transparent");
+
+  desenha_figura(svg, ponto1, 1, FIG_BORDA_SOLIDA);
+
+  destruir_figura(ponto1);
+  #endif
+}
+
+/**
  * Comando:    p?
  * Parametros: (t|p sufixo) (D|T) r1 r2 [cor]
  * Descricao:  Qual o melhor trajeto entre a origem que
@@ -243,21 +256,12 @@ int comando_qry_p(void *_this, void *_controlador) {
     desenhar_mapa_viario(controlador, svg_saida);
     desenhar_veiculos(controlador, svg_saida);
     
+    desenhar_circulo(svg_saida, origem, cor);
+    desenhar_circulo(svg_saida, destino, cor);
+
     if (caminho == NULL) {
       escreve_texto(svg_saida, "Caminho inexistente", origem, 20, cor);
     } else {
-
-      #ifdef DEBUG
-      Figura ponto1 = cria_circulo(origem.x,  origem.y,  5, cor, "transparent");
-      Figura ponto2 = cria_circulo(destino.x, destino.y, 5, cor, "transparent");
-
-      desenha_figura(svg_saida, ponto1, 1, FIG_BORDA_SOLIDA);
-      desenha_figura(svg_saida, ponto2, 1, FIG_BORDA_SOLIDA);
-
-      destruir_figura(ponto1);
-      destruir_figura(ponto2);
-      #endif
-
       desenhar_caminho_svg( svg_saida, caminho, controlador->mapa_viario, cor);
 
       Lista_t.destruir(caminho, NULL);
@@ -399,6 +403,11 @@ int comando_qry_sp(void *_this, void *_controlador) {
 
     Lista caminho = get_caminho(controlador->mapa_viario, origem_info, destino_info, distancia);
 
+    if (pictorica) {
+      desenhar_circulo(svg_saida, pos_origem, cor[i % 2]);
+      desenhar_circulo(svg_saida, pos_destino, cor[(i + 1) % 2]);
+    }
+
     if (caminho == NULL) {
       if (pictorica) {
 
@@ -413,17 +422,6 @@ int comando_qry_sp(void *_this, void *_controlador) {
     } else {
 
       if (pictorica) {
-        #ifdef DEBUG
-        Figura ponto1 = cria_circulo(pos_origem.x,  pos_origem.y,  5, cor[i % 2], "transparent");
-        Figura ponto2 = cria_circulo(pos_destino.x, pos_destino.y, 5, cor[(i + 1) % 2], "transparent");
-
-        desenha_figura(svg_saida, ponto1, 1, FIG_BORDA_SOLIDA);
-        desenha_figura(svg_saida, ponto2, 1, FIG_BORDA_SOLIDA);
-
-        destruir_figura(ponto1);
-        destruir_figura(ponto2);
-        #endif
-
         desenhar_caminho_svg(
           svg_saida,
           caminho,
