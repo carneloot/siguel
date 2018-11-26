@@ -171,9 +171,12 @@ static void escrever_caminho_txt(Lista saida, Lista caminho, GrafoD mapa) {
 
     Lista_t.insert(saida, saida_txt);
 
+
     ultima_rua = rua->nome;
     it = next_it;
   }
+
+  Lista_t.insert(saida, format_string("\n"));
 
 }
 

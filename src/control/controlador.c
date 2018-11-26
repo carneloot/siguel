@@ -509,12 +509,18 @@ static void escrever_txt_final(void *c) {
     
   LOG_PRINT(LOG_FILE, "Escrevendo txt final.");
 
-  full_path     = format_string(
+  full_path = format_string(
     "%s%s.txt", this->dir_saida, this->nome_base);
 
   arq = abrir_arquivo(full_path, ALTERACAO);
 
   free(full_path);
+
+  char *nome_qry = get_nome(this->extras[e_qry]);
+
+  escrever_linha(arq, "Arquivo \"%s.qry\":\n\n", nome_qry);
+
+  free(nome_qry);
 
   Posic iterator = Lista_t.get_first(this->saida);
 
