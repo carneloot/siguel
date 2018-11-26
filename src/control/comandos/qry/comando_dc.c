@@ -20,7 +20,7 @@ struct Colisao {
   Figura figura;
 };
 
-static int compare( const void* _this, const void* _other ){
+static int compare_x( const void* _this, const void* _other ){
 
   Veiculo this = (Veiculo) _this;
   Veiculo other = (Veiculo) _other;
@@ -49,59 +49,80 @@ static double __distancia_aresta_ponto(const Item _aresta_info, const Item _pont
   return DBL_MAX;
 }
 
-int comando_qry_dc( void* _this, void* _controlador ){
-  struct Comando *this = _this;
-  struct Controlador *controlador = _controlador;
-
+static void limpar_colisoes(Lista colisoes) {
   // Limpar retornar todas as arestas às velocidades originais
-  while ( Lista_t.length(controlador->colisoes) > 0 ) {
+  while ( Lista_t.length(colisoes) > 0 ) {
     struct Colisao* colisao = Lista_t.remove(
-      controlador->colisoes,
-      Lista_t.get_first(controlador->colisoes)
-    );
+      colisoes, Lista_t.get_first(colisoes));
 
     set_aresta_valido(colisao->aresta_info);
 
     destruir_figura(colisao->figura);
     free(colisao);
   }
+}
+
+static void desenhar_colisoes(Lista colisoes, SVG svg_saida) {
+  for (Posic it = Lista_t.get_first(colisoes); it != NULL; it = Lista_t.get_next(colisoes, it)) {
+    struct Colisao *colisao = Lista_t.get(colisoes, it);
+
+    ArestaInfo info_aresta = colisao->aresta_info;
+
+    escreve_comentario(svg_saida,
+      "COLISAO",
+      colisao->aresta_info->origem,
+      colisao->aresta_info->destino);
+
+    desenha_figura(svg_saida, colisao->figura, 1, false);
+
+    #ifdef DEBUG
+
+    Figura fig_aresta = cria_circulo( info_aresta->pos.x, info_aresta->pos.y, 5, "cyan", "transparent" );
+    desenha_figura( svg_saida, fig_aresta, 1, false );
+    destruir_figura( fig_aresta );
+
+    #endif
+
+  }
+}
+
+static ArestaInfo pegar_aresta_correspondente(KDTree arestas, Ponto2D ponto) {
+  return KDTree_t.nearest_neighbor(
+    arestas,
+    &ponto,
+    __distancia_aresta_ponto).point1;
+}
+
+int comando_qry_dc( void* _this, void* _controlador ){
+  struct Comando *this = _this;
+  struct Controlador *controlador = _controlador;
+
+  limpar_colisoes(controlador->colisoes);
   // Colisões removidas
 
   Veiculo* vetor_veiculos = Lista_t.to_array( controlador->veiculos );
   int tamanho = Lista_t.length( controlador->veiculos );
-  heap_sort(vetor_veiculos, tamanho, compare);
+  heap_sort(vetor_veiculos, tamanho, compare_x);
 
   // Percorrer o vetor comparando as sobreposições
   int i = 0;
   int j = 1;
 
-  double this_x;
-  double other_x;
-  double this_width;
-
-  double this_y;
-  double other_y;
-  double this_height;
-  double other_height;
-
-  double this_high;  // y + height
-  double other_high; // y + height
-
   while (i < (tamanho - 1)){
-    this_x     = get_x_veiculo( vetor_veiculos[ i ]);
-    other_x    = get_x_veiculo( vetor_veiculos[ j ]);
-    this_width = get_width_veiculo( vetor_veiculos[ i ] );
+    int this_x     = get_x_veiculo( vetor_veiculos[ i ]);
+    int other_x    = get_x_veiculo( vetor_veiculos[ j ]);
+    int this_width = get_width_veiculo( vetor_veiculos[ i ] );
 
 
     if(other_x < this_x + this_width ){
       // Sobrepõe em x, comparar o y
-      this_y       = get_y_veiculo      ( vetor_veiculos[ i ]);
-      this_height  = get_height_veiculo ( vetor_veiculos[ i ]);
-      other_y      = get_y_veiculo      ( vetor_veiculos[ j ]);
-      other_height = get_height_veiculo ( vetor_veiculos[ j ]);
+      int this_y       = get_y_veiculo      ( vetor_veiculos[ i ]);
+      int this_height  = get_height_veiculo ( vetor_veiculos[ i ]);
+      int other_y      = get_y_veiculo      ( vetor_veiculos[ j ]);
+      int other_height = get_height_veiculo ( vetor_veiculos[ j ]);
 
-      this_high    = this_y + this_height;
-      other_high   = other_y + other_height;
+      int this_high    = this_y + this_height;
+      int other_high   = other_y + other_height;
 
       if( ( other_high > this_y && other_high < this_high) ||
           ( other_y > this_y && other_y < this_high ) ){
@@ -115,15 +136,12 @@ int comando_qry_dc( void* _this, void* _controlador ){
 
         Ponto2D colisao_centro = get_centro_massa( fig_colisao );
 
-        ArestaInfo info_aresta = KDTree_t.nearest_neighbor(
-          controlador->arestas_mapa_viario,
-          &colisao_centro,
-          __distancia_aresta_ponto).point1;
+        ArestaInfo info_aresta = pegar_aresta_correspondente(controlador->arestas_mapa_viario, colisao_centro);
 
         struct Colisao* this_colisao = malloc( sizeof(struct Colisao) );
 
-        this_colisao->aresta_info             = info_aresta;
-        this_colisao->figura                  = fig_colisao;
+        this_colisao->aresta_info = info_aresta;
+        this_colisao->figura      = fig_colisao;
 
         set_aresta_invalido( info_aresta );
 
@@ -151,39 +169,23 @@ int comando_qry_dc( void* _this, void* _controlador ){
   char* path = format_string( "%s%s-%s-%s.svg",
     controlador->dir_saida,
     controlador->nome_base,
-    nome_qry,
-    sufixo);
-  
+    nome_qry, sufixo);
   free(nome_qry);
 
   SVG svg_saida = cria_SVG( path, controlador->max_qry.x, controlador->max_qry.y );
-  desenhar_elementos( controlador, svg_saida );
-  desenhar_mapa_viario( controlador, svg_saida );
-  desenhar_veiculos( controlador, svg_saida );
 
   free(path);
 
-  for (Posic it = Lista_t.get_first(controlador->colisoes); it != NULL; it = Lista_t.get_next(controlador->colisoes, it)) {
-    struct Colisao *colisao = Lista_t.get(controlador->colisoes, it);
+  desenhar_elementos( controlador, svg_saida );
 
-    ArestaInfo info_aresta = colisao->aresta_info;
+  desenhar_mapa_viario( controlador, svg_saida );
 
-    escreve_comentario(svg_saida,
-      "COLISAO",
-      colisao->aresta_info->origem,
-      colisao->aresta_info->destino);
-    desenha_figura(svg_saida, colisao->figura, 1, false);
+  desenhar_veiculos( controlador, svg_saida );
 
-    #ifdef DEBUG
-
-    Figura fig_aresta = cria_circulo( info_aresta->pos.x, info_aresta->pos.y, 5, "cyan", "transparent" );
-    desenha_figura( svg_saida, fig_aresta, 1, false );
-    destruir_figura( fig_aresta );
-
-    #endif
-  }
+  desenhar_colisoes( controlador->colisoes, svg_saida );
 
   salva_SVG( svg_saida );
+
   destruir_SVG( svg_saida );
 
   free(vetor_veiculos);
