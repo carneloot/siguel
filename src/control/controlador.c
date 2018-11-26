@@ -299,7 +299,7 @@ void gerar_fila_execucao(Controlador _this) {
   Lista arquivos = Lista_t.create();
 
   char *path = format_string(
-    "%s/%s.geo", this->dir_entrada, this->nome_base);
+    "%s%s.geo", this->dir_entrada, this->nome_base);
   Lista_t.insert(arquivos, path);
 
   // Se o arquivo de qry foi especificado
@@ -307,7 +307,7 @@ void gerar_fila_execucao(Controlador _this) {
     if (!this->extras[i]) continue;
 
     path = format_string(
-      "%s/%s.%s", this->dir_entrada, this->extras[i], extra_extensao[i]);
+      "%s%s.%s", this->dir_entrada, this->extras[i], extra_extensao[i]);
     Lista_t.insert(arquivos, path);
   }
 
