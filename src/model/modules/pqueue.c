@@ -8,7 +8,7 @@
 #define right(i)  (2 * (i) + 2)
 
 struct PItem {
-  int priority;
+  double priority;
   void *value;
 };
 
@@ -100,7 +100,7 @@ void *pq_extractmin(PQueue _this) {
   return raiz.value;
 }
 
-void pq_decrease(PQueue _this, int priority, void *value) {
+void pq_decrease(PQueue _this, double priority, void *value) {
   struct PQueue * this = (struct PQueue *) _this;
   
   int indice = findIndex(this, value);
@@ -115,7 +115,7 @@ void pq_decrease(PQueue _this, int priority, void *value) {
   }
 }
 
-void pq_insert(PQueue _this, int priority, void *value) {
+void pq_insert(PQueue _this, double priority, void *value) {
   struct PQueue *this = (struct PQueue *) _this;
 
   if (this->size >= this->capacity) return;

@@ -26,12 +26,12 @@ void *pq_extractmin(PQueue this);
 /**
  * Muda a prioridade de value para prioridade
  */
-void pq_decrease(PQueue this, int priority, void *value);
+void pq_decrease(PQueue this, double priority, void *value);
 
 /**
  * Insere value na fila com prioridade priority
  */
-void pq_insert(PQueue this, int priority, void *value);
+void pq_insert(PQueue this, double priority, void *value);
 
 /**
  * Remove value da fila

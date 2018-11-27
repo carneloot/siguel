@@ -18,7 +18,7 @@ void *cria_path(Lista pontos, double tamanho, double opacity, char *cor) {
 }
 
 static char *gerar_string_pontos(Lista pontos) {
-  size_t length = Lista_t.length(pontos) * 14;
+  size_t length = Lista_t.length(pontos) * 24;
 
   char *result = calloc(length + 1, sizeof(char));
 
@@ -26,7 +26,7 @@ static char *gerar_string_pontos(Lista pontos) {
   while (it) {
     Ponto2D *ponto = Lista_t.get(pontos, it);
 
-    char *ponto_string = format_string("%6.1f %6.1f,",
+    char *ponto_string = format_string("%10.1f %10.1f,",
       ponto->x, ponto->y);
 
     strcat(result, ponto_string);
