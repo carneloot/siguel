@@ -15,18 +15,20 @@
 struct DVInfo {
   char *label;             // Label usado para saber qual vertice e
   double distancia;        // Distancia do inicial ate o vertice
+  double heuristica;       // Valor de heuristica para o A*
   struct DVInfo *anterior; // Vertice anterior para criar o caminho
 };
 
 typedef struct DVInfo *DVInfo;
 
 /** Auxiliar para criar o DVInfo */
-static DVInfo create_dvinfo(char *label, double distancia) {
+static DVInfo create_dvinfo(char *label, double distancia, double heuristica) {
   DVInfo this = calloc(1, sizeof(*this));
 
-  this->label     = label;
-  this->distancia = distancia;
-  this->anterior  = NULL;
+  this->label      = label;
+  this->distancia  = distancia;
+  this->heuristica = heuristica;
+  this->anterior   = NULL;
 
   return this;
 }
@@ -63,22 +65,29 @@ static Lista gerarCaminho(DVInfo target) {
 }
 
 /**
- * Funcao do Dijkstra em si. Baseado no algoritmo encontrado no site do Geeks for Geeks
+ * Funcao do A* em si. Baseado no algoritmo encontrado no site do Geeks for Geeks
  */
-Lista dijkstra(GrafoD grafo, char *origem, char *destino, double (*get_dist_aresta)(void *aresta_info)) {
-  LOG_PRINT(LOG_FILE, "Dijkstra: gerando caminho de \"%s\" ate \"%s\".", origem, destino);
+Lista astar(
+  GrafoD grafo,
+  char *origem, char *destino,
+  double (*get_dist_aresta)(void *aresta_info),
+  double (*get_heuristica)(void *atual, void *destino)) {
+  LOG_PRINT(LOG_FILE, "A*: gerando caminho de \"%s\" ate \"%s\".", origem, destino);
 
   HashTable vertices = HashTable_t.create(GrafoD_t.total_vertices(grafo));
 
   PQueue fila = pq_create(HashTable_t.max_size(vertices));
 
-  DVInfo inicial = create_dvinfo(origem, 0);
+  void *info_inicial = GrafoD_t.get_info_vertice(grafo, origem);
+  void *info_target  = GrafoD_t.get_info_vertice(grafo, destino);
+
+  DVInfo inicial = create_dvinfo(origem, 0, get_heuristica(info_inicial, info_target));
   HashTable_t.insert(vertices, inicial->label, inicial);
 
-  DVInfo target = create_dvinfo(destino, DBL_MAX);
+  DVInfo target = create_dvinfo(destino, DBL_MAX, 0);
   HashTable_t.insert(vertices, target->label, target);
 
-  pq_insert(fila, inicial->distancia, inicial);
+  pq_insert(fila, inicial->distancia + inicial->heuristica, inicial);
 
   // Enquanto a fila nao estiver vazia
   while (pq_getsize(fila) > 0) {
@@ -97,7 +106,8 @@ Lista dijkstra(GrafoD grafo, char *origem, char *destino, double (*get_dist_ares
       if (HashTable_t.exists(vertices, labelAdjacente)) {
         adjacente = HashTable_t.get(vertices, labelAdjacente);
       } else {
-        adjacente = create_dvinfo(labelAdjacente, DBL_MAX);
+        void *info_adjacente = GrafoD_t.get_info_vertice(grafo, labelAdjacente);
+        adjacente = create_dvinfo(labelAdjacente, DBL_MAX, get_heuristica(info_adjacente, info_target));
         HashTable_t.insert(vertices, adjacente->label, adjacente);
       }
 
@@ -107,8 +117,8 @@ Lista dijkstra(GrafoD grafo, char *origem, char *destino, double (*get_dist_ares
 
       if (newDist < adjacente->distancia) {
         adjacente->distancia = newDist;
-        adjacente->anterior = menorDistancia;
-        pq_insert(fila, adjacente->distancia, adjacente);
+        adjacente->anterior  = menorDistancia;
+        pq_insert(fila, adjacente->distancia + adjacente->heuristica, adjacente);
       }
     }
 

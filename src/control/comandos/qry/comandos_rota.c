@@ -60,6 +60,13 @@ static double get_tempo_aresta(void *_aresta_info) {
   return aresta_info->comprimento / aresta_info->velocidade_media;
 }
 
+static double get_distancia_vertices(void *_atual, void *_target) {
+  VerticeInfo atual  = (VerticeInfo) _atual;
+  VerticeInfo target = (VerticeInfo) _target;
+
+  return Ponto2D_t.dist_squared(atual->pos, target->pos);
+}
+
 /**
  * Retorna o caminho de origem_info até destino_info.
  * Se distancia for true usa a distancia, senao usa a velocidade
@@ -69,7 +76,7 @@ static Lista get_caminho(GrafoD grafo, VerticeInfo origem_info, VerticeInfo dest
 
   double (*funcao)(void *) = (distancia == true) ? get_distancia_aresta : get_tempo_aresta;
 
-  caminho = dijkstra(grafo, origem_info->id, destino_info->id, funcao);
+  caminho = astar(grafo, origem_info->id, destino_info->id, funcao, get_distancia_vertices);
 
   return caminho;
 }
