@@ -22,6 +22,37 @@ struct HashTable {
   struct HashInfo *table;
 };
 
+static bool __eh_primo(int numero) {
+  if (numero <= 1)
+    return false;
+
+  if (numero == 2)
+    return true;
+  
+  if (numero % 2 == 0)
+    return false;
+
+  int final = (int) sqrt(numero) + 1;
+
+  for (int den = 3; den < final; den += 2) {
+    if (numero % den == 0)
+      return false;
+  }
+
+  return true;
+}
+
+static int __next_primo(int numero) {
+
+  if (numero % 2 == 0)
+    numero++;
+
+  while (!__eh_primo(numero))
+    numero += 2;
+
+  return numero;
+}
+
 static HashTable __create_hashtable(int tamanho) {
   if (tamanho == 0)
     return NULL;
@@ -29,6 +60,8 @@ static HashTable __create_hashtable(int tamanho) {
   assert(tamanho > 0); // Tamanho deve ser positivo
 
   struct HashTable *this = calloc(1, sizeof(*this));
+
+  tamanho = __next_primo(tamanho);
 
   this->size  = tamanho;
   this->count = 0;
@@ -69,32 +102,6 @@ static bool __tem_item_posicao(struct HashInfo *table, int posicao) {
   return (table[posicao].chave != NULL);
 }
 
-static bool __eh_primo(int numero) {
-  if (numero <= 1)
-    return false;
-
-  if (numero == 2)
-    return true;
-  
-  if (numero % 2 == 0)
-    return false;
-
-  int final = (int) sqrt(numero) + 1;
-
-  for (int den = 3; den < final; den += 2) {
-    if (numero % den == 0)
-      return false;
-  }
-
-  return true;
-}
-
-static int __next_primo(int numero) {
-  if (__eh_primo(numero))
-    return numero;
-  return __next_primo(numero + 2);
-}
-
 static int hash1(int chave, int size) {
   return (chave % size);
 }
@@ -122,6 +129,8 @@ static int char_to_int(char *chave) {
 
 static void __realocar_hashtable(struct HashTable *this, int new_size) {
   assert(new_size > this->size); // Novo tamanho deve ser maior que o tamanho anterior
+
+  LOG_PRINT(LOG_FILE, "REALOCANDO TABELA COM NOVO TAMANHO DE %d", new_size);
 
   struct HashInfo *nova_tabela = calloc(new_size, sizeof(*nova_tabela));
 
@@ -183,7 +192,7 @@ static void __insert_hashtable(HashTable _this, char *chave, void *valor) {
 
     // Nao inseriu
     if (i == this->size) {
-      __realocar_hashtable(this, this->size + SOMA_REALLOC);
+      __realocar_hashtable(this, __next_primo(this->size + SOMA_REALLOC));
       continue;
     }
 
