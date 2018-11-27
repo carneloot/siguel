@@ -32,27 +32,6 @@ static DVInfo create_dvinfo(char *label, double distancia) {
 }
 
 /**
- * Funcao para criar a lista inicial de DVInfos
- * Recebe um vetor com todos os labels do grafo
- * e o label do vertice inicial, para setar a distancia como 0
- */
-static HashTable getVertices(char **labels, int tamanho) {
-  LOG_PRINT(LOG_STDOUT, "Dijkstra: gerando tabela para Dijkstra.");
-
-  HashTable vertices = HashTable_t.create(tamanho);
-
-  for (int i = 0; i < tamanho; i++) {
-    char *label = labels[i];
-
-    DVInfo info = create_dvinfo(label, DBL_MAX);
-
-    HashTable_t.insert(vertices, info->label, info);
-  }
-
-  return vertices;
-}
-
-/**
  * Funcao recursiva para gerar a lista do caminho
  * mais proximo.
  */
