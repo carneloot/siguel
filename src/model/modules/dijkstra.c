@@ -134,3 +134,14 @@ Lista astar(
 
   return caminho;
 }
+
+static double return_zero(void *atual, void *target) {
+  return 0.0;
+}
+
+Lista dijkstra(
+  GrafoD grafo,
+  char *origem, char *destino,
+  double (*get_dist_aresta)(void *aresta_info)) {
+  return astar(grafo, origem, destino, get_dist_aresta, return_zero);
+}
