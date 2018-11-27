@@ -149,6 +149,14 @@ v rot1.L 0.000000 42.500000
 v rot1.O 85.000000 42.500000
 v rot1.N 42.500000 85.000000
 v rot1.S 42.500000 0.000000
+v rot2.L 845.000000 42.500000
+v rot2.O 930.000000 42.500000
+v rot2.N 887.500000 85.000000
+v rot2.S 887.500000 0.000000
+v rot3.L 845.000000 602.500000
+v rot3.O 930.000000 602.500000
+v rot3.N 887.500000 645.000000
+v rot3.S 887.500000 560.000000
 v cz1.a 7.500000 585.000000
 v cz1.b 57.500000 585.000000
 v cz1.c 7.500000 620.000000
@@ -396,6 +404,18 @@ e rot1.N pl.beL.SO # # 0.000000 15.000000 Perimetral_Leste
 e pl.(b0|0,0) rot1.N # # -3.750000 15.000000 Perimetral_Leste
 e rot1.O ps.(b0|0,0) # # -3.750000 15.000000 Perimetral_Sul
 e ps.beS.NE rot1.O # # 0.000000 15.000000 Perimetral_Sul
+e rot2.N rot2.O # # 60.104076 11.000000 Praca_Central2
+e rot2.O rot2.S # # 60.104076 11.000000 Praca_Central2
+e rot2.S rot2.L # # 60.104076 11.000000 Praca_Central2
+e rot2.L rot2.N # # 60.104076 11.000000 Praca_Central2
+e ps.(b0|0,5) rot2.L # # 88.750000 15.000000 Perimetral_Sul
+e rot2.L ps.beS.NO # # 85.000000 15.000000 Perimetral_Sul
+e rot3.N rot3.O # # 60.104076 11.000000 Praca_Central3
+e rot3.O rot3.S # # 60.104076 11.000000 Praca_Central3
+e rot3.S rot3.L # # 60.104076 11.000000 Praca_Central3
+e rot3.L rot3.N # # 60.104076 11.000000 Praca_Central3
+e pn.beN.SO rot3.L # # 85.000000 20.000000 Perimetral_Norte
+e rot3.L pn.(b0|5,5) # # 88.750000 20.000000 Perimetral_Norte
 e pl.beL.NO cz1.e # # -17.500000 15.000000 Perimetral_Leste
 e cz1.e cz1.a # # 7.500000 15.000000 Perimetral_Leste
 e cz1.g pl.(b0|5,0) # # 28.750000 15.000000 Perimetral_Leste
