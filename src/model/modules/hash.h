@@ -34,12 +34,12 @@ struct HashTable_t {
   /**
    * Retorna o numero de casas preenchidas da HashTable
    */
-  unsigned (*length)(HashTable this);
+  int (*length)(HashTable this);
 
   /**
    * Retorna o total de casas existentes na HashTable
    */
-  unsigned (*max_size)(HashTable this);
+  int (*max_size)(HashTable this);
 
   /**
    * A chave nao pode existir mais

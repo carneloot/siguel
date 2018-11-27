@@ -2,7 +2,11 @@
 
 #include <assert.h>
 #include <stdlib.h>
+#include <stdbool.h>
 #include <string.h>
+#include <math.h>
+
+#include "logger.h"
 
 #define PORC_TOTALIDADE 0.7
 #define SOMA_REALLOC 5
@@ -13,8 +17,8 @@ struct HashInfo {
 };
 
 struct HashTable {
-  unsigned size;
-  unsigned count;
+  int size;
+  int count;
   struct HashInfo *table;
 };
 
@@ -61,21 +65,51 @@ static void __destroy_hashtable(HashTable _this, void (*destruir_item)(void *ite
   free(this);
 }
 
-static unsigned hash1(unsigned chave, unsigned size) {
+static bool __tem_item_posicao(struct HashInfo *table, int posicao) {
+  return (table[posicao].chave != NULL);
+}
+
+static bool __eh_primo(int numero) {
+  if (numero <= 1)
+    return false;
+
+  if (numero == 2)
+    return true;
+  
+  if (numero % 2 == 0)
+    return false;
+
+  int final = (int) sqrt(numero) + 1;
+
+  for (int den = 3; den < final; den += 2) {
+    if (numero % den == 0)
+      return false;
+  }
+
+  return true;
+}
+
+static int __next_primo(int numero) {
+  if (__eh_primo(numero))
+    return numero;
+  return __next_primo(numero + 2);
+}
+
+static int hash1(int chave, int size) {
   return (chave % size);
 }
 
-static unsigned hash2(unsigned chave, unsigned size) {
+static int hash2(int chave, int size) {
   if (size == 1) return 1;
   return (1 + (chave % (size - 1)));
 }
 
-static unsigned hash(unsigned chave, unsigned i, unsigned size) {
+static int hash(int chave, int i, int size) {
   return ((hash1(chave, size) + i * hash2(chave, size)) % size);
 }
 
-static unsigned char_to_unsigned(char *chave) {
-  unsigned soma;
+static int char_to_int(char *chave) {
+  int soma;
   int tam = strlen(chave);
   soma    = 0;
 
@@ -86,23 +120,32 @@ static unsigned char_to_unsigned(char *chave) {
   return soma;
 }
 
-static void __realocar_hashtable(struct HashTable *this, unsigned new_size) {
+static void __realocar_hashtable(struct HashTable *this, int new_size) {
   assert(new_size > this->size); // Novo tamanho deve ser maior que o tamanho anterior
 
   struct HashInfo *nova_tabela = calloc(new_size, sizeof(*nova_tabela));
 
   for (int i = 0; i < this->size; i++) {
+    if (!__tem_item_posicao(this->table, i)) continue;
+
     struct HashInfo info_atual = this->table[i];
-    if (!info_atual.chave || !info_atual.valor) continue;
 
-    unsigned chave_em_numero = char_to_unsigned(info_atual.chave);
-    for (int j = 0; j < new_size; j++) {
-      unsigned posicao = hash(chave_em_numero, j, new_size);
+    int chave_em_numero = char_to_int(info_atual.chave);
 
-      if (!nova_tabela[posicao].valor) {
+    int j;
+
+    for (j = 0; j < new_size; j++) {
+      int posicao = hash(chave_em_numero, j, new_size);
+
+      if (!__tem_item_posicao(nova_tabela, posicao)) {
         nova_tabela[posicao] = info_atual;
         break;
       }
+    }
+
+    if (j == new_size) {
+      LOG_ERRO("NAO INSERIU O ITEM NA TABELA AO REALOCAR!!");
+      exit(1);
     }
   }
 
@@ -122,7 +165,7 @@ static void __insert_hashtable(HashTable _this, char *chave, void *valor) {
   if (!this)
     return;
 
-  unsigned chave_em_numero = char_to_unsigned(chave);
+  int chave_em_numero = char_to_int(chave);
 
   while (1) {
     int i;
@@ -130,7 +173,7 @@ static void __insert_hashtable(HashTable _this, char *chave, void *valor) {
 
       int posicao_table = hash(chave_em_numero, i, this->size);
 
-      if (!this->table[posicao_table].valor) {
+      if (!__tem_item_posicao(this->table, posicao_table)) {
         this->table[posicao_table].chave = chave;
         this->table[posicao_table].valor = valor;
         this->count++;
@@ -149,7 +192,7 @@ static void __insert_hashtable(HashTable _this, char *chave, void *valor) {
 
   // Checar se passou do limite determinado e realocar
   if (__passou_limite_hashtable(this))
-    __realocar_hashtable(this, this->size * 2);
+    __realocar_hashtable(this, __next_primo(this->size * 2 + 1));
 }
 
 static int __exists_hashtable(HashTable _this, char *chave) {
@@ -158,16 +201,14 @@ static int __exists_hashtable(HashTable _this, char *chave) {
   if (!this)
     return 0;
 
-  unsigned chave_em_numero = char_to_unsigned(chave);
+  int chave_em_numero = char_to_int(chave);
   
   for (int i = 0; i < this->size; i++) {
 
     int posicao_table = hash(chave_em_numero, i, this->size);
     
-    struct HashInfo info = this->table[posicao_table];
-
-    if (info.valor)
-      if (!strcmp(info.chave, chave))
+    if (__tem_item_posicao(this->table, posicao_table))
+      if (!strcmp(this->table[posicao_table].chave, chave))
         return 1;
   }
 
@@ -180,17 +221,15 @@ static void *__get_hashtable(HashTable _this, char *chave) {
   if (!this)
     return NULL;
 
-  unsigned chave_em_numero = char_to_unsigned(chave);
+  int chave_em_numero = char_to_int(chave);
   for (int i = 0; i < this->size; i++) {
 
     int posicao_table = hash(chave_em_numero, i, this->size);
     
-    struct HashInfo info = this->table[posicao_table];
-
-    if (info.valor) {
-      if (strcmp(info.chave, chave))
+    if (__tem_item_posicao(this->table, posicao_table)) {
+      if (strcmp(this->table[posicao_table].chave, chave))
         continue;
-      return info.valor;
+      return this->table[posicao_table].valor;
     }
   }
 
@@ -203,12 +242,12 @@ static void __remove_hashtable(HashTable _this, char *chave) {
   if (!this)
     return;
 
-  unsigned chave_em_numero = char_to_unsigned(chave);
+  int chave_em_numero = char_to_int(chave);
   for (int i = 0; i < this->size; i++) {
 
     int posicao_table = hash(chave_em_numero, i, this->size);
 
-    if (this->table[posicao_table].valor) {
+    if (__tem_item_posicao(this->table, posicao_table)) {
       if (strcmp(this->table[posicao_table].chave, chave))
         continue;
       this->table[posicao_table].chave = NULL;
@@ -246,7 +285,7 @@ static void __map_hashtable(
   }
 }
 
-static unsigned __length_hashtable(HashTable _this) {
+static int __length_hashtable(HashTable _this) {
   struct HashTable * this = (struct HashTable *) _this;
 
   if (!this)
@@ -255,7 +294,7 @@ static unsigned __length_hashtable(HashTable _this) {
   return this->count;
 }
 
-static unsigned __max_size_hashtable(HashTable _this) {
+static int __max_size_hashtable(HashTable _this) {
   struct HashTable * this = (struct HashTable *) _this;
 
   if (!this)
