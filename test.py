@@ -1,10 +1,11 @@
 import os
 from time import time
+from sys import argv
 import subprocess
 
 BIN_FOLDER   = "./bin"
-TESTS_FOLDER = "./test/t5"
-OUT_FOLDER   = "./out/t5"
+TESTS_FOLDER = "./test/t"
+OUT_FOLDER   = "./out/t"
 APP_NAME     = "siguel"
 
 APP_PATH     = "{0}/{1}".format(BIN_FOLDER, APP_NAME)
@@ -41,6 +42,13 @@ def rodar_comando_verbose(filename, comando):
     
 
 if __name__ == "__main__":
+
+    if (len(argv) > 1):
+        TESTS_FOLDER += argv[1]
+        OUT_FOLDER   += argv[1]
+    else:
+        TESTS_FOLDER += "5"
+        OUT_FOLDER   += "5"
 
     tests = os.listdir(TESTS_FOLDER)
     tests.sort()
