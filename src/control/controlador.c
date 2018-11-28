@@ -516,6 +516,9 @@ static void escrever_txt_final(void *c) {
 
   free(full_path);
 
+  if (this->extras[e_qry] == NULL)
+    return;
+
   char *nome_qry = get_nome(this->extras[e_qry]);
 
   escrever_linha(arq, "Arquivo \"%s.qry\":\n\n", nome_qry);
