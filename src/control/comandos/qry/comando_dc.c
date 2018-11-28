@@ -11,6 +11,8 @@
 #include <model/mapa_viario/aresta.h>
 #include <model/SVG.h>
 #include <model/utils.h>
+#include <model/modules/grafod.h>
+#include <model/mapa_viario/vertice.h>
 
 #include <stdlib.h>
 #include <float.h>
@@ -86,11 +88,50 @@ static void desenhar_colisoes(Lista colisoes, SVG svg_saida) {
   }
 }
 
-static ArestaInfo pegar_aresta_correspondente(KDTree arestas, Ponto2D ponto) {
+static ArestaInfo pegar_aresta_correspondente(struct Controlador* this, Ponto2D ponto) {
+  KDTree arestas = this->arestas_mapa_viario;
   return KDTree_t.nearest_neighbor(
     arestas,
     &ponto,
     __distancia_aresta_ponto).point1;
+}
+
+bool aresta_corresponde_colisao(struct Controlador* controlador, ArestaInfo aresta, Figura fig_colisao ){
+  
+  VerticeInfo vertice_origem  = GrafoD_t.get_info_vertice( controlador->mapa_viario, aresta->origem );
+  VerticeInfo vertice_destino = GrafoD_t.get_info_vertice( controlador->mapa_viario, aresta->destino );
+
+  // Verificar se a reta da aresta cruza uma das retas dos lados dos retângulos
+  // São verificados apenas dois lados do retângulo
+  Ponto2D origem;
+  Ponto2D destino;
+  Ponto2D colisao;
+  Ponto2D colisao_tamanho;
+  origem.x          = vertice_origem->pos.x;
+  origem.y          = vertice_origem->pos.y;
+  destino.x         = vertice_destino->pos.x;
+  // destino.y         = vertice_destino->pos.y;
+  colisao.x         = get_x( fig_colisao );
+  colisao.y         = get_y( fig_colisao );
+  colisao_tamanho.x = get_w( fig_colisao );
+  colisao_tamanho.y = get_h( fig_colisao );
+
+  if( origem.x == destino.x ){
+    // Aresta é vertical
+    if( origem.x > colisao.x && origem.x < (colisao.x + colisao_tamanho.x) ){
+      return true;
+    }
+    return false;
+
+  }else{
+    // Aresta é horizontal
+    if( origem.y > colisao.y && origem.y < (colisao.y + colisao_tamanho.y) ){
+      return true;
+    }
+    return false;
+
+  }
+  
 }
 
 int comando_qry_dc( void* _this, void* _controlador ){
@@ -130,13 +171,27 @@ int comando_qry_dc( void* _this, void* _controlador ){
         // =============================== Sobreposições ===============================
         // Alterar aresta
         // Adicionar retangulo pontilhado à lista de drawables
-        Figura veiculo_this = get_figura_veiculo( vetor_veiculos[i]);
+        Figura veiculo_this  = get_figura_veiculo( vetor_veiculos[i]);
         Figura veiculo_other = get_figura_veiculo( vetor_veiculos[j]);
-        Figura fig_colisao = get_rect_sobreposicao( veiculo_this, veiculo_other, "red");
+        Figura fig_colisao   = get_rect_sobreposicao( veiculo_this, veiculo_other, "red");
 
         Ponto2D colisao_centro = get_centro_massa( fig_colisao );
+        
 
-        ArestaInfo info_aresta = pegar_aresta_correspondente(controlador->arestas_mapa_viario, colisao_centro);
+        ArestaInfo info_aresta = pegar_aresta_correspondente(controlador, colisao_centro);
+
+        if( !aresta_corresponde_colisao( controlador, info_aresta, fig_colisao ) ){
+          // Retirar essa aresta da arvore, pegar outra aresta mais prox e conferir
+          KDTree_t.remove( controlador->arestas_mapa_viario, info_aresta );
+          ArestaInfo info_nova_aresta = pegar_aresta_correspondente(controlador, colisao_centro);
+          KDTree_t.insert( controlador->arestas_mapa_viario, info_aresta );
+
+          if( aresta_corresponde_colisao( controlador, info_nova_aresta, fig_colisao ) ){
+            // Como é um ponteiro, basta igualar
+            info_aresta = info_nova_aresta;
+          }
+
+        }
 
         struct Colisao* this_colisao = malloc( sizeof(struct Colisao) );
 
