@@ -52484,10 +52484,10 @@ e rot1.N rot1.O # # 173.241161 11.000000 Praca_Central
 e rot1.O rot1.S # # 173.241161 11.000000 Praca_Central
 e rot1.S rot1.L # # 173.241161 11.000000 Praca_Central
 e rot1.L rot1.N # # 173.241161 11.000000 Praca_Central
-e rot1.N ib2b.(B41-|0,24) # # -2.500000 1.500000 Interbairros_II
-e ib2b.(B42-|0,0) rot1.N # # -2.500000 1.500000 Interbairros_II
+e rot1.N ib2b.(B41-|0,24) # # 2.500000 1.500000 Interbairros_II
+e ib2b.(B42-|0,0) rot1.N # # 2.500000 1.500000 Interbairros_II
 e rot1.O elo3.(B42-|0,0) # # 97.500000 1.600000 ExpressaLesteOeste
-e elo3.(B32-|40,0) rot1.O # # -2.500000 1.600000 ExpressaLesteOeste
+e elo3.(B32-|40,0) rot1.O # # 2.500000 1.600000 ExpressaLesteOeste
 e elo2.(B41-|0,24) rot1.L # # 302.500000 1.600000 ExpressaLesteOeste
 e rot1.L elo2.(B31-|40,32) # # 2.500000 1.600000 ExpressaLesteOeste
 e ib2a.(B31-|40,32) rot1.S # # 7.500000 1.500000 Interbairros_II
@@ -52529,7 +52529,7 @@ e elo1.(B40-|0,24) cz2.c # # 422.500000 1.600000 ExpressaLesteOeste
 e cz2.c cz2.f # # 20.000000 1.600000 ExpressaLesteOeste
 e cz2.c cz2.d # # 155.000000 1.600000 ExpressaLesteOeste
 e cz2.c cz2.g # # 190.918831 1.600000 ExpressaLesteOeste
-e ib1a.(B30-|40,32) cz2.e # # -27.500000 1.500000 Interbairros_I
+e ib1a.(B30-|40,32) cz2.e # # 27.500000 1.500000 Interbairros_I
 e cz2.e cz2.a # # 20.000000 1.500000 Interbairros_I
 e cz2.g ib1a.(B31-|40,0) # # 27.500000 1.500000 Interbairros_I
 e cz2.e cz2.f # # 155.000000 1.500000 Interbairros_I
@@ -52579,7 +52579,7 @@ e cz6.b cz6.g # # 20.000000 1.500000 Perimetral_Norte
 e cz6.d pn1.beN1.SE # # 70.000000 1.500000 Perimetral_Norte
 e cz6.b cz6.a # # 155.000000 1.500000 Perimetral_Norte
 e cz6.b cz6.f # # 190.918831 1.500000 Perimetral_Norte
-e pl.beL.NO cz6.e # # -20.000000 1.500000 Perimetral_Leste
+e pl.beL.NO cz6.e # # 20.000000 1.500000 Perimetral_Leste
 e cz6.e cz6.a # # 20.000000 1.500000 Perimetral_Leste
 e cz6.g pl.(B40-|20,0) # # 27.500000 1.500000 Perimetral_Leste
 e cz6.e cz6.f # # 155.000000 1.500000 Perimetral_Leste
@@ -52589,7 +52589,7 @@ e pn1.beN1.SO cz7.c # # 20.000000 1.500000 Perimetral_Norte
 e cz7.c cz7.f # # 20.000000 1.500000 Perimetral_Norte
 e cz7.c cz7.d # # 155.000000 1.500000 Perimetral_Norte
 e cz7.c cz7.g # # 190.918831 1.500000 Perimetral_Norte
-e ib2b.(B41-|20,24) cz7.e # # -27.500000 1.500000 Interbairros_II
+e ib2b.(B41-|20,24) cz7.e # # 27.500000 1.500000 Interbairros_II
 e cz7.e cz7.a # # 20.000000 1.500000 Interbairros_II
 e cz7.g ib2b.(B42-|20,0) # # 27.500000 1.500000 Interbairros_II
 e cz7.e cz7.f # # 155.000000 1.500000 Interbairros_II
