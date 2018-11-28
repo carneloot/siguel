@@ -16,31 +16,6 @@ PM_COMMAND   = " -pm {0}"
 EC_COMMAND   = " -ec {0}"
 VIA_COMMAND  = " -v {0}"
 
-
-def rodar_comando(comando):
-    before_time = time()
-    output = subprocess.Popen(
-        comando,
-        shell=True,
-        stdout=subprocess.PIPE            
-    ).stdout.read()
-    output = str(output, 'utf-8')
-    after_time = time()
-
-    time_elapsed = round(after_time - before_time, 2)
-
-    return(time_elapsed, output)
-
-def rodar_comando_verbose(filename, comando):
-    print("Rodando \"{0}\".".format(filename))
-
-    tempo, output = rodar_comando(comando_string)
-
-    print(output)
-
-    print("Rodou em {} seg.\n".format(tempo))
-    
-
 if __name__ == "__main__":
 
     if (len(argv) > 1):
@@ -76,8 +51,6 @@ if __name__ == "__main__":
         if os.path.exists(TESTS_FOLDER + "/" + via_name):
             comando_string += VIA_COMMAND.format(via_name)
 
-        # print(comando_string)
-        
         query_dir = "{}/{}".format(TESTS_FOLDER, file_name)
 
         if os.path.exists(query_dir):
@@ -91,3 +64,5 @@ if __name__ == "__main__":
                 query_string = comando_string + QRY_COMMAND.format(query_path)
 
                 print(query_string)
+        else:
+            print(comando_string)
