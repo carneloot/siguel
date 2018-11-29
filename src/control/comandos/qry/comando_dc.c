@@ -88,13 +88,6 @@ static void desenhar_colisoes(Lista colisoes, SVG svg_saida) {
   }
 }
 
-static ArestaInfo pegar_aresta_correspondente(struct Controlador* this, Ponto2D ponto) {
-  KDTree arestas = this->arestas_mapa_viario;
-  return KDTree_t.nearest_neighbor(
-    arestas,
-    &ponto,
-    __distancia_aresta_ponto).point1;
-}
 
 bool aresta_corresponde_colisao(struct Controlador* controlador, ArestaInfo aresta, Figura fig_colisao ){
   
@@ -132,6 +125,31 @@ bool aresta_corresponde_colisao(struct Controlador* controlador, ArestaInfo ares
 
   }
   
+}
+
+static ArestaInfo pegar_aresta_correspondente(struct Controlador* this, Ponto2D colisao_centro, Figura fig_colisao ) {
+  KDTree arestas = this->arestas_mapa_viario;
+  ArestaInfo info_aresta = KDTree_t.nearest_neighbor(
+    arestas,
+    &colisao_centro,
+    __distancia_aresta_ponto).point1;
+
+  if( !aresta_corresponde_colisao( this, info_aresta, fig_colisao ) ){
+        // Retirar essa aresta da arvore, pegar outra aresta mais prox e conferir
+        KDTree_t.remove( this->arestas_mapa_viario, info_aresta );
+        ArestaInfo info_nova_aresta = KDTree_t.nearest_neighbor(
+          arestas,
+          &colisao_centro,
+        __distancia_aresta_ponto).point1;
+        KDTree_t.insert( this->arestas_mapa_viario, info_aresta );
+
+        if( aresta_corresponde_colisao( this, info_nova_aresta, fig_colisao ) ){
+          // Como é um ponteiro, basta igualar
+          info_aresta = info_nova_aresta;
+        }
+
+  }
+  return info_aresta;
 }
 
 int comando_qry_dc( void* _this, void* _controlador ){
@@ -178,20 +196,7 @@ int comando_qry_dc( void* _this, void* _controlador ){
         Ponto2D colisao_centro = get_centro_massa( fig_colisao );
         
 
-        ArestaInfo info_aresta = pegar_aresta_correspondente(controlador, colisao_centro);
-
-        if( !aresta_corresponde_colisao( controlador, info_aresta, fig_colisao ) ){
-          // Retirar essa aresta da arvore, pegar outra aresta mais prox e conferir
-          KDTree_t.remove( controlador->arestas_mapa_viario, info_aresta );
-          ArestaInfo info_nova_aresta = pegar_aresta_correspondente(controlador, colisao_centro);
-          KDTree_t.insert( controlador->arestas_mapa_viario, info_aresta );
-
-          if( aresta_corresponde_colisao( controlador, info_nova_aresta, fig_colisao ) ){
-            // Como é um ponteiro, basta igualar
-            info_aresta = info_nova_aresta;
-          }
-
-        }
+        ArestaInfo info_aresta = pegar_aresta_correspondente(controlador, colisao_centro, fig_colisao);
 
         struct Colisao* this_colisao = malloc( sizeof(struct Colisao) );
 
