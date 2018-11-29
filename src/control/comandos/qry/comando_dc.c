@@ -127,7 +127,8 @@ bool aresta_corresponde_colisao(struct Controlador* controlador, ArestaInfo ares
   
 }
 
-static ArestaInfo pegar_aresta_correspondente(struct Controlador* this, Ponto2D colisao_centro, Figura fig_colisao ) {
+static ArestaInfo pegar_aresta_correspondente(struct Controlador* this, Figura fig_colisao ) {
+  Ponto2D colisao_centro = get_centro_massa( fig_colisao );
   KDTree arestas = this->arestas_mapa_viario;
   ArestaInfo info_aresta = KDTree_t.nearest_neighbor(
     arestas,
@@ -196,7 +197,7 @@ int comando_qry_dc( void* _this, void* _controlador ){
         Ponto2D colisao_centro = get_centro_massa( fig_colisao );
         
 
-        ArestaInfo info_aresta = pegar_aresta_correspondente(controlador, colisao_centro, fig_colisao);
+        ArestaInfo info_aresta = pegar_aresta_correspondente(controlador, fig_colisao);
 
         struct Colisao* this_colisao = malloc( sizeof(struct Colisao) );
 
