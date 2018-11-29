@@ -17,6 +17,8 @@
 #include <stdlib.h>
 #include <float.h>
 
+#define between(valor, min, max) ( ((valor) < (min)) ? false : ((valor) > (max)) ? false : true )
+
 struct Colisao {
   ArestaInfo aresta_info;
   Figura figura;
@@ -88,8 +90,26 @@ static void desenhar_colisoes(Lista colisoes, SVG svg_saida) {
   }
 }
 
+static bool linhas_intersectam( Ponto2D p, Ponto2D r, Ponto2D q, Ponto2D s ){
 
-bool aresta_corresponde_colisao(struct Controlador* controlador, ArestaInfo aresta, Figura fig_colisao ){
+  double rxs = Ponto2D_t.vetorial( r,s );
+  if(rxs == 0) return false;
+
+  Ponto2D qmp = Ponto2D_t.sub( p, q );
+
+  // t = (q − p) × s / (r × s)
+  double t = Ponto2D_t.vetorial( qmp, s ) / rxs;
+
+  // u = (q − p) × r / (r × s)
+  double u = Ponto2D_t.vetorial( qmp, r ) / rxs;
+
+  if( between(t, 0, 1) && between(u, 0, 1) )
+    return true;
+
+  return false;
+}
+
+static bool aresta_corresponde_colisao(struct Controlador* controlador, ArestaInfo aresta, Figura fig_colisao ){
   
   VerticeInfo vertice_origem  = GrafoD_t.get_info_vertice( controlador->mapa_viario, aresta->origem );
   VerticeInfo vertice_destino = GrafoD_t.get_info_vertice( controlador->mapa_viario, aresta->destino );
@@ -103,27 +123,45 @@ bool aresta_corresponde_colisao(struct Controlador* controlador, ArestaInfo ares
   origem.x          = vertice_origem->pos.x;
   origem.y          = vertice_origem->pos.y;
   destino.x         = vertice_destino->pos.x;
-  // destino.y         = vertice_destino->pos.y;
+  destino.y         = vertice_destino->pos.y;
   colisao.x         = get_x( fig_colisao );
   colisao.y         = get_y( fig_colisao );
   colisao_tamanho.x = get_w( fig_colisao );
   colisao_tamanho.y = get_h( fig_colisao );
 
-  if( origem.x == destino.x ){
-    // Aresta é vertical
-    if( origem.x > colisao.x && origem.x < (colisao.x + colisao_tamanho.x) ){
-      return true;
-    }
-    return false;
+  // q e s Representarão cada lado do retângulo
+  Ponto2D q;
+  Ponto2D s;
 
-  }else{
-    // Aresta é horizontal
-    if( origem.y > colisao.y && origem.y < (colisao.y + colisao_tamanho.y) ){
-      return true;
-    }
-    return false;
+  Ponto2D r = Ponto2D_t.sub( destino, origem );
 
-  }
+  // Borda de cima
+  q = colisao;
+  s.x = colisao.x + colisao_tamanho.x;
+  s.y = colisao.y;
+  s = Ponto2D_t.sub( s, q );
+  if( linhas_intersectam( origem, r, q, s ) ) return true;
+
+  // Borda da esquerda
+  // q = colisao;
+  s.x = colisao.x;
+  s.y = colisao.y + colisao_tamanho.y;
+  s = Ponto2D_t.sub( s, q );
+  if( linhas_intersectam( origem, r, q, s) ) return true;
+
+  // Borda de baixo
+  q = s;
+  s.x = colisao.x + colisao_tamanho.x;
+  s.y = colisao.y + colisao_tamanho.y;
+  s = Ponto2D_t.sub( s, q );
+  if( linhas_intersectam( origem, r, q, s ) )    return true;
+
+  // Borda da direita
+  q.x = colisao.x + colisao_tamanho.x;
+  q.y = colisao.y;
+  if( linhas_intersectam( origem, r, q, s ) )  return true;
+
+  return false;
   
 }
 
@@ -193,10 +231,7 @@ int comando_qry_dc( void* _this, void* _controlador ){
         Figura veiculo_this  = get_figura_veiculo( vetor_veiculos[i]);
         Figura veiculo_other = get_figura_veiculo( vetor_veiculos[j]);
         Figura fig_colisao   = get_rect_sobreposicao( veiculo_this, veiculo_other, "red");
-
-        Ponto2D colisao_centro = get_centro_massa( fig_colisao );
         
-
         ArestaInfo info_aresta = pegar_aresta_correspondente(controlador, fig_colisao);
 
         struct Colisao* this_colisao = malloc( sizeof(struct Colisao) );

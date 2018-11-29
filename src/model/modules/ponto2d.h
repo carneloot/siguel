@@ -28,6 +28,8 @@ struct Ponto2D_t {
 
   Ponto2D (*maximo)(Ponto2D this, Ponto2D other);
 
+  double (*vetorial)(Ponto2D this, Ponto2D other);
+
   double (*angle)(Ponto2D this);
 
   /**

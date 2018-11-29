@@ -47,6 +47,10 @@ static Ponto2D __max_ponto2d(Ponto2D this, Ponto2D other) {
   );
 }
 
+static double __vetorial_ponto2d(Ponto2D this, Ponto2D other) {
+  return this.x * other.y - this.y * other.y;
+}
+
 static double __angle_ponto2d(Ponto2D this) {
   return atan2(this.y, this.x);
 }
@@ -72,5 +76,6 @@ const struct Ponto2D_t Ponto2D_t = {
   .sub_scalar   = &__sub_scalar_ponto2d,
   .maximo       = &__max_ponto2d,
   .angle        = &__angle_ponto2d,
+  .vetorial     = &__vetorial_ponto2d,
   .orientation  = &__orientation_ponto2d,
 };
