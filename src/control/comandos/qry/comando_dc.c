@@ -109,20 +109,20 @@ int comando_qry_dc( void* _this, void* _controlador ){
   int j = 1;
 
   while (i < (tamanho - 1)){
-    int this_x     = get_x_veiculo( vetor_veiculos[ i ]);
-    int other_x    = get_x_veiculo( vetor_veiculos[ j ]);
-    int this_width = get_width_veiculo( vetor_veiculos[ i ] );
+    double this_x     = get_x_veiculo( vetor_veiculos[ i ]);
+    double other_x    = get_x_veiculo( vetor_veiculos[ j ]);
+    double this_width = get_width_veiculo( vetor_veiculos[ i ] );
 
 
     if(other_x < this_x + this_width ){
       // Sobrepõe em x, comparar o y
-      int this_y       = get_y_veiculo      ( vetor_veiculos[ i ]);
-      int this_height  = get_height_veiculo ( vetor_veiculos[ i ]);
-      int other_y      = get_y_veiculo      ( vetor_veiculos[ j ]);
-      int other_height = get_height_veiculo ( vetor_veiculos[ j ]);
+      double this_y       = get_y_veiculo      ( vetor_veiculos[ i ]);
+      double this_height  = get_height_veiculo ( vetor_veiculos[ i ]);
+      double other_y      = get_y_veiculo      ( vetor_veiculos[ j ]);
+      double other_height = get_height_veiculo ( vetor_veiculos[ j ]);
 
-      int this_high    = this_y + this_height;
-      int other_high   = other_y + other_height;
+      double this_high    = this_y + this_height;
+      double other_high   = other_y + other_height;
 
       if( ( other_high > this_y && other_high < this_high) ||
           ( other_y > this_y && other_y < this_high ) ){
