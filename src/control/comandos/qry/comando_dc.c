@@ -201,6 +201,8 @@ static Lista pegar_aresta_correspondente(struct Controlador* controlador, Figura
   // Encontrar arestas num "raio" de uma quadra
   Lista lista_arestas = KDTree_t.range_search( arestas, __aresta_dentro, &ponto_a, &ponto_b );
   Lista arestas_colisao = Lista_t.create();
+
+  figura_expandir(fig_colisao, 2, 2);
   
   // Comparar cada aresta
   while( Lista_t.length( lista_arestas ) > 0 ){
@@ -209,6 +211,8 @@ static Lista pegar_aresta_correspondente(struct Controlador* controlador, Figura
       Lista_t.insert( arestas_colisao, info_aresta );
     }
   }
+
+  figura_expandir(fig_colisao, -2, -2);
 
   Lista_t.destruir(lista_arestas, 0);
 
@@ -256,8 +260,6 @@ int comando_qry_dc( void* _this, void* _controlador ){
         Figura veiculo_this  = get_figura_veiculo( vetor_veiculos[i]);
         Figura veiculo_other = get_figura_veiculo( vetor_veiculos[j]);
         Figura fig_colisao   = get_rect_sobreposicao( veiculo_this, veiculo_other, "red");
-        
-        
 
         struct Colisao* this_colisao = malloc( sizeof(struct Colisao) );
 
