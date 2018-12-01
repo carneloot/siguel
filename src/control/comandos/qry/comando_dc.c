@@ -98,8 +98,8 @@ static void limpar_colisoes(Lista colisoes) {
 
 static void set_arestas_invalido( Lista arestas ){
 
-  while( Lista_t.length( arestas ) > 0 ){
-    ArestaInfo aresta = Lista_t.remove( arestas, Lista_t.get_first(arestas) );
+  for (Posic it = Lista_t.get_first(arestas); it != NULL; it = Lista_t.get_next(arestas, it) ) {
+    ArestaInfo aresta = Lista_t.get( arestas, it );
     set_aresta_invalido(aresta);
   }
 
@@ -108,33 +108,16 @@ static void set_arestas_invalido( Lista arestas ){
 static void desenhar_colisoes(Lista colisoes, SVG svg_saida) {
   for (Posic it = Lista_t.get_first(colisoes); it != NULL; it = Lista_t.get_next(colisoes, it)) {
     struct Colisao *colisao = Lista_t.get(colisoes, it);
+
+    escreve_comentario(svg_saida, "COLISAO");
     desenha_figura(svg_saida, colisao->figura, 1, false);
-
-    for( Posic aresta = Lista_t.get_first(colisao->arestas_colisao); aresta != NULL; aresta = Lista_t.get_next(colisao->arestas_colisao, aresta) ){
-      
-
-      ArestaInfo info_aresta = Lista_t.get( colisao->arestas_colisao, aresta );
-      escreve_comentario(svg_saida,
-        "COLISAO",
-        info_aresta->origem,
-        info_aresta->destino);
-
-
-      #ifdef DEBUG
-
-      Figura fig_aresta = cria_circulo( info_aresta->pos.x, info_aresta->pos.y, 5, "cyan", "transparent" );
-      desenha_figura( svg_saida, fig_aresta, 1, false );
-      destruir_figura( fig_aresta );
-
-      #endif
-    }
 
   }
 }
 
 static bool linhas_intersectam( Ponto2D p, Ponto2D r, Ponto2D q, Ponto2D s ){
 
-  double rxs = Ponto2D_t.vetorial( r,s );
+  double rxs = Ponto2D_t.vetorial( r, s );
   if(rxs == 0) return false;
 
   Ponto2D qmp = Ponto2D_t.sub( q, p );
@@ -158,18 +141,11 @@ static bool aresta_corresponde_colisao(struct Controlador* controlador, ArestaIn
 
   // Verificar se a reta da aresta cruza uma das retas dos lados dos retângulos
   // São verificados apenas dois lados do retângulo
-  Ponto2D origem;
-  Ponto2D destino;
-  Ponto2D colisao;
+  Ponto2D origem  = vertice_origem->pos;
+  Ponto2D destino = vertice_destino->pos;
+  Ponto2D colisao = get_pos(fig_colisao);
   Ponto2D colisao_tamanho;
 
-  origem.x          = vertice_origem->pos.x;
-  origem.y          = vertice_origem->pos.y;
-  destino.x         = vertice_destino->pos.x;
-  destino.y         = vertice_destino->pos.y;
-
-  colisao.x         = get_x( fig_colisao );
-  colisao.y         = get_y( fig_colisao );
   colisao_tamanho.x = get_w( fig_colisao );
   colisao_tamanho.y = get_h( fig_colisao );
 
@@ -177,40 +153,32 @@ static bool aresta_corresponde_colisao(struct Controlador* controlador, ArestaIn
   Ponto2D q;
   Ponto2D s;
 
+  Ponto2D p = origem;
   Ponto2D r = Ponto2D_t.sub( destino, origem );
 
   // Borda de cima
   q = colisao;
-  s.x = colisao.x + colisao_tamanho.x;
-  s.y = colisao.y;
-  s = Ponto2D_t.sub( s, q );
-  if( linhas_intersectam( origem, r, q, s ) ) return true;
+  s = Ponto2D_t.new(colisao_tamanho.x, 0);
+  if( linhas_intersectam( p, r, q, s ) ) return true;
 
   // Borda da esquerda
-  // q = colisao;
-  s.x = colisao.x;
-  s.y = colisao.y + colisao_tamanho.y;
-  s = Ponto2D_t.sub( s, q );
-  if( linhas_intersectam( origem, r, q, s) ) return true;
+  q = colisao;
+  s = Ponto2D_t.new(0, colisao_tamanho.y);
+  if( linhas_intersectam( p, r, q, s ) ) return true;
 
   // Borda de baixo
-  q.x = colisao.x;
-  q.y = colisao.y + colisao_tamanho.y;
-  s.x = colisao.x + colisao_tamanho.x;
-  s.y = colisao.y + colisao_tamanho.y;
-  s = Ponto2D_t.sub( s, q );
-  if( linhas_intersectam( origem, r, q, s ) )    return true;
+  q    = colisao;
+  q.y += colisao_tamanho.y;
+  s    = Ponto2D_t.new(colisao_tamanho.x, 0);
+  if( linhas_intersectam( p, r, q, s ) ) return true;
 
   // Borda da direita
-  q.x = colisao.x + colisao_tamanho.x;
-  q.y = colisao.y;
-  s.x = colisao.x + colisao_tamanho.x;
-  s.y = colisao.y + colisao_tamanho.y;
-  s = Ponto2D_t.sub( s, q );
-  if( linhas_intersectam( origem, r, q, s ) )  return true;
+  q    = colisao;
+  q.x += colisao_tamanho.x;
+  s    = Ponto2D_t.new(0, colisao_tamanho.y);
+  if( linhas_intersectam( p, r, q, s ) ) return true;
 
   return false;
-  
 }
 
 static Lista pegar_aresta_correspondente(struct Controlador* controlador, Figura fig_colisao ) {
