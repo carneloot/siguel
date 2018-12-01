@@ -48,7 +48,7 @@ static Ponto2D __max_ponto2d(Ponto2D this, Ponto2D other) {
 }
 
 static double __vetorial_ponto2d(Ponto2D this, Ponto2D other) {
-  return this.x * other.y - this.y * other.y;
+  return this.x * other.x - this.y * other.y;
 }
 
 static double __angle_ponto2d(Ponto2D this) {

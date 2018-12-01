@@ -137,7 +137,7 @@ static bool linhas_intersectam( Ponto2D p, Ponto2D r, Ponto2D q, Ponto2D s ){
   double rxs = Ponto2D_t.vetorial( r,s );
   if(rxs == 0) return false;
 
-  Ponto2D qmp = Ponto2D_t.sub( p, q );
+  Ponto2D qmp = Ponto2D_t.sub( q, p );
 
   // t = (q − p) × s / (r × s)
   double t = Ponto2D_t.vetorial( qmp, s ) / rxs;
