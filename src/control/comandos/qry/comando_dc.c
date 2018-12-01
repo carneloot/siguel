@@ -52,21 +52,6 @@ static double __distancia_quadra_ponto(const Item _quadra, const Item _ponto, in
   return DBL_MAX;
 }
 
-static double __distancia_aresta_ponto(const Item _aresta_info, const Item _ponto, int dim) {
-  ArestaInfo aresta_info = (ArestaInfo) _aresta_info;
-
-  Ponto2D ponto        = * (Ponto2D *) _ponto;
-  Ponto2D ponto_aresta = aresta_info->pos;
-
-  switch (dim) {
-    case 0:  return sqr(ponto.x - ponto_aresta.x);
-    case 1:  return sqr(ponto.y - ponto_aresta.y);
-    case -1: return Ponto2D_t.dist_squared(ponto, ponto_aresta);
-  }
-
-  return DBL_MAX;
-}
-
 static int __aresta_dentro(const Item value, int dim, const Item _ponto_a, const Item _ponto_b ){
   ArestaInfo aresta = (ArestaInfo) value;
   Ponto2D ponto_a = * (Ponto2D *) _ponto_a;
@@ -75,21 +60,21 @@ static int __aresta_dentro(const Item value, int dim, const Item _ponto_a, const
   
   switch(dim){
     case 0:
-      if( between( pos_aresta.x, ponto_a.x, ponto_b.x ) ){
-        return 1;
-      }
-      return -1;
+      if (pos_aresta.x < ponto_a.x) return -1;
+      if (pos_aresta.x > ponto_b.x) return 1;
+      return 0;
 
     case 1:
-      if( between( pos_aresta.y, ponto_a.y, ponto_b.y ) ){
-        return 1;
-      }
-      return -1;
+      if (pos_aresta.y < ponto_a.y) return -1;
+      if (pos_aresta.y > ponto_b.y) return 1;
+      return 0;
 
     case -1:
-      if( between( pos_aresta.x, ponto_a.x, ponto_b.x ) && between( pos_aresta.y, ponto_a.y, ponto_b.y ) )
+      // Se estiver dentro retorna 1
+      if( between( pos_aresta.x, ponto_a.x, ponto_b.x ) &&
+          between( pos_aresta.y, ponto_a.y, ponto_b.y ) )
         return 1;
-      return -1;
+      return 0;
   }
   return -1;
 }
@@ -239,14 +224,11 @@ static Lista pegar_aresta_correspondente(struct Controlador* controlador, Figura
   tamanho_quadra.x = get_largura(quadra);
   tamanho_quadra.y = get_altura(quadra);
 
-  // Pontos de busca
-  Ponto2D ponto_a;
-  ponto_a.x = colisao_centro.x - (tamanho_quadra.x / 2);
-  ponto_a.y = colisao_centro.y - (tamanho_quadra.y / 2);
+  tamanho_quadra = Ponto2D_t.mult(tamanho_quadra, 0.5);
 
-  Ponto2D ponto_b;
-  ponto_b.x = colisao_centro.x + (tamanho_quadra.x / 2);
-  ponto_b.y = colisao_centro.y + (tamanho_quadra.y / 2);
+  // Pontos de busca
+  Ponto2D ponto_a = Ponto2D_t.sub(colisao_centro, tamanho_quadra);
+  Ponto2D ponto_b = Ponto2D_t.add(colisao_centro, tamanho_quadra);
 
   // Encontrar arestas num "raio" de uma quadra
   Lista lista_arestas = KDTree_t.range_search( arestas, __aresta_dentro, &ponto_a, &ponto_b );
@@ -259,6 +241,9 @@ static Lista pegar_aresta_correspondente(struct Controlador* controlador, Figura
       Lista_t.insert( arestas_colisao, info_aresta );
     }
   }
+
+  Lista_t.destruir(lista_arestas, 0);
+
   return arestas_colisao;
   
 }
