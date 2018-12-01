@@ -20,7 +20,7 @@
 #define between(valor, min, max) ( ((valor) < (min)) ? false : ((valor) > (max)) ? false : true )
 
 struct Colisao {
-  ArestaInfo aresta_info;
+  Lista arestas_colisao;
   Figura figura;
 };
 
@@ -38,6 +38,20 @@ static int compare_x( const void* _this, const void* _other ){
   return -1;
 }
 
+static double __distancia_quadra_ponto(const Item _quadra, const Item _ponto, int dim) {
+  Elemento quadra = (Elemento) _quadra;
+  Ponto2D ponto_quadra = get_pos( quadra );
+  Ponto2D ponto = * (Ponto2D *) _ponto;
+
+  switch(dim){
+    case  0: return sqr(ponto.x - ponto_quadra.x);
+    case  1: return sqr(ponto.y - ponto_quadra.y);
+    case -1: return Ponto2D_t.dist_squared( ponto, ponto_quadra );
+  }
+
+  return DBL_MAX;
+}
+
 static double __distancia_aresta_ponto(const Item _aresta_info, const Item _ponto, int dim) {
   ArestaInfo aresta_info = (ArestaInfo) _aresta_info;
 
@@ -53,39 +67,82 @@ static double __distancia_aresta_ponto(const Item _aresta_info, const Item _pont
   return DBL_MAX;
 }
 
+static int __aresta_dentro(const Item value, int dim, const Item _ponto_a, const Item _ponto_b ){
+  ArestaInfo aresta = (ArestaInfo) value;
+  Ponto2D ponto_a = * (Ponto2D *) _ponto_a;
+  Ponto2D ponto_b = * (Ponto2D *) _ponto_b;
+  Ponto2D pos_aresta = aresta->pos;
+  
+  switch(dim){
+    case 0:
+      if( between( pos_aresta.x, ponto_a.x, ponto_b.x ) ){
+        return 1;
+      }
+      return -1;
+
+    case 1:
+      if( between( pos_aresta.y, ponto_a.y, ponto_b.y ) ){
+        return 1;
+      }
+      return -1;
+
+    case -1:
+      if( between( pos_aresta.x, ponto_a.x, ponto_b.x ) && between( pos_aresta.y, ponto_a.y, ponto_b.y ) )
+        return 1;
+      return -1;
+  }
+  return -1;
+}
+
 static void limpar_colisoes(Lista colisoes) {
   // Limpar retornar todas as arestas às velocidades originais
   while ( Lista_t.length(colisoes) > 0 ) {
     struct Colisao* colisao = Lista_t.remove(
       colisoes, Lista_t.get_first(colisoes));
 
-    set_aresta_valido(colisao->aresta_info);
-
+    //Arrumar cada aresta da lista de colisões
+    while( Lista_t.length( colisao->arestas_colisao ) > 0 ){
+      ArestaInfo aresta = Lista_t.remove( colisao->arestas_colisao, Lista_t.get_first(colisao->arestas_colisao) );
+      set_aresta_valido(aresta);
+    }
+    Lista_t.destruir(colisao->arestas_colisao, NULL);
     destruir_figura(colisao->figura);
     free(colisao);
   }
 }
 
+static void set_arestas_invalido( Lista arestas ){
+
+  while( Lista_t.length( arestas ) > 0 ){
+    ArestaInfo aresta = Lista_t.remove( arestas, Lista_t.get_first(arestas) );
+    set_aresta_invalido(aresta);
+  }
+
+}
+
 static void desenhar_colisoes(Lista colisoes, SVG svg_saida) {
   for (Posic it = Lista_t.get_first(colisoes); it != NULL; it = Lista_t.get_next(colisoes, it)) {
     struct Colisao *colisao = Lista_t.get(colisoes, it);
-
-    ArestaInfo info_aresta = colisao->aresta_info;
-
-    escreve_comentario(svg_saida,
-      "COLISAO",
-      colisao->aresta_info->origem,
-      colisao->aresta_info->destino);
-
     desenha_figura(svg_saida, colisao->figura, 1, false);
 
-    #ifdef DEBUG
+    for( Posic aresta = Lista_t.get_first(colisao->arestas_colisao); aresta != NULL; aresta = Lista_t.get_next(colisao->arestas_colisao, aresta) ){
+      
 
-    Figura fig_aresta = cria_circulo( info_aresta->pos.x, info_aresta->pos.y, 5, "cyan", "transparent" );
-    desenha_figura( svg_saida, fig_aresta, 1, false );
-    destruir_figura( fig_aresta );
+      ArestaInfo info_aresta = Lista_t.get( colisao->arestas_colisao, aresta );
+      escreve_comentario(svg_saida,
+        "COLISAO",
+        info_aresta->origem,
+        info_aresta->destino);
 
-    #endif
+
+      #ifdef DEBUG
+
+      Figura fig_aresta = cria_circulo( info_aresta->pos.x, info_aresta->pos.y, 5, "cyan", "transparent" );
+      desenha_figura( svg_saida, fig_aresta, 1, false );
+      destruir_figura( fig_aresta );
+
+      #endif
+    }
 
   }
 }
@@ -120,10 +177,12 @@ static bool aresta_corresponde_colisao(struct Controlador* controlador, ArestaIn
   Ponto2D destino;
   Ponto2D colisao;
   Ponto2D colisao_tamanho;
+
   origem.x          = vertice_origem->pos.x;
   origem.y          = vertice_origem->pos.y;
   destino.x         = vertice_destino->pos.x;
   destino.y         = vertice_destino->pos.y;
+
   colisao.x         = get_x( fig_colisao );
   colisao.y         = get_y( fig_colisao );
   colisao_tamanho.x = get_w( fig_colisao );
@@ -150,7 +209,8 @@ static bool aresta_corresponde_colisao(struct Controlador* controlador, ArestaIn
   if( linhas_intersectam( origem, r, q, s) ) return true;
 
   // Borda de baixo
-  q = s;
+  q.x = colisao.x;
+  q.y = colisao.y + colisao_tamanho.y;
   s.x = colisao.x + colisao_tamanho.x;
   s.y = colisao.y + colisao_tamanho.y;
   s = Ponto2D_t.sub( s, q );
@@ -159,36 +219,48 @@ static bool aresta_corresponde_colisao(struct Controlador* controlador, ArestaIn
   // Borda da direita
   q.x = colisao.x + colisao_tamanho.x;
   q.y = colisao.y;
+  s.x = colisao.x + colisao_tamanho.x;
+  s.y = colisao.y + colisao_tamanho.y;
+  s = Ponto2D_t.sub( s, q );
   if( linhas_intersectam( origem, r, q, s ) )  return true;
 
   return false;
   
 }
 
-static ArestaInfo pegar_aresta_correspondente(struct Controlador* this, Figura fig_colisao ) {
+static Lista pegar_aresta_correspondente(struct Controlador* controlador, Figura fig_colisao ) {
   Ponto2D colisao_centro = get_centro_massa( fig_colisao );
-  KDTree arestas = this->arestas_mapa_viario;
-  ArestaInfo info_aresta = KDTree_t.nearest_neighbor(
-    arestas,
-    &colisao_centro,
-    __distancia_aresta_ponto).point1;
+  KDTree arestas = controlador->arestas_mapa_viario;
+  KDTree quadras = controlador->elementos[QUADRA];
+  // Encontrar quadra mais próxima
+  Elemento quadra = KDTree_t.nearest_neighbor( quadras, &colisao_centro, __distancia_quadra_ponto ).point1;
 
-  if( !aresta_corresponde_colisao( this, info_aresta, fig_colisao ) ){
-        // Retirar essa aresta da arvore, pegar outra aresta mais prox e conferir
-        KDTree_t.remove( this->arestas_mapa_viario, info_aresta );
-        ArestaInfo info_nova_aresta = KDTree_t.nearest_neighbor(
-          arestas,
-          &colisao_centro,
-        __distancia_aresta_ponto).point1;
-        KDTree_t.insert( this->arestas_mapa_viario, info_aresta );
+  Ponto2D tamanho_quadra;
+  tamanho_quadra.x = get_largura(quadra);
+  tamanho_quadra.y = get_altura(quadra);
 
-        if( aresta_corresponde_colisao( this, info_nova_aresta, fig_colisao ) ){
-          // Como é um ponteiro, basta igualar
-          info_aresta = info_nova_aresta;
-        }
+  // Pontos de busca
+  Ponto2D ponto_a;
+  ponto_a.x = colisao_centro.x - (tamanho_quadra.x / 2);
+  ponto_a.y = colisao_centro.y - (tamanho_quadra.y / 2);
 
+  Ponto2D ponto_b;
+  ponto_b.x = colisao_centro.x + (tamanho_quadra.x / 2);
+  ponto_b.y = colisao_centro.y + (tamanho_quadra.y / 2);
+
+  // Encontrar arestas num "raio" de uma quadra
+  Lista lista_arestas = KDTree_t.range_search( arestas, __aresta_dentro, &ponto_a, &ponto_b );
+  Lista arestas_colisao = Lista_t.create();
+  
+  // Comparar cada aresta
+  while( Lista_t.length( lista_arestas ) > 0 ){
+    ArestaInfo info_aresta = Lista_t.remove( lista_arestas, Lista_t.get_first(lista_arestas) );
+    if( aresta_corresponde_colisao( controlador, info_aresta, fig_colisao ) ){
+      Lista_t.insert( arestas_colisao, info_aresta );
+    }
   }
-  return info_aresta;
+  return arestas_colisao;
+  
 }
 
 int comando_qry_dc( void* _this, void* _controlador ){
@@ -232,14 +304,14 @@ int comando_qry_dc( void* _this, void* _controlador ){
         Figura veiculo_other = get_figura_veiculo( vetor_veiculos[j]);
         Figura fig_colisao   = get_rect_sobreposicao( veiculo_this, veiculo_other, "red");
         
-        ArestaInfo info_aresta = pegar_aresta_correspondente(controlador, fig_colisao);
+        
 
         struct Colisao* this_colisao = malloc( sizeof(struct Colisao) );
 
-        this_colisao->aresta_info = info_aresta;
-        this_colisao->figura      = fig_colisao;
+        this_colisao->arestas_colisao = pegar_aresta_correspondente( controlador, fig_colisao ) ;
+        this_colisao->figura          = fig_colisao;
 
-        set_aresta_invalido( info_aresta );
+        set_arestas_invalido( this_colisao->arestas_colisao );
 
         Lista_t.insert( controlador->colisoes, this_colisao );
       }
