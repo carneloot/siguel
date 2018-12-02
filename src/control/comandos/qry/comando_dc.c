@@ -13,16 +13,13 @@
 #include <model/utils.h>
 #include <model/modules/grafod.h>
 #include <model/mapa_viario/vertice.h>
+#include <model/colisao.h>
 
 #include <stdlib.h>
 #include <float.h>
 
 #define between(valor, min, max) ( ((valor) < (min)) ? false : ((valor) > (max)) ? false : true )
 
-struct Colisao {
-  Lista arestas_colisao;
-  Figura figura;
-};
 
 static int compare_x( const void* _this, const void* _other ){
 
@@ -82,17 +79,16 @@ static int __aresta_dentro(const Item value, int dim, const Item _ponto_a, const
 static void limpar_colisoes(Lista colisoes) {
   // Limpar retornar todas as arestas às velocidades originais
   while ( Lista_t.length(colisoes) > 0 ) {
-    struct Colisao* colisao = Lista_t.remove(
+    Colisao colisao = Lista_t.remove(
       colisoes, Lista_t.get_first(colisoes));
 
     //Arrumar cada aresta da lista de colisões
-    while( Lista_t.length( colisao->arestas_colisao ) > 0 ){
-      ArestaInfo aresta = Lista_t.remove( colisao->arestas_colisao, Lista_t.get_first(colisao->arestas_colisao) );
+    Lista arestas_colisao = colisao_get_arestas( colisao );
+    while( Lista_t.length( arestas_colisao ) > 0 ){
+      ArestaInfo aresta = Lista_t.remove( arestas_colisao, Lista_t.get_first(arestas_colisao) );
       set_aresta_valido(aresta);
     }
-    Lista_t.destruir(colisao->arestas_colisao, NULL);
-    destruir_figura(colisao->figura);
-    free(colisao);
+    colisao_destroy( colisao );
   }
 }
 
@@ -107,10 +103,10 @@ static void set_arestas_invalido( Lista arestas ){
 
 static void desenhar_colisoes(Lista colisoes, SVG svg_saida) {
   for (Posic it = Lista_t.get_first(colisoes); it != NULL; it = Lista_t.get_next(colisoes, it)) {
-    struct Colisao *colisao = Lista_t.get(colisoes, it);
-
+    Colisao colisao = Lista_t.get(colisoes, it);
+    Figura figura = colisao_get_figura(colisao);
     escreve_comentario(svg_saida, "COLISAO");
-    desenha_figura(svg_saida, colisao->figura, 1, false);
+    desenha_figura(svg_saida, figura, 1, false);
 
   }
 }
@@ -140,7 +136,7 @@ static bool aresta_corresponde_colisao(struct Controlador* controlador, ArestaIn
   VerticeInfo vertice_destino = GrafoD_t.get_info_vertice( controlador->mapa_viario, aresta->destino );
 
   // Verificar se a reta da aresta cruza uma das retas dos lados dos retângulos
-  // São verificados apenas dois lados do retângulo
+  
   Ponto2D origem  = vertice_origem->pos;
   Ponto2D destino = vertice_destino->pos;
   Ponto2D colisao = get_pos(fig_colisao);
@@ -261,12 +257,11 @@ int comando_qry_dc( void* _this, void* _controlador ){
         Figura veiculo_other = get_figura_veiculo( vetor_veiculos[j]);
         Figura fig_colisao   = get_rect_sobreposicao( veiculo_this, veiculo_other, "red");
 
-        struct Colisao* this_colisao = malloc( sizeof(struct Colisao) );
+        Lista arestas_colisao = pegar_aresta_correspondente( controlador, fig_colisao ) ;
+        Colisao this_colisao  = colisao_create( fig_colisao, arestas_colisao );
 
-        this_colisao->arestas_colisao = pegar_aresta_correspondente( controlador, fig_colisao ) ;
-        this_colisao->figura          = fig_colisao;
 
-        set_arestas_invalido( this_colisao->arestas_colisao );
+        set_arestas_invalido( arestas_colisao );
 
         Lista_t.insert( controlador->colisoes, this_colisao );
       }
