@@ -244,6 +244,19 @@ int dentro_figura(Figura _this, Figura _other) {
   return -1;
 }
 
+void figura_expandir(Figura _this, double dx, double dy) {
+  struct Figura * this = (struct Figura *) _this;
+
+  if (this->tipo != RETANGULO)
+    return;
+  
+  x(this) -= dx;
+  y(this) -= dy;
+
+  w(this) += 2.0 * dx;
+  h(this) += 2.0 * dy;
+}
+
 char *get_svg_figura(Figura _this) {
   struct Figura * this = (struct Figura *) _this;
 

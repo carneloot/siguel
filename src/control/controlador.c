@@ -15,6 +15,7 @@
 #include <model/utils.h>
 #include <model/modules/logger.h>
 #include <model/veiculo.h>
+#include <model/colisao.h>
 
 #include <model/mapa_viario/aresta.h>
 #include <model/mapa_viario/vertice.h>
@@ -447,7 +448,7 @@ void destruir_controlador(Controlador c) {
   Lista_t.destruir(this->saida_svg_qry, desenhavel_destruir);
 
   Lista_t.destruir(this->veiculos, destruir_veiculo);
-  Lista_t.destruir(this->colisoes, free);
+  Lista_t.destruir(this->colisoes, colisao_destroy);
   Lista_t.destruir(this->figuras, &destruir_figura);
 
   // Sobreposicoes

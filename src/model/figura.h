@@ -35,6 +35,8 @@ void destruir_figura(Figura f);
  */
 int dentro_figura(Figura this, Figura other);
 
+void figura_expandir(Figura this, double dx, double dy);
+
 /** Getters */
 
 Ponto2D get_pos(Figura f);
