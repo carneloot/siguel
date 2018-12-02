@@ -1,10 +1,11 @@
 import os
 from time import time
+from sys import argv
 import subprocess
 
 BIN_FOLDER   = "./bin"
-TESTS_FOLDER = "./test/t4"
-OUT_FOLDER   = "./out/t4"
+TESTS_FOLDER = "./test/t"
+OUT_FOLDER   = "./out/t"
 APP_NAME     = "siguel"
 
 APP_PATH     = "{0}/{1}".format(BIN_FOLDER, APP_NAME)
@@ -13,33 +14,16 @@ RUN_COMMAND  = "{0} -e {1} -o {2} -f {3}"
 QRY_COMMAND  = " -q {0}"
 PM_COMMAND   = " -pm {0}"
 EC_COMMAND   = " -ec {0}"
-
-
-def rodar_comando(comando):
-    before_time = time()
-    output = subprocess.Popen(
-        comando,
-        shell=True,
-        stdout=subprocess.PIPE            
-    ).stdout.read()
-    output = str(output, 'utf-8')
-    after_time = time()
-
-    time_elapsed = round(after_time - before_time, 2)
-
-    return(time_elapsed, output)
-
-def rodar_comando_verbose(filename, comando):
-    print("Rodando \"{0}\".".format(filename))
-
-    tempo, output = rodar_comando(comando_string)
-
-    print(output)
-
-    print("Rodou em {} seg.\n".format(tempo))
-    
+VIA_COMMAND  = " -v {0}"
 
 if __name__ == "__main__":
+
+    if (len(argv) > 1):
+        TESTS_FOLDER += argv[1]
+        OUT_FOLDER   += argv[1]
+    else:
+        TESTS_FOLDER += "5"
+        OUT_FOLDER   += "5"
 
     tests = os.listdir(TESTS_FOLDER)
     tests.sort()
@@ -63,8 +47,10 @@ if __name__ == "__main__":
         if os.path.exists(TESTS_FOLDER + "/" + ec_name):
             comando_string += EC_COMMAND.format(ec_name)
 
-        print(comando_string)
-        
+        via_name = file_name + "-v.via"
+        if os.path.exists(TESTS_FOLDER + "/" + via_name):
+            comando_string += VIA_COMMAND.format(via_name)
+
         query_dir = "{}/{}".format(TESTS_FOLDER, file_name)
 
         if os.path.exists(query_dir):
@@ -78,3 +64,5 @@ if __name__ == "__main__":
                 query_string = comando_string + QRY_COMMAND.format(query_path)
 
                 print(query_string)
+        else:
+            print(comando_string)

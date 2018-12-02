@@ -1,0 +1,18 @@
+@m? R2 000.000.461-83
+@e? R3 B41-10.2 N 10
+@xy R4 1822.500000 628.500000
+p? p 01-c D R3 R4 blue
+p? p 01-r T R3 R4 red
+@xy R5 9112.500000 3142.500000
+@xy R6 16402.500000 5656.500000
+p? p 02-c D R5 R6 green
+p? p 02-r T R5 R6 orange
+@xy R6 16402.500000 5656.500000
+@g? R7 hoB42-20.5
+p? t D R6 R7
+p? t T R6 R7
+@m? R2 000.000.461-83
+@tp? R8 bxb R2
+p? t D R8 R2
+@tp? R9 tet R3
+p? p 03-c D R9 R3 cyan
