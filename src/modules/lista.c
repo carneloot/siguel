@@ -2,45 +2,43 @@
 
 #include <stdlib.h>
 
-struct Posic {
-  Item value;
-  struct Posic *next;
-  struct Posic *prev;
+struct Posic_t {
+  void *value;
+  struct Posic_t *next;
+  struct Posic_t *prev;
 };
 
-struct Lista {
-  struct Posic *start;
-  struct Posic *end;
+struct Lista_t {
+  struct Posic_t *start;
+  struct Posic_t *end;
   int size;
 };
 
-static Lista __create_lista() {
-  struct Lista *this = (struct Lista *) malloc(sizeof(struct Lista));
+Lista_t lt_create() {
+  struct Lista_t *this = (struct Lista_t *) malloc(sizeof(*this));
 
   this->start = NULL;
   this->end   = NULL;
   this->size  = 0;
 
-  return (Lista) this;
+  return (Lista_t) this;
 }
 
-static int __length_lista(Lista lista) {
-  struct Lista *this = (struct Lista *) lista;
+int lt_length(Lista_t lista) {
+  struct Lista_t *this = (struct Lista_t *) lista;
   return this->size;
 }
 
-static Posic __insert_lista(Lista lista, Item item) {
-  struct Lista *this = (struct Lista *) lista;
-  struct Posic *posic;
-
-  posic = (struct Posic *) malloc(sizeof(struct Posic));
+Posic_t lt_insert(Lista_t lista, void *item) {
+  struct Lista_t *this = (struct Lista_t *) lista;
+  struct Posic_t *posic = (struct Posic_t *) malloc(sizeof(*posic));
 
   posic->next  = NULL;
   posic->prev  = NULL;
   posic->value = item;
 
   // Se a lista estiver vazia
-  if (__length_lista(lista) == 0) {
+  if (lt_length(lista) == 0) {
     this->start = posic;
     this->end   = posic;
     this->size++;
@@ -57,14 +55,14 @@ static Posic __insert_lista(Lista lista, Item item) {
   return posic;
 }
 
-static Item __remove_lista(Lista lista, Posic posicao) {
-  struct Lista *this  = (struct Lista *) lista;
-  struct Posic *posic = (struct Posic *) posicao;
+void *lt_remove(Lista_t lista, Posic_t posicao) {
+  struct Lista_t *this  = (struct Lista_t *) lista;
+  struct Posic_t *posic = (struct Posic_t *) posicao;
 
   if (!posicao)
     return NULL;
 
-  Item retorno = posic->value;
+  void *retorno = posic->value;
 
   if (this->start == posic)
     this->start = posic->next;
@@ -85,8 +83,8 @@ static Item __remove_lista(Lista lista, Posic posicao) {
   return retorno;
 }
 
-static Item __get_lista(Lista lista, Posic posicao) {
-  struct Posic *posic = (struct Posic *) posicao;
+void *lt_get(Lista_t lista, Posic_t posicao) {
+  struct Posic_t *posic = (struct Posic_t *) posicao;
 
   if (!posicao)
     return NULL;
@@ -94,10 +92,10 @@ static Item __get_lista(Lista lista, Posic posicao) {
   return posic->value;
 }
 
-static Posic __insert_before_lista(Lista lista, Posic posicao, Item item) {
-  struct Lista *this     = (struct Lista *) lista;
-  struct Posic *posic    = (struct Posic *) posicao;
-  struct Posic *newPosic = (struct Posic *) malloc(sizeof(struct Posic));
+Posic_t lt_insert_before(Lista_t lista, Posic_t posicao, void *item) {
+  struct Lista_t *this     = (struct Lista_t *) lista;
+  struct Posic_t *posic    = (struct Posic_t *) posicao;
+  struct Posic_t *newPosic = (struct Posic_t *) malloc(sizeof(*newPosic));
 
   if (!posicao)
     return NULL;
@@ -120,13 +118,13 @@ static Posic __insert_before_lista(Lista lista, Posic posicao, Item item) {
 
   this->size++;
 
-  return (Posic) newPosic;
+  return newPosic;
 }
 
-static Posic __insert_after_lista(Lista lista, Posic posicao, Item item) {
-  struct Lista *this     = (struct Lista *) lista;
-  struct Posic *posic    = (struct Posic *) posicao;
-  struct Posic *newPosic = (struct Posic *) malloc(sizeof(struct Posic));
+Posic_t lt_insert_after(Lista_t lista, Posic_t posicao, void *item) {
+  struct Lista_t *this     = (struct Lista_t *) lista;
+  struct Posic_t *posic    = (struct Posic_t *) posicao;
+  struct Posic_t *newPosic = (struct Posic_t *) malloc(sizeof(*newPosic));
 
   if (!posicao)
     return NULL;
@@ -149,45 +147,45 @@ static Posic __insert_after_lista(Lista lista, Posic posicao, Item item) {
 
   this->size++;
 
-  return (Posic) newPosic;
+  return newPosic;
 }
 
-static Posic __get_first_lista(Lista lista) {
-  struct Lista *this = (struct Lista *) lista;
-  return (Posic) this->start;
+Posic_t lt_get_first(Lista_t lista) {
+  struct Lista_t *this = (struct Lista_t *) lista;
+  return this->start;
 }
 
-static Posic __get_next_lista(Lista lista, Posic posicao) {
-  struct Posic *posic = (struct Posic *) posicao;
+Posic_t lt_get_next(Lista_t lista, Posic_t posicao) {
+  struct Posic_t *posic = (struct Posic_t *) posicao;
   if (!posicao)
     return NULL;
-  return (Posic) posic->next;
+  return posic->next;
 }
 
-static Posic __get_last_lista(Lista lista) {
-  struct Lista *this = (struct Lista *) lista;
-  return (Posic) this->end;
+Posic_t lt_get_last(Lista_t lista) {
+  struct Lista_t *this = (struct Lista_t *) lista;
+  return this->end;
 }
 
-static Posic __get_previous_lista(Lista lista, Posic posicao) {
-  struct Posic *posic = (struct Posic *) posicao;
+Posic_t lt_get_previous(Lista_t lista, Posic_t posicao) {
+  struct Posic_t *posic = (struct Posic_t *) posicao;
   if (!posicao)
     return NULL;
-  return (Posic) posic->prev;
+  return posic->prev;
 }
 
-static Posic __search_lista(
-  Lista _lista,
-  Posic _start,
-  const void *other,
-  int (*compare)(const Item item, const void *other)) {
-  struct Posic *iterator;
+Posic_t lt_search(
+  Lista_t _lista,
+  Posic_t _start,
+  void *other,
+  int (*compare)(void *item, void *other)) {
+  struct Posic_t *iterator;
 
-  iterator = (struct Posic *) _start;
+  iterator = (struct Posic_t *) _start;
 
   while (iterator) {
     if (!compare(iterator->value, other))
-      return (Posic) iterator;
+      return iterator;
 
     iterator = iterator->next;
   }
@@ -195,56 +193,56 @@ static Posic __search_lista(
   return NULL;
 }
 
-static Lista __copy_lista(Lista _this) {
-  struct Lista * this = (struct Lista *) _this;
-  Lista copia = __create_lista();
+Lista_t lt_copy(Lista_t _this) {
+  struct Lista_t * this = (struct Lista_t *) _this;
+  Lista_t copia = lt_create();
 
-  struct Posic *it = this->start;
+  struct Posic_t *it = this->start;
   while (it) {
-    __insert_lista(copia, it->value);
+    lt_insert(copia, it->value);
     it = it->next;
   }
 
   return copia;
 }
 
-static Lista __filter_lista(Lista _this, void *other, int (*compare)(const Item item, const void *other)) {
-  struct Lista * this = (struct Lista *) _this;
-  Lista filtrado = __create_lista();
+Lista_t lt_filter(Lista_t _this, void *other, int (*compare)(void *item, void *other)) {
+  struct Lista_t * this = (struct Lista_t *) _this;
+  Lista_t filtrado = lt_create();
 
-  struct Posic *it = __get_first_lista(this);
-  it = __search_lista(this, it, other, compare);
+  struct Posic_t *it = lt_get_first(this);
+  it = lt_search(this, it, other, compare);
   while (it) {
-    Item item = __get_lista(this, it);
+    void *item = lt_get(this, it);
 
-    __insert_lista(filtrado, item);
+    lt_insert(filtrado, item);
 
-    it = __search_lista(this, __get_next_lista(this, it), other, compare);
+    it = lt_search(this, lt_get_next(this, it), other, compare);
   }
   
   return filtrado;
 }
 
-static void __map_lista(Lista _this, void *other, void (*map_function)(const Item item, const void *other)) {
-  struct Lista * this = (struct Lista *) _this;
+void lt_map(Lista_t _this, void *other, void (*map_function)(void *item, void *other)) {
+  struct Lista_t * this = (struct Lista_t *) _this;
 
-  struct Posic *it = __get_first_lista(this);
+  struct Posic_t *it = lt_get_first(this);
   while (it) {
-    Item item = __get_lista(this, it);
+    void *item = lt_get(this, it);
 
     map_function(item, other);
 
-    it = __get_next_lista(this, it);
+    it = lt_get_next(this, it);
   }
   
 }
 
-static Item *__to_array_lista(Lista _this) {
-  struct Lista *this = (struct Lista *) _this;
+void **lt_to_array(Lista_t _this) {
+  struct Lista_t *this = (struct Lista_t *) _this;
 
-  Item *array = (Item *) calloc(this->size, sizeof(Item));
+  void **array = (void **) calloc(this->size, sizeof(void *));
 
-  struct Posic *iterator = this->start;
+  struct Posic_t *iterator = this->start;
 
   int i = 0;
   while (iterator) {
@@ -257,58 +255,38 @@ static Item *__to_array_lista(Lista _this) {
   return array;
 }
 
-static int __contem_lista(Lista _this, Item item) {
-  struct Lista *this = (struct Lista *) _this;
+int lt_contem(Lista_t _this, void *item) {
+  struct Lista_t *this = (struct Lista_t *) _this;
 
-  Posic it = __get_first_lista(this);
+  Posic_t it = lt_get_first(this);
 
   while (it) {
-    Item atual = __get_lista(this, it);
+    void *atual = lt_get(this, it);
 
     if (atual == item) {
       return 1;
     }
 
-    it = __get_next_lista(this, it);
+    it = lt_get_next(this, it);
   }
 
   return 0;
 }
 
-static void __destruir_lista(Lista lista, void (*destruir_item)(Item item)) {
+void lt_destroy(Lista_t lista, void (*destruir_item)(void *item)) {
   if (destruir_item) {
-    Posic iterator;
+    Posic_t iterator;
 
-    iterator = __get_first_lista(lista);
+    iterator = lt_get_first(lista);
     while (iterator) {
-      destruir_item(__get_lista(lista, iterator));
-      iterator = __get_next_lista(lista, iterator);
+      destruir_item(lt_get(lista, iterator));
+      iterator = lt_get_next(lista, iterator);
     }
   }
 
   // Destruir os nodes que ainda existam.
-  while (__length_lista(lista) != 0)
-    __remove_lista(lista, __get_last_lista(lista));
+  while (lt_length(lista) != 0)
+    lt_remove(lista, lt_get_last(lista));
 
   free(lista);
 }
-
-const struct Lista_t Lista_t = {  //
-  .create        = &__create_lista,
-  .length        = &__length_lista,
-  .insert        = &__insert_lista,
-  .remove        = &__remove_lista,
-  .get           = &__get_lista,
-  .insert_before = &__insert_before_lista,
-  .insert_after  = &__insert_after_lista,
-  .get_first     = &__get_first_lista,
-  .get_next      = &__get_next_lista,
-  .get_last      = &__get_last_lista,
-  .get_previous  = &__get_previous_lista,
-  .search        = &__search_lista,
-  .copy          = &__copy_lista,
-  .filter        = &__filter_lista,
-  .map           = &__map_lista,
-  .to_array      = &__to_array_lista,
-  .contem        = &__contem_lista,
-  .destruir      = &__destruir_lista};

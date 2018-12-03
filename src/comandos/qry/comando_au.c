@@ -35,7 +35,7 @@ int comando_qry_au( void* _this, void* _controlador ){
 
   Veiculo veiculo = cria_veiculo( pos, w, h, placa );
 
-  Lista_t.insert(controlador->veiculos, veiculo);
+  lt_insert(controlador->veiculos, veiculo);
   
   // TODO Escrever a placa do carro no svg
 

@@ -29,7 +29,7 @@ int comando_qry_mudec(void *_this, void *_controlador) {
   if (!HashTable_t.exists(tabela, cnpj)) {
     char *saida = format_string(
       "O comercio com o CNPJ \"%s\" nao foi encontrado.\n", cnpj);
-    Lista_t.insert(controlador->saida, saida);
+    lt_insert(controlador->saida, saida);
     return 1;
   } 
 
@@ -52,7 +52,7 @@ int comando_qry_mudec(void *_this, void *_controlador) {
   char *saida = format_string(
     "Mudanca de endereco:\n\t%s\n\tmudou para %s\n",
     info_comercio, info_endereco_atual);
-  Lista_t.insert(controlador->saida, saida);
+  lt_insert(controlador->saida, saida);
 
   free(info_comercio);
   free(info_endereco_atual);
@@ -63,7 +63,7 @@ int comando_qry_mudec(void *_this, void *_controlador) {
   Ponto2D_t new_max = p2d_maximo(pos_antiga, pos_atual);
   controlador->max_qry = p2d_maximo(controlador->max_qry, new_max);
 
-  Lista_t.insert(controlador->saida_svg_qry, 
+  lt_insert(controlador->saida_svg_qry, 
     cria_desenhavel(pontos, svg_pontos, free_svg_pontos)
   );
   

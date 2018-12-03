@@ -30,7 +30,7 @@ int comando_geo_c(void *_this, void *_controlador) {
   Figura figura = cria_circulo(pos.x, pos.y, r, cor, cor_borda);
   set_id_figura(figura, id);
 
-  Lista_t.insert((Lista) controlador->figuras, figura);
+  lt_insert((Lista_t) controlador->figuras, figura);
   
   Ponto2D_t new_max = p2d_add_scalar(pos, r + 4);
 
@@ -63,7 +63,7 @@ int comando_geo_r(void *_this, void *_controlador) {
   Figura figura = cria_retangulo(pos.x, pos.y, size.x, size.y, cor, cor_borda);
   set_id_figura(figura, id);
 
-  Lista_t.insert((Lista) controlador->figuras, figura);
+  lt_insert((Lista_t) controlador->figuras, figura);
 
   Ponto2D_t new_max = p2d_add(pos, size);
   new_max = p2d_add_scalar(new_max, 4);

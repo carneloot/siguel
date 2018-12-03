@@ -6,18 +6,18 @@
 #include <elemento.h>
 #include <utils.h>
 
-int checar_id_figura(const Item _figura, const void *_id) {
-  const Figura figura = (const Figura) _figura;
-  const int id        = (const int) *(int *) _id;
+int checar_id_figura(void *_figura, void *_id) {
+  Figura figura = (Figura) _figura;
+  int id        = (int) *(int *) _id;
 
   return !(get_id_figura(figura) == id);
 }
 
-void compararCEP(const Item _ele, unsigned prof, va_list list) {
+void compararCEP(void *_ele, unsigned prof, va_list list) {
   // CEP, *RESULT
   char *cep          = va_arg(list, char *);
   Elemento *result   = va_arg(list, Elemento *);
-  const Elemento ele = _ele;
+  Elemento ele = _ele;
 
   if (*result)
     return;

@@ -15,7 +15,7 @@
  * e ao vertice de destino e retorna um valor de heuristica para dar
  * prioridade ao vertice atual
  */
-Lista astar(
+Lista_t astar(
   GrafoD grafo,
   char *origem, char *destino,
   double (*get_dist_aresta)(void *aresta_info),
@@ -28,7 +28,7 @@ Lista astar(
  * A funcao get_dist_aresta recebe a informacao atribuida a aresta
  * e retorna a distancia utilizada para o calculo do algoritmo
  */
-Lista dijkstra(
+Lista_t dijkstra(
   GrafoD grafo,
   char *origem, char *destino,
   double (*get_dist_aresta)(void *aresta_info));

@@ -70,7 +70,7 @@ static void destroy_vertice(void *_this) {
 struct GrafoD {
   int num_vertices;
 
-  Lista vertices;
+  Lista_t vertices;
   HashTable label_x_vertice;
 };
 
@@ -79,7 +79,7 @@ static GrafoD __create_grafod() {
 
   this->num_vertices = 0;
 
-  this->vertices = Lista_t.create();
+  this->vertices = lt_create();
   this->label_x_vertice = HashTable_t.create(199);
   
   return this;
@@ -88,7 +88,7 @@ static GrafoD __create_grafod() {
 static void __destroy_grafod(GrafoD _this) {
   struct GrafoD *this = (struct GrafoD *) _this;
 
-  Lista_t.destruir(this->vertices, NULL);
+  lt_destroy(this->vertices, NULL);
   HashTable_t.destroy(this->label_x_vertice, destroy_vertice, false);
 
   free(this);
@@ -101,14 +101,14 @@ static char **__get_all_vertices_grafod(GrafoD _this) {
 
   int indice = 0;
 
-  Posic it = Lista_t.get_first(this->vertices);
+  Posic_t it = lt_get_first(this->vertices);
 
   while (it) {
-    struct Vertice *vertice = Lista_t.get(this->vertices, it);
+    struct Vertice *vertice = lt_get(this->vertices, it);
 
     retorno[indice++] = vertice->label;
 
-    it = Lista_t.get_next(this->vertices, it);
+    it = lt_get_next(this->vertices, it);
   }
 
   return retorno;
@@ -137,16 +137,16 @@ static void __generate_dot_grafod(GrafoD _this, FILE *fp) {
 
   // Passar por todos os vertices imprimindo as arestas
 
-  Posic it = Lista_t.get_first(this->vertices);
+  Posic_t it = lt_get_first(this->vertices);
 
   while (it) {
-    struct Vertice *vertice = Lista_t.get(this->vertices, it);
+    struct Vertice *vertice = lt_get(this->vertices, it);
     
     fprintf(fp, "\"%p\" [label=\"%s\"];\n", vertice->label, vertice->label);
 
     HashTable_t.map(vertice->arestas, fp, __imprimir_aresta_dot);
 
-    it = Lista_t.get_next(this->vertices, it);
+    it = lt_get_next(this->vertices, it);
   }
 
   fprintf(fp, "}\n");
@@ -292,7 +292,7 @@ static void __insert_vertice_grafod(GrafoD _this, char *node) {
 
   struct Vertice *vertice = create_vertice(NULL, node);
 
-  Lista_t.insert(this->vertices, vertice);
+  lt_insert(this->vertices, vertice);
   HashTable_t.insert(this->label_x_vertice, vertice->label, vertice);
 
   this->num_vertices++;
@@ -350,15 +350,15 @@ static void __remove_vertice_grafod(GrafoD _this, char *node) {
 
 static void __adicionar_lista(void *_aresta, void *_lista) {
   const struct Aresta *aresta = (const struct Aresta *) _aresta;
-  Lista lista = _lista;
+  Lista_t lista = _lista;
 
-  Lista_t.insert(lista, aresta->label_destino);
+  lt_insert(lista, aresta->label_destino);
 }
 
-static Lista __adjacentes_grafod(GrafoD _this, char *node) {
+static Lista_t __adjacentes_grafod(GrafoD _this, char *node) {
   struct GrafoD *this = _this;
 
-  Lista lista = Lista_t.create();
+  Lista_t lista = lt_create();
 
   struct Vertice *vertice = HashTable_t.get(this->label_x_vertice, node);
 

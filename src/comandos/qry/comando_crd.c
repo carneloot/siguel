@@ -36,7 +36,7 @@ int comando_qry_crd(void *_this, void *_controlador) {
 
     char *saida = get_info_elemento(result);
     strcat(saida, "\n");
-    Lista_t.insert(controlador->saida, saida);
+    lt_insert(controlador->saida, saida);
   }
 
   return 1;

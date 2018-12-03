@@ -10,9 +10,9 @@
 #include <utils.h>
 #include "../funcoes_checagem.h"
 
-static int contemCep(const Item item, const void *other) {
+static int contemCep(void *item, void *other) {
   Pessoa pessoa   = item;
-  const char *cep = other;
+  char *cep = other;
 
   char *cep_pessoa = pessoa_get_cep(pessoa);
 
@@ -22,36 +22,36 @@ static int contemCep(const Item item, const void *other) {
   return strcmp(cep, cep_pessoa);
 }
 
-static Lista comando_m_all(Lista lista, char *cep) {
-  Posic it = Lista_t.get_first(lista);
-  Lista saida = Lista_t.create();
+static Lista_t comando_m_all(Lista_t lista, char *cep) {
+  Posic_t it = lt_get_first(lista);
+  Lista_t saida = lt_create();
 
-  it = Lista_t.search(lista, it, cep, contemCep);
+  it = lt_search(lista, it, cep, contemCep);
   while (it) {
-    Lista_t.insert(saida, Lista_t.get(lista, it));
+    lt_insert(saida, lt_get(lista, it));
 
-    it = Lista_t.search(lista, Lista_t.get_next(lista, it), cep, contemCep);
+    it = lt_search(lista, lt_get_next(lista, it), cep, contemCep);
   }
 
   return saida;
 }
 
-static void __reportar_pessoas(Lista pessoas, struct Controlador *controlador) {
-  Posic it = Lista_t.get_first(pessoas);
+static void __reportar_pessoas(Lista_t pessoas, struct Controlador *controlador) {
+  Posic_t it = lt_get_first(pessoas);
   while (it) {
-    Pessoa pessoa = Lista_t.get(pessoas, it);
+    Pessoa pessoa = lt_get(pessoas, it);
 
     char *info_pessoa = pessoa_get_info(pessoa, controlador);
 
-    Lista_t.insert(controlador->saida, format_string("\t%s\n", info_pessoa));
+    lt_insert(controlador->saida, format_string("\t%s\n", info_pessoa));
 
     free(info_pessoa);
 
-    it = Lista_t.get_next(pessoas, it);
+    it = lt_get_next(pessoas, it);
   }
 }
 
-static Lista __quadras_dentro(KDTree arvore, Figura figura) {
+static Lista_t __quadras_dentro(KDTree arvore, Figura figura) {
 
   Ponto2D_t pA = get_pos(figura);
 
@@ -59,18 +59,18 @@ static Lista __quadras_dentro(KDTree arvore, Figura figura) {
   pB.y += get_h(figura);
   pB.x += get_w(figura);
 
-  Lista quadras = KDTree_t.range_search(arvore, elemento_dentro_rect, &pA, &pB);
+  Lista_t quadras = KDTree_t.range_search(arvore, elemento_dentro_rect, &pA, &pB);
 
-  Posic it = Lista_t.get_first(quadras);
-  Posic next_it;
+  Posic_t it = lt_get_first(quadras);
+  Posic_t next_it;
   while (it) {
-    next_it = Lista_t.get_next(quadras, it);
+    next_it = lt_get_next(quadras, it);
 
-    Elemento quadra = Lista_t.get(quadras, it);
+    Elemento quadra = lt_get(quadras, it);
     Figura figura_elemento = get_figura_elemento(quadra);
 
     if (!dentro_figura(figura, figura_elemento))
-      Lista_t.remove(quadras, it);
+      lt_remove(quadras, it);
 
     destruir_figura(figura_elemento);
 
@@ -96,26 +96,26 @@ int comando_qry_m(void *_this, void *_controlador) {
   char *cep = params[0];
 
   if (!HashTable_t.exists(controlador->tabelas[CEP_X_QUADRA], cep)) {
-    Lista_t.insert(controlador->saida,
+    lt_insert(controlador->saida,
       format_string("A quadra \"%s\" nao foi encontrada.\n", cep));
     return 1;
   }
 
-  Lista pessoas_cep = comando_m_all(controlador->pessoas, cep);
+  Lista_t pessoas_cep = comando_m_all(controlador->pessoas, cep);
 
-  if (Lista_t.length(pessoas_cep) == 0) {
-    Lista_t.insert(controlador->saida, format_string(
+  if (lt_length(pessoas_cep) == 0) {
+    lt_insert(controlador->saida, format_string(
       "Nao ha pessoas na quadra %s\n", cep));
-    Lista_t.destruir(pessoas_cep, NULL);
+    lt_destroy(pessoas_cep, NULL);
     return 1;
   }
 
   char *string_saida = format_string("Pessoas na quadra %s:\n", cep);
-  Lista_t.insert(controlador->saida, string_saida);
+  lt_insert(controlador->saida, string_saida);
 
   __reportar_pessoas(pessoas_cep, controlador);
 
-  Lista_t.destruir(pessoas_cep, NULL);
+  lt_destroy(pessoas_cep, NULL);
 
   return 1;
 }
@@ -140,38 +140,38 @@ int comando_qry_mr(void *_this, void *_controlador) {
   
   Figura figura = cria_retangulo(pos.x, pos.y, size.x, size.y, "pink", "pink");
 
-  Lista quadras_dentro = __quadras_dentro(controlador->elementos[QUADRA], figura);
+  Lista_t quadras_dentro = __quadras_dentro(controlador->elementos[QUADRA], figura);
 
   destruir_figura(figura);
 
-  if (Lista_t.length(quadras_dentro) == 0) {
-    Lista_t.insert(controlador->saida,
+  if (lt_length(quadras_dentro) == 0) {
+    lt_insert(controlador->saida,
       format_string("Nao foram encontradas quadras na area especificada.\n"));
-    Lista_t.destruir(quadras_dentro, NULL);
+    lt_destroy(quadras_dentro, NULL);
     return 1;
   }
 
   char *string_saida = format_string(
     "Pessoas nas quadras entre (%.0f,%.0f) com tamanho (%.0f,%.0f):\n", 
     pos.x, pos.y, size.x, size.y);
-  Lista_t.insert(controlador->saida, string_saida);
+  lt_insert(controlador->saida, string_saida);
 
-  Posic it = Lista_t.get_first(quadras_dentro);
+  Posic_t it = lt_get_first(quadras_dentro);
   while (it) {
-    Elemento quadra = Lista_t.get(quadras_dentro, it);
+    Elemento quadra = lt_get(quadras_dentro, it);
 
     char *cep = get_cep_elemento(quadra);
 
-    Lista pessoas_cep = comando_m_all(controlador->pessoas, cep);
+    Lista_t pessoas_cep = comando_m_all(controlador->pessoas, cep);
     
     __reportar_pessoas(pessoas_cep, controlador);
 
-    Lista_t.destruir(pessoas_cep, NULL);
+    lt_destroy(pessoas_cep, NULL);
 
-    it = Lista_t.get_next(quadras_dentro, it);
+    it = lt_get_next(quadras_dentro, it);
   }
 
-  Lista_t.destruir(quadras_dentro, NULL);
+  lt_destroy(quadras_dentro, NULL);
 
   return 1;
 }

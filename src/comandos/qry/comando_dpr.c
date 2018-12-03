@@ -31,8 +31,8 @@
 "	236.269,292.533 252.521,276.528 264.232,296.021 266.264,273.445 287.923,280.944 274.784,262.361 \"/>" \
 "</svg>"
 
-static int __dentro_figura(void * const quadra, const void *figura) {
-  const Figura fig_quadra = get_figura_elemento(quadra);
+static int __dentro_figura(void * quadra, void *figura) {
+  Figura fig_quadra = get_figura_elemento(quadra);
 
   int result = dentro_figura((Figura) figura, fig_quadra);
 
@@ -41,7 +41,7 @@ static int __dentro_figura(void * const quadra, const void *figura) {
   return !result;
 }
 
-static int __comercioDentro(void * const comercio, const void *cep_quadra) {
+static int __comercioDentro(void *comercio, void *cep_quadra) {
   int result = strcmp(comercio_get_endereco(comercio)->cep, cep_quadra);
 
   if (result != 0)
@@ -50,18 +50,18 @@ static int __comercioDentro(void * const comercio, const void *cep_quadra) {
   return result;
 }
 
-static Lista __get_elementos_dentro(KDTree arvore, Ponto2D_t pos, Ponto2D_t size, enum TipoElemento tipo) {
+static Lista_t __get_elementos_dentro(KDTree arvore, Ponto2D_t pos, Ponto2D_t size, enum TipoElemento tipo) {
   Ponto2D_t pA = pos;
   Ponto2D_t pB = p2d_add(pos, size);
 
-  Lista saida = KDTree_t.range_search(arvore, elemento_dentro_rect, &pA, &pB);
+  Lista_t saida = KDTree_t.range_search(arvore, elemento_dentro_rect, &pA, &pB);
 
   if (tipo == QUADRA) {
     Figura figura = cria_retangulo(pos.x, pos.y, size.x, size.y, "", "");
 
-    Lista lista_aux = Lista_t.filter(saida, figura, __dentro_figura);
+    Lista_t lista_aux = lt_filter(saida, figura, __dentro_figura);
 
-    Lista_t.destruir(saida, 0);
+    lt_destroy(saida, 0);
 
     saida = lista_aux;
 
@@ -69,24 +69,24 @@ static Lista __get_elementos_dentro(KDTree arvore, Ponto2D_t pos, Ponto2D_t size
   }
   
 
-  if (Lista_t.length(saida) == 0) {
-    Lista_t.destruir(saida, 0);
+  if (lt_length(saida) == 0) {
+    lt_destroy(saida, 0);
     return NULL;
   }
 
   return saida;
 }
 
-static void __adicionarHashComercio(void * const comercio, const void *tabela) {
+static void __adicionarHashComercio(void * comercio, void *tabela) {
   HashTable_t.insert((HashTable) tabela, comercio_get_cnpj(comercio), comercio);
 }
 
-static int __pessoaDentro(void * const pessoa, const void *cep_quadra) {
+static int __pessoaDentro(void * pessoa, void *cep_quadra) {
   if (!pessoa_get_cep(pessoa)) return 1;
   return strcmp((char *) pessoa_get_cep(pessoa), cep_quadra);
 }
 
-static void __removerEnderecoPessoa(void * const pessoa, const void *tabela) {
+static void __removerEnderecoPessoa(void * pessoa, void *tabela) {
   pessoa_remover_endereco(pessoa);
   HashTable_t.remove((HashTable) tabela, pessoa_get_cpf(pessoa));
 }
@@ -95,28 +95,28 @@ static void __removerEnderecoPessoa(void * const pessoa, const void *tabela) {
 static void __remover_elementos(
   struct Comando *this,
   struct Controlador *controlador,
-  Lista *elementos) {
+  Lista_t *elementos) {
 
   for (int h = 0; h < 4; h++) {
     if (!elementos[h]) continue;
 
     const char *tipo_elemento = get_tipo_string_elemento(h);
 
-    Posic it = Lista_t.get_first(elementos[h]);
+    Posic_t it = lt_get_first(elementos[h]);
     while (it) {
-      Elemento elemento = Lista_t.get(elementos[h], it);
+      Elemento elemento = lt_get(elementos[h], it);
 
       KDTree_t.remove(controlador->elementos[h], elemento);
       char *cep   = get_cep_elemento(elemento);
       char *saida = format_string("\t%s: %s deletado (a).\n", tipo_elemento, cep);
-      Lista_t.insert(controlador->saida, saida);
+      lt_insert(controlador->saida, saida);
 
       // destruir_elemento(elemento);
 
-      it = Lista_t.get_next(elementos[h], it);
+      it = lt_get_next(elementos[h], it);
     }
 
-    Lista_t.destruir(elementos[h], destruir_elemento);
+    lt_destroy(elementos[h], destruir_elemento);
 
   }
 
@@ -139,52 +139,52 @@ int comando_qry_dpr(void *_this, void *_controlador) {
   Ponto2D_t pos  = p2d_new(strtod(this->params[0], 0), strtod(this->params[1], 0));
   Ponto2D_t size = p2d_new(strtod(this->params[2], 0), strtod(this->params[3], 0));
 
-  Lista elementos_dentro[4];
+  Lista_t elementos_dentro[4];
 
   for (int i = 0; i < 4; i++) {
     KDTree arvore = controlador->elementos[i];
     elementos_dentro[i] = __get_elementos_dentro(arvore, pos, size, i);
   }
 
-  Lista_t.insert(controlador->saida, 
+  lt_insert(controlador->saida, 
     format_string("Comando DPR:\n"));
 
 
   if (elementos_dentro[QUADRA]) {
 
-    Posic it = Lista_t.get_first(elementos_dentro[QUADRA]);
+    Posic_t it = lt_get_first(elementos_dentro[QUADRA]);
     while (it) {
-      Elemento quadra = Lista_t.get(elementos_dentro[QUADRA], it);
+      Elemento quadra = lt_get(elementos_dentro[QUADRA], it);
 
       // Retirar das pessoas os endereços das quadras destruidas e remover da tabela CPF/CEP
-      Lista pessoas_dentro = Lista_t.filter(controlador->pessoas, get_cep_elemento(quadra), __pessoaDentro);
-      Lista_t.map(pessoas_dentro, controlador->tabelas[CPF_X_CEP], __removerEnderecoPessoa);
-      Lista_t.destruir(pessoas_dentro, 0);
+      Lista_t pessoas_dentro = lt_filter(controlador->pessoas, get_cep_elemento(quadra), __pessoaDentro);
+      lt_map(pessoas_dentro, controlador->tabelas[CPF_X_CEP], __removerEnderecoPessoa);
+      lt_destroy(pessoas_dentro, 0);
 
       // Destruir os comercios nas quadras e tirar da tabela CNPJ/COMERCIO
-      Lista new_comercios = Lista_t.filter(controlador->comercios, get_cep_elemento(quadra), __comercioDentro);
-      Lista_t.destruir(controlador->comercios, 0);
+      Lista_t new_comercios = lt_filter(controlador->comercios, get_cep_elemento(quadra), __comercioDentro);
+      lt_destroy(controlador->comercios, 0);
       HashTable_t.destroy(controlador->tabelas[CNPJ_X_COMERCIO], NULL, 0);
 
       controlador->comercios = new_comercios;
-      controlador->tabelas[CNPJ_X_COMERCIO] = HashTable_t.create(Lista_t.length(new_comercios));
+      controlador->tabelas[CNPJ_X_COMERCIO] = HashTable_t.create(lt_length(new_comercios));
 
-      Lista_t.map(new_comercios, controlador->tabelas[CNPJ_X_COMERCIO], __adicionarHashComercio);
+      lt_map(new_comercios, controlador->tabelas[CNPJ_X_COMERCIO], __adicionarHashComercio);
 
       // Remover da tabela CEP/QUADRA as quadras removidas
       HashTable_t.remove(controlador->tabelas[CEP_X_QUADRA], get_cep_elemento(quadra));
 
-      it = Lista_t.get_next(elementos_dentro[QUADRA], it);
+      it = lt_get_next(elementos_dentro[QUADRA], it);
     }
   }
 
   // Remover da tabela ID/RADIO_BASE as radios removidas
   if (elementos_dentro[RADIO_BASE]) {
-    Posic it = Lista_t.get_first(elementos_dentro[RADIO_BASE]);
+    Posic_t it = lt_get_first(elementos_dentro[RADIO_BASE]);
     while (it) {
-      Elemento radio_base = Lista_t.get(elementos_dentro[RADIO_BASE], it);
+      Elemento radio_base = lt_get(elementos_dentro[RADIO_BASE], it);
       HashTable_t.remove(controlador->tabelas[ID_X_RADIO], get_id_elemento(radio_base));
-      it = Lista_t.get_next(elementos_dentro[RADIO_BASE], it);
+      it = lt_get_next(elementos_dentro[RADIO_BASE], it);
     }
   }
 
@@ -205,10 +205,10 @@ int comando_qry_dpr(void *_this, void *_controlador) {
 
   void *custom = cria_custom(posicao_asset, tamanho, NUCLEAR_SVG, NULL);
 
-  Lista_t.insert(controlador->saida_svg_qry, cria_desenhavel(
+  lt_insert(controlador->saida_svg_qry, cria_desenhavel(
     custom, print_custom_asset, free_custom));
 
-  Lista_t.insert(controlador->saida_svg_qry, cria_desenhavel(
+  lt_insert(controlador->saida_svg_qry, cria_desenhavel(
     area_afetada, get_svg_figura, destruir_figura));
 
   return 1;

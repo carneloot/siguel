@@ -32,7 +32,7 @@ int comando_qry_mud(void *_this, void *_controlador) {
 
   if (!HashTable_t.exists(tabela_pessoa, cpf)) {
     char *saida = format_string("CPF \"%s\" nao encontrado.\n", cpf);
-    Lista_t.insert(controlador->saida, saida);
+    lt_insert(controlador->saida, saida);
     return 1;
   } 
 
@@ -57,7 +57,7 @@ int comando_qry_mud(void *_this, void *_controlador) {
   char *saida = format_string(
     "Mudanca de endereco:\n\t%s\n\tmudou para %s\n",
     info_pessoa, info_endereco_atual);
-  Lista_t.insert(controlador->saida, saida);
+  lt_insert(controlador->saida, saida);
 
   free(info_pessoa);
   free(info_endereco_atual);
@@ -68,7 +68,7 @@ int comando_qry_mud(void *_this, void *_controlador) {
   Ponto2D_t new_max = p2d_maximo(pos_antiga, pos_atual);
   controlador->max_qry = p2d_maximo(controlador->max_qry, new_max);
 
-  Lista_t.insert(controlador->saida_svg_qry, 
+  lt_insert(controlador->saida_svg_qry, 
     cria_desenhavel(pontos, svg_pontos, free_svg_pontos)
   );
   

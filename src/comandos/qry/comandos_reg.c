@@ -21,9 +21,9 @@
  *             registrador r2
  * 
  */
-int search_tp(void * const _comercio, const void *_tp) {
+int search_tp(void *_comercio, void *_tp) {
   Comercio comercio = _comercio;
-  const char *tp = (const char *) _tp;
+  char *tp = (char *) _tp;
 
   return strcmp(tp, comercio_get_tipo(comercio));
 }
@@ -43,14 +43,14 @@ int comando_reg_tp(void *_this, void *_controlador) {
   // Sei que isso é muito porco, mas os comercios sao guardados numa lista,
   // e mesmo se fossem guardados numa KDTree, os tipo sao diferentes.
   // Entao esse foi o melhor jeito que encontrei de fazer esse comando
-  Posic it = Lista_t.get_first(controlador->comercios);
-  it = Lista_t.search(controlador->comercios, it, tipo, search_tp);
+  Posic_t it = lt_get_first(controlador->comercios);
+  it = lt_search(controlador->comercios, it, tipo, search_tp);
 
   double menor_distancia_quadrado = DBL_MAX;
   Ponto2D_t ponto_mais_proximo = p2d_new(0, 0);
 
   while (it) {
-    Comercio comercio = Lista_t.get(controlador->comercios, it);
+    Comercio comercio = lt_get(controlador->comercios, it);
 
     Endereco endereco_comercio = comercio_get_endereco(comercio);
 
@@ -63,8 +63,8 @@ int comando_reg_tp(void *_this, void *_controlador) {
       ponto_mais_proximo = posicao_comercio;
     }
 
-    it = Lista_t.get_next(controlador->comercios, it);
-    it = Lista_t.search(controlador->comercios, it, tipo, search_tp);
+    it = lt_get_next(controlador->comercios, it);
+    it = lt_search(controlador->comercios, it, tipo, search_tp);
   }
 
   controlador->registradores[reg_resultado] = ponto_mais_proximo;

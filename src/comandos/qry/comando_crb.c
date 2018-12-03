@@ -44,7 +44,7 @@ int comando_qry_crb(void *_this, void *_controlador) {
   if (KDTree_t.is_empty(controlador->elementos[RADIO_BASE])) {
     saida = format_string(
       "Nao ha torres de celular suficientes para checar a distancia.\n");
-    Lista_t.insert(controlador->saida, saida);
+    lt_insert(controlador->saida, saida);
     return 1;
   }
 
@@ -67,7 +67,7 @@ int comando_qry_crb(void *_this, void *_controlador) {
     id2,
     distancia);
 
-  Lista_t.insert(controlador->saida, saida);
+  lt_insert(controlador->saida, saida);
 
   // Desenhar os circulos nas torres mais proximas
   Ponto2D_t pos;
@@ -81,7 +81,7 @@ int comando_qry_crb(void *_this, void *_controlador) {
     set_opacity_figura(circ, 0.8);
     set_dashed_figura(circ, FIG_BORDA_TRACEJADA);
 
-    Lista_t.insert(
+    lt_insert(
       controlador->saida_svg_qry,
       cria_desenhavel(circ, get_svg_figura, destruir_figura));
 

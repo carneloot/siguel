@@ -76,34 +76,34 @@ static int __aresta_dentro(const Item value, int dim, const Item _ponto_a, const
   return -1;
 }
 
-static void limpar_colisoes(Lista colisoes) {
+static void limpar_colisoes(Lista_t colisoes) {
   // Limpar retornar todas as arestas às velocidades originais
-  while ( Lista_t.length(colisoes) > 0 ) {
-    Colisao colisao = Lista_t.remove(
-      colisoes, Lista_t.get_first(colisoes));
+  while ( lt_length(colisoes) > 0 ) {
+    Colisao colisao = lt_remove(
+      colisoes, lt_get_first(colisoes));
 
     //Arrumar cada aresta da lista de colisões
-    Lista arestas_colisao = colisao_get_arestas( colisao );
-    while( Lista_t.length( arestas_colisao ) > 0 ){
-      ArestaInfo aresta = Lista_t.remove( arestas_colisao, Lista_t.get_first(arestas_colisao) );
+    Lista_t arestas_colisao = colisao_get_arestas( colisao );
+    while( lt_length( arestas_colisao ) > 0 ){
+      ArestaInfo aresta = lt_remove( arestas_colisao, lt_get_first(arestas_colisao) );
       set_aresta_valido(aresta);
     }
     colisao_destroy( colisao );
   }
 }
 
-static void set_arestas_invalido( Lista arestas ){
+static void set_arestas_invalido( Lista_t arestas ){
 
-  for (Posic it = Lista_t.get_first(arestas); it != NULL; it = Lista_t.get_next(arestas, it) ) {
-    ArestaInfo aresta = Lista_t.get( arestas, it );
+  for (Posic_t it = lt_get_first(arestas); it != NULL; it = lt_get_next(arestas, it) ) {
+    ArestaInfo aresta = lt_get( arestas, it );
     set_aresta_invalido(aresta);
   }
 
 }
 
-static void desenhar_colisoes(Lista colisoes, SVG svg_saida) {
-  for (Posic it = Lista_t.get_first(colisoes); it != NULL; it = Lista_t.get_next(colisoes, it)) {
-    Colisao colisao = Lista_t.get(colisoes, it);
+static void desenhar_colisoes(Lista_t colisoes, SVG svg_saida) {
+  for (Posic_t it = lt_get_first(colisoes); it != NULL; it = lt_get_next(colisoes, it)) {
+    Colisao colisao = lt_get(colisoes, it);
     Figura figura = colisao_get_figura(colisao);
     escreve_comentario(svg_saida, "COLISAO");
     desenha_figura(svg_saida, figura, 1, false);
@@ -177,7 +177,7 @@ static bool aresta_corresponde_colisao(struct Controlador* controlador, ArestaIn
   return false;
 }
 
-static Lista pegar_aresta_correspondente(struct Controlador* controlador, Figura fig_colisao ) {
+static Lista_t pegar_aresta_correspondente(struct Controlador* controlador, Figura fig_colisao ) {
   Ponto2D_t colisao_centro = get_centro_massa( fig_colisao );
   KDTree arestas = controlador->arestas_mapa_viario;
   KDTree quadras = controlador->elementos[QUADRA];
@@ -195,22 +195,22 @@ static Lista pegar_aresta_correspondente(struct Controlador* controlador, Figura
   Ponto2D_t ponto_b = p2d_add(colisao_centro, tamanho_quadra);
 
   // Encontrar arestas num "raio" de uma quadra
-  Lista lista_arestas = KDTree_t.range_search( arestas, __aresta_dentro, &ponto_a, &ponto_b );
-  Lista arestas_colisao = Lista_t.create();
+  Lista_t lista_arestas = KDTree_t.range_search( arestas, __aresta_dentro, &ponto_a, &ponto_b );
+  Lista_t arestas_colisao = lt_create();
 
   figura_expandir(fig_colisao, 2, 2);
   
   // Comparar cada aresta
-  while( Lista_t.length( lista_arestas ) > 0 ){
-    ArestaInfo info_aresta = Lista_t.remove( lista_arestas, Lista_t.get_first(lista_arestas) );
+  while( lt_length( lista_arestas ) > 0 ){
+    ArestaInfo info_aresta = lt_remove( lista_arestas, lt_get_first(lista_arestas) );
     if( aresta_corresponde_colisao( controlador, info_aresta, fig_colisao ) ){
-      Lista_t.insert( arestas_colisao, info_aresta );
+      lt_insert( arestas_colisao, info_aresta );
     }
   }
 
   figura_expandir(fig_colisao, -2, -2);
 
-  Lista_t.destruir(lista_arestas, 0);
+  lt_destroy(lista_arestas, 0);
 
   return arestas_colisao;
   
@@ -223,8 +223,8 @@ int comando_qry_dc( void* _this, void* _controlador ){
   limpar_colisoes(controlador->colisoes);
   // Colisões removidas
 
-  Veiculo* vetor_veiculos = Lista_t.to_array( controlador->veiculos );
-  int tamanho = Lista_t.length( controlador->veiculos );
+  Veiculo* vetor_veiculos = lt_to_array( controlador->veiculos );
+  int tamanho = lt_length( controlador->veiculos );
   heap_sort(vetor_veiculos, tamanho, compare_x);
 
   // Percorrer o vetor comparando as sobreposições
@@ -257,13 +257,13 @@ int comando_qry_dc( void* _this, void* _controlador ){
         Figura veiculo_other = get_figura_veiculo( vetor_veiculos[j]);
         Figura fig_colisao   = get_rect_sobreposicao( veiculo_this, veiculo_other, "red");
 
-        Lista arestas_colisao = pegar_aresta_correspondente( controlador, fig_colisao ) ;
+        Lista_t arestas_colisao = pegar_aresta_correspondente( controlador, fig_colisao ) ;
         Colisao this_colisao  = colisao_create( fig_colisao, arestas_colisao );
 
 
         set_arestas_invalido( arestas_colisao );
 
-        Lista_t.insert( controlador->colisoes, this_colisao );
+        lt_insert( controlador->colisoes, this_colisao );
       }
 
       // Se sobrepõe em x, o próximo pode sobrepor também

@@ -28,7 +28,7 @@ int comando_pm_p(void *_this, void *_controlador) {
     params[0], params[1], params[2], sexo, params[4]
   );
 
-  Lista_t.insert(controlador->pessoas, pessoa);
+  lt_insert(controlador->pessoas, pessoa);
 
   HashTable_t.insert(controlador->tabelas[CPF_X_PESSOA], pessoa_get_cpf(pessoa), pessoa);
 

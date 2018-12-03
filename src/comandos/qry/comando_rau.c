@@ -20,9 +20,9 @@
 #include <modules/logger.h>
 
 
-int comparar_placa( void* const _veiculo, const void* _placa ){
+int comparar_placa( void* _veiculo, void* _placa ){
   Veiculo veiculo = _veiculo;
-  const char* placa = (const char*) _placa;
+  char* placa = (char*) _placa;
 
   return strcmp( get_placa_veiculo( veiculo ), placa );
 }
@@ -33,10 +33,10 @@ int comando_qry_rau( void* _this, void* _controlador ){
 
   char* placa = this->params[0];
 
-  Posic atual = Lista_t.get_first(controlador->veiculos);
+  Posic_t atual = lt_get_first(controlador->veiculos);
 
   // Encontrar veículo
-  atual = Lista_t.search( controlador->veiculos, atual, placa, comparar_placa );
+  atual = lt_search( controlador->veiculos, atual, placa, comparar_placa );
   
   if( atual == NULL){
     LOG_ERRO(LOG_FILE, "Tendando remover um veiculo que nao existe");
@@ -44,13 +44,11 @@ int comando_qry_rau( void* _this, void* _controlador ){
   }
 
   // free em veículo
-  Veiculo veiculo = Lista_t.get( controlador->veiculos, atual );
+  Veiculo veiculo = lt_get( controlador->veiculos, atual );
   destruir_veiculo( veiculo );
 
   // Tirar veículo da lista
-  Lista_t.remove(controlador->veiculos, atual);
-
-  // TODO: Remover a placa do carro do SVG
+  lt_remove(controlador->veiculos, atual);
 
   return 1;
 }

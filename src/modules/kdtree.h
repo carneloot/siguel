@@ -83,7 +83,7 @@ struct KDTree_t {
    * 'dim'. Se 'dim' for -1, checa se o valor esta completamente dentro do
    * intervalo
    */
-  Lista (*range_search)(
+  Lista_t (*range_search)(
     KDTree this, int (*dentro)(Item value, int dim, Item ponto_a, Item ponto_b), Item ponto_a, Item ponto_b);
 
   /**

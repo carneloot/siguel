@@ -257,7 +257,7 @@ typedef int (*__range_search_dentro)(Item value, int dim, Item ponto_a, Item pon
 
 static void __range_search_rec_kdtree(
   KDTree _this,
-  Lista saida,
+  Lista_t saida,
   Item ponto_a, Item ponto_b,
   __range_search_dentro dentro,
   unsigned prof) {
@@ -288,16 +288,16 @@ static void __range_search_rec_kdtree(
   }
 
   if (dentro(this->value, -1, ponto_a, ponto_b))  // Se o valor esta dentro do retangulo
-    Lista_t.insert(saida, this->value);
+    lt_insert(saida, this->value);
 }
 
-static Lista __range_search_kdtree(
+static Lista_t __range_search_kdtree(
   KDTree _this, __range_search_dentro dentro, Item ponto_a, Item ponto_b) {
   struct KDTree *this = (struct KDTree *) _this;
 
-  Lista saida;
+  Lista_t saida;
 
-  saida = Lista_t.create();
+  saida = lt_create();
 
   __range_search_rec_kdtree(this, saida, ponto_a, ponto_b, dentro, 0);
 

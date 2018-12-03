@@ -6,7 +6,7 @@
 #include <modules/ponto2d.h>
 #include <utils.h>
 
-void *cria_path(Lista pontos, double tamanho, double opacity, char *cor) {
+void *cria_path(Lista_t pontos, double tamanho, double opacity, char *cor) {
   struct Path *this = calloc(1, sizeof(*this));
 
   this->pontos  = pontos;
@@ -17,14 +17,14 @@ void *cria_path(Lista pontos, double tamanho, double opacity, char *cor) {
   return this;
 }
 
-static char *gerar_string_pontos(Lista pontos) {
-  size_t length = Lista_t.length(pontos) * 24;
+static char *gerar_string_pontos(Lista_t pontos) {
+  size_t length = lt_length(pontos) * 24;
 
   char *result = calloc(length + 1, sizeof(char));
 
-  Posic it = Lista_t.get_first(pontos);
+  Posic_t it = lt_get_first(pontos);
   while (it) {
-    Ponto2D_t *ponto = Lista_t.get(pontos, it);
+    Ponto2D_t *ponto = lt_get(pontos, it);
 
     char *ponto_string = format_string("%10.1f %10.1f,",
       ponto->x, ponto->y);
@@ -33,7 +33,7 @@ static char *gerar_string_pontos(Lista pontos) {
 
     free(ponto_string);
     
-    it = Lista_t.get_next(pontos, it);
+    it = lt_get_next(pontos, it);
   }
 
   return result;

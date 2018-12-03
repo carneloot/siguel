@@ -7,7 +7,7 @@
 #include <utils.h>
 #include <modules/logger.h>
 
-int procurarComercio(void * const com1, const void *com2) {
+int procurarComercio(void * com1, void *com2) {
   return !(com1 == com2);
 }
 
@@ -28,16 +28,16 @@ int comando_qry_fec(void *_this, void *_controlador) {
   HashTable tabela = controlador->tabelas[CNPJ_X_COMERCIO];
 
   if (!HashTable_t.exists(tabela, cnpj)) {
-    Lista_t.insert(controlador->saida, 
+    lt_insert(controlador->saida, 
       format_string("CNPJ \"%s\" nao encontrado.", cnpj));
     return 1;
   }
 
   Comercio comercio = HashTable_t.get(tabela, cnpj);
 
-  Lista comercios = controlador->comercios;
-  Posic posic   = Lista_t.get_first(comercios);
-  posic         = Lista_t.search(comercios, posic, comercio, procurarComercio);
+  Lista_t comercios = controlador->comercios;
+  Posic_t posic   = lt_get_first(comercios);
+  posic         = lt_search(comercios, posic, comercio, procurarComercio);
 
   if (!posic) {
     LOG_ERRO("Erro interno.");
@@ -45,7 +45,7 @@ int comando_qry_fec(void *_this, void *_controlador) {
   }
 
   HashTable_t.remove(tabela, cnpj);
-  Lista_t.remove(comercios, posic);
+  lt_remove(comercios, posic);
 
   // Mostrar informacoes
   char *tipo_desc = HashTable_t.get(controlador->tabelas[TIPO_X_DESCRICAO], comercio_get_tipo(comercio));
@@ -53,7 +53,7 @@ int comando_qry_fec(void *_this, void *_controlador) {
   char *rip_message = format_string(
     "Nota de fechamento de comercio:\n\t%s\n", info_comercio);
 
-  Lista_t.insert(controlador->saida, rip_message);
+  lt_insert(controlador->saida, rip_message);
 
   free(info_comercio);
 

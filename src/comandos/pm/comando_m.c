@@ -25,7 +25,7 @@ int comando_pm_m(void *_this, void *_controlador) {
   HashTable tabela = controlador->tabelas[CPF_X_PESSOA];
 
   if (!HashTable_t.exists(tabela, cpf)) {
-    Lista_t.insert(controlador->saida,
+    lt_insert(controlador->saida,
       format_string("CPF \"%s\" nao encontrado.\n", cpf));
     return 0;
   }

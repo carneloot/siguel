@@ -4,10 +4,10 @@
 #include <modules/lista.h>
 #include <stdarg.h>
 
-int checar_id_figura(const Item _figura, const void *_id);
+int checar_id_figura(void *figura, void *id);
 
-void compararCEP(const Item _ele, unsigned prof, va_list _list);
+void compararCEP(void *ele, unsigned prof, va_list list);
 
-int elemento_dentro_rect(void *_elemento, int dim, void *_pA, void *_pB);
+int elemento_dentro_rect(void *elemento, int dim, void *pA, void *pB);
 
 #endif /* __FUNCOES_CHECAGEM_H__ */

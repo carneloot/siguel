@@ -62,7 +62,7 @@ int comando_qry_hmp(void *_this, void *_controlador) {
     info_radio, info_hidrante, pair.distance
   );
 
-  Lista_t.insert(controlador->saida, saida);
+  lt_insert(controlador->saida, saida);
 
   free(info_hidrante);
   free(info_radio);
@@ -71,7 +71,7 @@ int comando_qry_hmp(void *_this, void *_controlador) {
   Ponto2D_t a = *((Ponto2D_t *) radio_base);
   Ponto2D_t b = *((Ponto2D_t *) pair.point1);
   Seta pontos = cria_svg_pontos(a, b, "aqua", 0, 1);
-  Lista_t.insert(controlador->saida_svg_qry, cria_desenhavel(
+  lt_insert(controlador->saida_svg_qry, cria_desenhavel(
     pontos, svg_pontos, free_svg_pontos));
 
   return 1;
@@ -110,7 +110,7 @@ int comando_qry_hmpe(void *_this, void *_controlador) {
     info_hidrante, pair.distance
   );
 
-  Lista_t.insert(controlador->saida, saida);
+  lt_insert(controlador->saida, saida);
 
   free(info_hidrante);
   endereco_destruir(endereco);
@@ -119,7 +119,7 @@ int comando_qry_hmpe(void *_this, void *_controlador) {
   Ponto2D_t a = pos_endereco;
   Ponto2D_t b = *((Ponto2D_t *) pair.point1);
   Seta pontos = cria_svg_pontos(a, b, "orange", 0, 1);
-  Lista_t.insert(controlador->saida_svg_qry, cria_desenhavel(
+  lt_insert(controlador->saida_svg_qry, cria_desenhavel(
     pontos, svg_pontos, free_svg_pontos));
 
   // Adicionar X no pos_endereco
@@ -128,7 +128,7 @@ int comando_qry_hmpe(void *_this, void *_controlador) {
   pos_X.y += 0.3  * TEXT_SIZE;
 
   void *custom = cria_custom(pos_X, TEXT_SIZE, "X", "orange");
-  Lista_t.insert(controlador->saida_svg_qry, cria_desenhavel(
+  lt_insert(controlador->saida_svg_qry, cria_desenhavel(
     custom, print_custom_texto, free_custom));
 
   pos_endereco = p2d_add_scalar(pos_endereco, TEXT_SIZE);

@@ -154,8 +154,8 @@ Controlador cria_controlador() {
   struct Controlador *this =
     (struct Controlador *) malloc(sizeof(struct Controlador));
 
-  this->saida         = Lista_t.create();
-  this->saida_svg_qry = Lista_t.create();
+  this->saida         = lt_create();
+  this->saida_svg_qry = lt_create();
 
   this->nome_base   = NULL;
   this->dir_saida   = NULL;
@@ -166,13 +166,13 @@ Controlador cria_controlador() {
   for (i = 0; i < EXTRAS_TOTAL; i++)
     this->extras[i] = NULL;
 
-  this->veiculos = Lista_t.create();
-  this->colisoes = Lista_t.create();
-  this->figuras = Lista_t.create();
+  this->veiculos = lt_create();
+  this->colisoes = lt_create();
+  this->figuras = lt_create();
 
   this->linha_atual = 0;
 
-  this->sobreposicoes = Lista_t.create();
+  this->sobreposicoes = lt_create();
 
   for (i = 0; i < 4; i++) {
     this->elementos[i] = KDTree_t.create(2, equalElements, compareX, compareY);
@@ -184,10 +184,10 @@ Controlador cria_controlador() {
   this->max_geo = p2d_new(0, 0);
   this->max_qry = p2d_new(0, 0);
 
-  this->fila_execucao = Lista_t.create();
+  this->fila_execucao = lt_create();
 
-  this->comercios = Lista_t.create();
-  this->pessoas   = Lista_t.create();
+  this->comercios = lt_create();
+  this->pessoas   = lt_create();
 
   for (i = 0; i < TABELAS_TOTAL; i++)
     this->tabelas[i] = HashTable_t.create(73);
@@ -271,10 +271,10 @@ int executar_proximo_comando(Controlador c) {
   struct Controlador *this = (struct Controlador *) c;
   Comando comando;
 
-  Posic inicio_lista = Lista_t.get_first(this->fila_execucao);
+  Posic_t inicio_lista = lt_get_first(this->fila_execucao);
 
-  comando = (Comando) Lista_t.get(this->fila_execucao, inicio_lista);
-  Lista_t.remove(this->fila_execucao, inicio_lista);
+  comando = (Comando) lt_get(this->fila_execucao, inicio_lista);
+  lt_remove(this->fila_execucao, inicio_lista);
 
   this->linha_atual++;
 
@@ -290,18 +290,18 @@ int executar_proximo_comando(Controlador c) {
 int ha_comandos(Controlador c) {
   struct Controlador *this = (struct Controlador *) c;
 
-  return !!Lista_t.length(this->fila_execucao);
+  return !!lt_length(this->fila_execucao);
 }
 
 void gerar_fila_execucao(Controlador _this) {
   struct Controlador *this = (struct Controlador *) _this;
 
   // Adicionar os arquivos a serem verificados na lista
-  Lista arquivos = Lista_t.create();
+  Lista_t arquivos = lt_create();
 
   char *path = format_string(
     "%s%s.geo", this->dir_entrada, this->nome_base);
-  Lista_t.insert(arquivos, path);
+  lt_insert(arquivos, path);
 
   // Se o arquivo de qry foi especificado
   for (int i = 0; i < EXTRAS_TOTAL; i++) {
@@ -309,14 +309,14 @@ void gerar_fila_execucao(Controlador _this) {
 
     path = format_string(
       "%s%s.%s", this->dir_entrada, this->extras[i], extra_extensao[i]);
-    Lista_t.insert(arquivos, path);
+    lt_insert(arquivos, path);
   }
 
   // Adicionando comandos a fila de execução
-  Posic iterator = Lista_t.get_first(arquivos);
+  Posic_t iterator = lt_get_first(arquivos);
 
   while (iterator) {
-    path        = Lista_t.get(arquivos, iterator);
+    path        = lt_get(arquivos, iterator);
     Arquivo arq = abrir_arquivo(path, LEITURA);
 
     char *linha;
@@ -335,7 +335,7 @@ void gerar_fila_execucao(Controlador _this) {
         continue;
       }
       
-      Lista_t.insert(this->fila_execucao, (Item) comando);
+      lt_insert(this->fila_execucao, (Item) comando);
 
       free(linha);
     }
@@ -344,10 +344,10 @@ void gerar_fila_execucao(Controlador _this) {
 
     fechar_arquivo(arq);
 
-    iterator = Lista_t.get_next(arquivos, iterator);
+    iterator = lt_get_next(arquivos, iterator);
   }
 
-  Lista_t.destruir(arquivos, free);
+  lt_destroy(arquivos, free);
 }
 
 /**
@@ -358,7 +358,7 @@ void gerar_fila_execucao(Controlador _this) {
 void finalizar_arquivos(Controlador c) {
   struct Controlador *this = (struct Controlador *) c;
   char *full_path;
-  Posic iterator;
+  Posic_t iterator;
 
   // Escreve o txt do .geo
   escrever_txt_final(c);
@@ -388,10 +388,10 @@ void finalizar_arquivos(Controlador c) {
 
   // Desenhando saida dos comandos
 
-  iterator = Lista_t.get_first(this->saida_svg_qry);
+  iterator = lt_get_first(this->saida_svg_qry);
   while (iterator) {
-    desenha_desenhavel(s, Lista_t.get(this->saida_svg_qry, iterator));
-    iterator = Lista_t.get_next(this->saida_svg_qry, iterator);
+    desenha_desenhavel(s, lt_get(this->saida_svg_qry, iterator));
+    iterator = lt_get_next(this->saida_svg_qry, iterator);
   }
 
   salva_SVG(s);
@@ -444,15 +444,15 @@ void destruir_controlador(Controlador c) {
 
   this = (struct Controlador *) c;
 
-  Lista_t.destruir(this->saida, &free);
-  Lista_t.destruir(this->saida_svg_qry, desenhavel_destruir);
+  lt_destroy(this->saida, &free);
+  lt_destroy(this->saida_svg_qry, desenhavel_destruir);
 
-  Lista_t.destruir(this->veiculos, destruir_veiculo);
-  Lista_t.destruir(this->colisoes, colisao_destroy);
-  Lista_t.destruir(this->figuras, &destruir_figura);
+  lt_destroy(this->veiculos, destruir_veiculo);
+  lt_destroy(this->colisoes, colisao_destroy);
+  lt_destroy(this->figuras, &destruir_figura);
 
   // Sobreposicoes
-  Lista_t.destruir(this->sobreposicoes, &destruir_figura);
+  lt_destroy(this->sobreposicoes, &destruir_figura);
 
   // Elementos
   for (i = 0; i < 4; i++) {
@@ -475,10 +475,10 @@ void destruir_controlador(Controlador c) {
     if (this->extras[i])
       free(this->extras[i]);
 
-  Lista_t.destruir(this->fila_execucao, NULL);
+  lt_destroy(this->fila_execucao, NULL);
 
-  Lista_t.destruir(this->comercios, comercio_destruir);
-  Lista_t.destruir(this->pessoas,     pessoa_destruir);
+  lt_destroy(this->comercios, comercio_destruir);
+  lt_destroy(this->pessoas,     pessoa_destruir);
 
   HashTable_t.destroy(this->tabelas[CPF_X_CEP],        NULL, 0);
   HashTable_t.destroy(this->tabelas[CEP_X_QUADRA],     NULL, 0);
@@ -526,11 +526,11 @@ static void escrever_txt_final(void *c) {
 
   free(nome_qry);
 
-  Posic iterator = Lista_t.get_first(this->saida);
+  Posic_t iterator = lt_get_first(this->saida);
 
   while (iterator) {
-    escrever_linha(arq, (char *) Lista_t.get(this->saida, iterator));
-    iterator = Lista_t.get_next(this->saida, iterator);
+    escrever_linha(arq, (char *) lt_get(this->saida, iterator));
+    iterator = lt_get_next(this->saida, iterator);
   }
 
   escrever_linha(arq, "\n\n");
@@ -545,12 +545,12 @@ void desenhar_todas_figuras(void *c, void *s) {
 
   this = (struct Controlador *) c;
 
-  Posic iterator = Lista_t.get_first(this->figuras);
+  Posic_t iterator = lt_get_first(this->figuras);
 
   while (iterator) {
-    figAtual = Lista_t.get(this->figuras, iterator);
+    figAtual = lt_get(this->figuras, iterator);
     desenha_figura(s, figAtual, 0.4, FIG_BORDA_SOLIDA);
-    iterator = Lista_t.get_next(this->figuras, iterator);
+    iterator = lt_get_next(this->figuras, iterator);
   }
 }
 
@@ -560,23 +560,23 @@ void desenhar_sobreposicoes(void *c, void *s) {
 
   this = (struct Controlador *) c;
 
-  if (!Lista_t.length(this->sobreposicoes))
+  if (!lt_length(this->sobreposicoes))
     return;
 
   escreve_comentario(s, "INICIO SOBREPOSICOES");
 
   /* Calcular retangulo das sobreposicoes */
-  Posic iterator = Lista_t.get_first(this->sobreposicoes);
+  Posic_t iterator = lt_get_first(this->sobreposicoes);
 
   while (iterator) {
-    figDash = (Figura) Lista_t.get(this->sobreposicoes, iterator);
+    figDash = (Figura) lt_get(this->sobreposicoes, iterator);
 
     desenha_figura(s, figDash, 1.0, FIG_BORDA_TRACEJADA);
     Ponto2D_t pos = get_pos(figDash);
     pos.y -= 5;
     escreve_texto(s, "sobrepoe", pos, 15, "purple");
 
-    iterator = Lista_t.get_next(this->sobreposicoes, iterator);
+    iterator = lt_get_next(this->sobreposicoes, iterator);
   }
 
   escreve_comentario(s, "FIM SOBREPOSICOES");
@@ -597,9 +597,9 @@ void desenhar_elementos(void *_this, void *svg) {
   }
 }
 
-void desenha_veiculo(const Item _veiculo, const void *_svg) {
+void desenha_veiculo(Item _veiculo, void *_svg) {
   Veiculo veiculo = _veiculo;
-  const SVG svg = (const SVG) _svg;
+  SVG svg = (SVG) _svg;
 
   escreve_comentario(svg, "VEICULO: %s", get_placa_veiculo(veiculo));
 
@@ -613,7 +613,7 @@ void desenha_veiculo(const Item _veiculo, const void *_svg) {
 void desenhar_veiculos(void *_this, void *svg) {
   struct Controlador* this = _this;
 
-  Lista_t.map(this->veiculos, svg, desenha_veiculo);
+  lt_map(this->veiculos, svg, desenha_veiculo);
 
 }
 

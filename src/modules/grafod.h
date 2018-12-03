@@ -105,7 +105,7 @@ struct GrafoD_t {
    * Retorna uma lista ligada com os labels de todos os vertices adjacentes a node.
    * O vertice deve existir.
    */
-  Lista (*adjacentes)(GrafoD this, char *node);
+  Lista_t (*adjacentes)(GrafoD this, char *node);
 
 };
 

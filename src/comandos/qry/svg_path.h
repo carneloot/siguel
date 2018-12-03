@@ -4,13 +4,13 @@
 #include <modules/lista.h>
 
 struct Path {
-  Lista pontos;
+  Lista_t pontos;
   double tamanho;
   double opacity;
   char *cor;
 };
 
-void *cria_path(Lista pontos, double tamanho, double opacity, char *cor);
+void *cria_path(Lista_t pontos, double tamanho, double opacity, char *cor);
 
 char *print_path(void *this);
 
