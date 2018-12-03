@@ -33,10 +33,10 @@ int comando_geo_a(void *_this, void *_controlador) {
 
   int id = (int) strtol(params[0], NULL, 10);
 
-  Posic posic;
+  Posic_t posic;
 
-  posic = Lista_t.get_first(controlador->figuras);
-  posic = Lista_t.search(controlador->figuras, posic, &id, checar_id_figura);
+  posic = lt_get_first(controlador->figuras);
+  posic = lt_search(controlador->figuras, posic, &id, checar_id_figura);
 
   if (!posic) {
     LOG_ERRO(
@@ -44,7 +44,7 @@ int comando_geo_a(void *_this, void *_controlador) {
     return 0;
   }
 
-  Figura figura = Lista_t.get(controlador->figuras, posic);
+  Figura figura = lt_get(controlador->figuras, posic);
 
   /* Cria o sufixo padrao caso nao tenha sido especificado */
   char *sufixo = params[1];
@@ -62,17 +62,17 @@ int comando_geo_a(void *_this, void *_controlador) {
 
   desenhar_todas_figuras(controlador, svg_saida);
 
-  Ponto2D pos, pos2;
+  Ponto2D_t pos, pos2;
 
   pos = get_centro_massa(figura);
 
-  Posic iterator = Lista_t.get_first(controlador->figuras);
+  Posic_t iterator = lt_get_first(controlador->figuras);
 
   while (iterator) {
-    Figura figura2 = Lista_t.get(controlador->figuras, iterator);
+    Figura figura2 = lt_get(controlador->figuras, iterator);
 
     if (figura == figura2) {
-      iterator = Lista_t.get_next(controlador->figuras, iterator);
+      iterator = lt_get_next(controlador->figuras, iterator);
       continue;
     }
 
@@ -85,15 +85,15 @@ int comando_geo_a(void *_this, void *_controlador) {
 
     saida = format_string("%.1f", distancia);
 
-    Ponto2D aux = Ponto2D_t.add(pos, pos2);
-    aux         = Ponto2D_t.mult(aux, 0.5);
+    Ponto2D_t aux = p2d_add(pos, pos2);
+    aux         = p2d_mult(aux, 0.5);
     aux.x += 10;
 
     escreve_texto(svg_saida, saida, aux, 15, cor);
 
     free(saida);
 
-    iterator = Lista_t.get_next(controlador->figuras, iterator);
+    iterator = lt_get_next(controlador->figuras, iterator);
   }
 
   salva_SVG(svg_saida);

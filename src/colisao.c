@@ -7,10 +7,10 @@
 
 struct Colisao{
     Figura figura;
-    Lista arestas;
+    Lista_t arestas;
 };
 
-Colisao colisao_create(Figura figura, Lista arestas){
+Colisao colisao_create(Figura figura, Lista_t arestas){
     struct Colisao* this = malloc(sizeof(struct Colisao));
     this->arestas = arestas;
     this->figura = figura;
@@ -19,12 +19,12 @@ Colisao colisao_create(Figura figura, Lista arestas){
 
 void colisao_destroy(Colisao _this){
     struct Colisao* this = _this;
-    Lista_t.destruir( this->arestas, NULL );
+    lt_destroy( this->arestas, NULL );
     destruir_figura( this->figura );
     free(this);
 }
 
-Lista colisao_get_arestas( Colisao _this ){
+Lista_t colisao_get_arestas( Colisao _this ){
     struct Colisao* this = _this;
     return this->arestas;
 }

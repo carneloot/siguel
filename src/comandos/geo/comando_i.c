@@ -22,11 +22,11 @@ int comando_geo_i(void *_this, void *_controlador) {
   char **params = this->params;
 
   int id      = (int) strtol(params[0], NULL, 10);
-  Ponto2D pos = Ponto2D_t.new(strtod(params[1], NULL), strtod(params[2], NULL));
+  Ponto2D_t pos = p2d_new(strtod(params[1], NULL), strtod(params[2], NULL));
 
-  Posic posic_figura1 = Lista_t.get_first(controlador->figuras);
+  Posic_t posic_figura1 = lt_get_first(controlador->figuras);
   posic_figura1 =
-    Lista_t.search(controlador->figuras, posic_figura1, &id, checar_id_figura);
+    lt_search(controlador->figuras, posic_figura1, &id, checar_id_figura);
 
   if (!posic_figura1) {
     LOG_ERRO(
@@ -34,7 +34,7 @@ int comando_geo_i(void *_this, void *_controlador) {
     return 0;
   }
 
-  Figura figura1 = Lista_t.get(controlador->figuras, posic_figura1);
+  Figura figura1 = lt_get(controlador->figuras, posic_figura1);
 
   char *saida;
 
@@ -43,7 +43,7 @@ int comando_geo_i(void *_this, void *_controlador) {
   else
     saida = format_string("i %s %s %s\nNAO\n", params[0], params[1], params[2]);
 
-  Lista_t.insert(controlador->saida, (Item) saida);
+  lt_insert(controlador->saida, (void *) saida);
 
   return 1;
 }

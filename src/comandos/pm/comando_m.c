@@ -22,18 +22,18 @@ int comando_pm_m(void *_this, void *_controlador) {
   char **params = this->params;
   char *cpf     = params[0];
 
-  HashTable tabela = controlador->tabelas[CPF_X_PESSOA];
+  HashTable_t tabela = controlador->tabelas[CPF_X_PESSOA];
 
-  if (!HashTable_t.exists(tabela, cpf)) {
-    Lista_t.insert(controlador->saida,
+  if (!ht_exists(tabela, cpf)) {
+    lt_insert(controlador->saida,
       format_string("CPF \"%s\" nao encontrado.\n", cpf));
     return 0;
   }
 
-  Pessoa pessoa = HashTable_t.get(tabela, cpf);
+  Pessoa pessoa = ht_get(tabela, cpf);
 
   if (pessoa_get_endereco(pessoa) != NULL) {
-    HashTable_t.remove(controlador->tabelas[CPF_X_CEP], cpf);
+    ht_remove(controlador->tabelas[CPF_X_CEP], cpf);
   }
 
   int face   = char_to_face(params[2][0]);
@@ -44,7 +44,7 @@ int comando_pm_m(void *_this, void *_controlador) {
   pessoa_set_endereco(pessoa, cep, face, numero, complemento);
 
   // Adicionar na tabela CPF_X_CEP
-  HashTable_t.insert(controlador->tabelas[CPF_X_CEP], pessoa_get_cpf(pessoa), pessoa_get_cep(pessoa));
+  ht_insert(controlador->tabelas[CPF_X_CEP], pessoa_get_cpf(pessoa), pessoa_get_cep(pessoa));
 
   return 1;
 }

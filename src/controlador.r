@@ -33,8 +33,8 @@ enum Tabelas {
 };
 
 struct Controlador {
-  Lista saida;
-  Lista saida_svg_qry;
+  Lista_t saida;
+  Lista_t saida_svg_qry;
 
   char *nome_base;
   char *dir_saida;
@@ -42,34 +42,34 @@ struct Controlador {
 
   char *extras[EXTRAS_TOTAL];
 
-  Lista comercios;
-  Lista pessoas;
-  HashTable tabelas[TABELAS_TOTAL];
+  Lista_t comercios;
+  Lista_t pessoas;
+  HashTable_t tabelas[TABELAS_TOTAL];
 
-  Lista veiculos;
+  Lista_t veiculos;
 
-  Lista colisoes;
+  Lista_t colisoes;
   
-  Lista figuras;
+  Lista_t figuras;
 
   int linha_atual;
 
-  Lista sobreposicoes;
+  Lista_t sobreposicoes;
 
-  KDTree elementos[4];
+  KDTree_t elementos[4];
   char *cores[4];
   char *cores_borda[4];
 
-  Ponto2D max_geo, max_qry;
+  Ponto2D_t max_geo, max_qry;
 
-  Lista fila_execucao;
+  Lista_t fila_execucao;
 
   // O valor padrão dos registradores é (0, 0)
-  Ponto2D registradores[11];
+  Ponto2D_t registradores[11];
 
-  GrafoD mapa_viario;
-  KDTree vertices_mapa_viario;
-  KDTree arestas_mapa_viario;
+  GrafoD_t mapa_viario;
+  KDTree_t vertices_mapa_viario;
+  KDTree_t arestas_mapa_viario;
 };
 
 extern void desenhar_todas_figuras(void *controlador, void *svg);

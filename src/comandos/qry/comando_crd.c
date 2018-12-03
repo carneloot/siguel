@@ -26,17 +26,17 @@ int comando_qry_crd(void *_this, void *_controlador) {
   char *cep = params[0];
 
   for (int i = 0; i < 4; i++) {
-    KDTree arvore   = controlador->elementos[i];
+    KDTree_t arvore   = controlador->elementos[i];
     Elemento result = NULL;
 
-    KDTree_t.passe_simetrico(arvore, compararCEP, cep, &result);
+    kdt_passe_simetrico(arvore, compararCEP, cep, &result);
 
     if (!result)
       continue;
 
     char *saida = get_info_elemento(result);
     strcat(saida, "\n");
-    Lista_t.insert(controlador->saida, saida);
+    lt_insert(controlador->saida, saida);
   }
 
   return 1;

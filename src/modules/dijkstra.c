@@ -37,27 +37,27 @@ static DVInfo create_dvinfo(char *label, double distancia, double heuristica) {
  * Funcao recursiva para gerar a lista do caminho
  * mais proximo.
  */
-static void gerarCaminhoRec(DVInfo atual, Lista lista) {
+static void gerarCaminhoRec(DVInfo atual, Lista_t lista) {
   if (atual->anterior == NULL) {
-    Lista_t.insert(lista, atual->label);
+    lt_insert(lista, atual->label);
     return;
   }
 
   gerarCaminhoRec(atual->anterior, lista);
 
-  Lista_t.insert(lista, atual->label);
+  lt_insert(lista, atual->label);
 }
 
 /**
  * Funcao para gerar o caminho mais proximo.
  * Recebe o DVInfo do destino.
  */
-static Lista gerarCaminho(DVInfo target) {
+static Lista_t gerarCaminho(DVInfo target) {
 
   if (target->anterior == NULL)
     return NULL;
     
-  Lista lista = Lista_t.create();
+  Lista_t lista = lt_create();
 
   gerarCaminhoRec(target, lista);
 
@@ -67,25 +67,25 @@ static Lista gerarCaminho(DVInfo target) {
 /**
  * Funcao do A* em si. Baseado no algoritmo encontrado no site do Geeks for Geeks
  */
-Lista astar(
-  GrafoD grafo,
+Lista_t astar(
+  GrafoD_t grafo,
   char *origem, char *destino,
   double (*get_dist_aresta)(void *aresta_info),
   double (*get_heuristica)(void *atual, void *destino)) {
   LOG_PRINT(LOG_FILE, "A*: gerando caminho de \"%s\" ate \"%s\".", origem, destino);
 
-  HashTable vertices = HashTable_t.create(GrafoD_t.total_vertices(grafo));
+  HashTable_t vertices = ht_create(gd_total_vertices(grafo));
 
-  PQueue fila = pq_create(HashTable_t.max_size(vertices));
+  PQueue_t fila = pq_create(ht_max_size(vertices));
 
-  void *info_inicial = GrafoD_t.get_info_vertice(grafo, origem);
-  void *info_target  = GrafoD_t.get_info_vertice(grafo, destino);
+  void *info_inicial = gd_get_info_vertice(grafo, origem);
+  void *info_target  = gd_get_info_vertice(grafo, destino);
 
   DVInfo inicial = create_dvinfo(origem, 0, get_heuristica(info_inicial, info_target));
-  HashTable_t.insert(vertices, inicial->label, inicial);
+  ht_insert(vertices, inicial->label, inicial);
 
   DVInfo target = create_dvinfo(destino, DBL_MAX, 0);
-  HashTable_t.insert(vertices, target->label, target);
+  ht_insert(vertices, target->label, target);
 
   pq_insert(fila, inicial->distancia + inicial->heuristica, inicial);
 
@@ -96,22 +96,22 @@ Lista astar(
     if (menorDistancia == target)
       break;
 
-    Lista adjacentes = GrafoD_t.adjacentes(grafo, menorDistancia->label);
+    Lista_t adjacentes = gd_adjacentes(grafo, menorDistancia->label);
 
-    for (Posic it = Lista_t.get_first(adjacentes); it != NULL; it = Lista_t.get_next(adjacentes, it)) {
-      char *labelAdjacente = Lista_t.get(adjacentes, it);
+    for (Posic_t it = lt_get_first(adjacentes); it != NULL; it = lt_get_next(adjacentes, it)) {
+      char *labelAdjacente = lt_get(adjacentes, it);
 
       DVInfo adjacente;
 
-      if (HashTable_t.exists(vertices, labelAdjacente)) {
-        adjacente = HashTable_t.get(vertices, labelAdjacente);
+      if (ht_exists(vertices, labelAdjacente)) {
+        adjacente = ht_get(vertices, labelAdjacente);
       } else {
-        void *info_adjacente = GrafoD_t.get_info_vertice(grafo, labelAdjacente);
+        void *info_adjacente = gd_get_info_vertice(grafo, labelAdjacente);
         adjacente = create_dvinfo(labelAdjacente, DBL_MAX, get_heuristica(info_adjacente, info_target));
-        HashTable_t.insert(vertices, adjacente->label, adjacente);
+        ht_insert(vertices, adjacente->label, adjacente);
       }
 
-      void *infoAresta = GrafoD_t.get_info_aresta(grafo, menorDistancia->label, labelAdjacente);
+      void *infoAresta = gd_get_info_aresta(grafo, menorDistancia->label, labelAdjacente);
 
       double newDist = menorDistancia->distancia + get_dist_aresta(infoAresta);
 
@@ -122,15 +122,15 @@ Lista astar(
       }
     }
 
-    Lista_t.destruir(adjacentes, NULL);
+    lt_destroy(adjacentes, NULL);
 
   }
 
   pq_destroy(fila, NULL);
 
-  Lista caminho = gerarCaminho(target);
+  Lista_t caminho = gerarCaminho(target);
 
-  HashTable_t.destroy(vertices, free, 0);
+  ht_destroy(vertices, free, 0);
 
   return caminho;
 }
@@ -139,8 +139,8 @@ static double return_zero(void *atual, void *target) {
   return 0.0;
 }
 
-Lista dijkstra(
-  GrafoD grafo,
+Lista_t dijkstra(
+  GrafoD_t grafo,
   char *origem, char *destino,
   double (*get_dist_aresta)(void *aresta_info)) {
   return astar(grafo, origem, destino, get_dist_aresta, return_zero);

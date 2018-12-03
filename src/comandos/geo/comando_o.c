@@ -24,13 +24,13 @@ int comando_geo_o(void *_this, void *_controlador) {
   int id1 = (int) strtol(params[0], NULL, 10);
   int id2 = (int) strtol(params[1], NULL, 10);
 
-  Posic posic_figura1, posic_figura2;
+  Posic_t posic_figura1, posic_figura2;
 
-  posic_figura1 = posic_figura2 = Lista_t.get_first(controlador->figuras);
+  posic_figura1 = posic_figura2 = lt_get_first(controlador->figuras);
 
   // Checa se as figuras estao na lista de figuras
   posic_figura1 =
-    Lista_t.search(controlador->figuras, posic_figura1, &id1, checar_id_figura);
+    lt_search(controlador->figuras, posic_figura1, &id1, checar_id_figura);
   if (!posic_figura1) {
     LOG_ERRO(
       "Nao ha figura no id %d! (linha %d)", id1, controlador->linha_atual);
@@ -38,28 +38,28 @@ int comando_geo_o(void *_this, void *_controlador) {
   }
 
   posic_figura2 =
-    Lista_t.search(controlador->figuras, posic_figura2, &id2, checar_id_figura);
+    lt_search(controlador->figuras, posic_figura2, &id2, checar_id_figura);
   if (!posic_figura2) {
     LOG_ERRO(
       "Nao ha figura no id %d! (linha %d)", id2, controlador->linha_atual);
     return 0;
   }
 
-  Figura figura1 = Lista_t.get(controlador->figuras, posic_figura1);
-  Figura figura2 = Lista_t.get(controlador->figuras, posic_figura2);
+  Figura figura1 = lt_get(controlador->figuras, posic_figura1);
+  Figura figura2 = lt_get(controlador->figuras, posic_figura2);
 
   char *saida;
 
   if (sobrepoe_figura(figura1, figura2)) {
     saida = format_string("o %s %s\nSIM\n", params[0], params[1]);
     /* Desenhar retangulo no lugar da sobreposicao */
-    Lista_t.insert(
+    lt_insert(
       controlador->sobreposicoes,
-      (Item) get_rect_sobreposicao(figura1, figura2, "purple"));
+      (void *) get_rect_sobreposicao(figura1, figura2, "purple"));
   } else
     saida = format_string("o %s %s\nNAO\n", params[0], params[1]);
 
-  Lista_t.insert(controlador->saida, (Item) saida);
+  lt_insert(controlador->saida, (void *) saida);
 
   return 1;
 }

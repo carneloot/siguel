@@ -6,18 +6,18 @@
 #include <elemento.h>
 #include <utils.h>
 
-int checar_id_figura(const Item _figura, const void *_id) {
-  const Figura figura = (const Figura) _figura;
-  const int id        = (const int) *(int *) _id;
+int checar_id_figura(void *_figura, void *_id) {
+  Figura figura = (Figura) _figura;
+  int id        = (int) *(int *) _id;
 
   return !(get_id_figura(figura) == id);
 }
 
-void compararCEP(const Item _ele, unsigned prof, va_list list) {
+void compararCEP(void *_ele, unsigned prof, va_list list) {
   // CEP, *RESULT
   char *cep          = va_arg(list, char *);
   Elemento *result   = va_arg(list, Elemento *);
-  const Elemento ele = _ele;
+  Elemento ele = _ele;
 
   if (*result)
     return;
@@ -29,20 +29,20 @@ void compararCEP(const Item _ele, unsigned prof, va_list list) {
 int elemento_dentro_rect(void *_elemento, int dim, void *_pA, void *_pB) {
   Elemento elemento = (Elemento) _elemento;
   
-  Ponto2D *pA = _pA;
-  Ponto2D *pB = _pB;
+  Ponto2D_t *pA = _pA;
+  Ponto2D_t *pB = _pB;
   
-  Ponto2D min = Ponto2D_t.new(
+  Ponto2D_t min = p2d_new(
     min(pA->x, pB->x),
     min(pA->y, pB->y)
   );
 
-  Ponto2D max = Ponto2D_t.new(
+  Ponto2D_t max = p2d_new(
     max(pA->x, pB->x),
     max(pA->y, pB->y)
   ); 
   
-  Ponto2D pos = get_pos(elemento);
+  Ponto2D_t pos = get_pos(elemento);
   
   switch (dim) {
     case -1:

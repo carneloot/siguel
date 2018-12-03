@@ -14,7 +14,7 @@
 #define altura(a) ((a)->data.quadra.altura)
 
 struct Elemento {
-  Ponto2D pos;
+  Ponto2D_t pos;
   char *cor, *cor_borda;
 
   char *cep;
@@ -49,7 +49,7 @@ static struct Elemento *cria_elemento(double x, double y, char *cep) {
   this->cor_borda = NULL;
 
   this->cep = calloc(strlen(cep) + 1, sizeof(char));
-  this->pos = Ponto2D_t.new(x, y);
+  this->pos = p2d_new(x, y);
 
   strcpy(this->cep, cep);
 

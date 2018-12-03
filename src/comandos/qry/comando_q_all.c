@@ -34,19 +34,19 @@ static int elemento_dentro_figura(const void *_elemento, const void *_figura) {
   return contem;
 }
 
-static Lista *comando_q_all(
+static Lista_t *comando_q_all(
   struct Comando *this,
   struct Controlador *controlador,
-  Ponto2D pA, Ponto2D pB) {
+  Ponto2D_t pA, Ponto2D_t pB) {
   
-  Lista *saida = calloc(4, sizeof(*saida));
+  Lista_t *saida = calloc(4, sizeof(*saida));
 
   for (int i = 0; i < 4; i++) {
-    KDTree arvore = controlador->elementos[i];
+    KDTree_t arvore = controlador->elementos[i];
 
-    if (KDTree_t.is_empty(arvore)) continue;
+    if (kdt_is_empty(arvore)) continue;
 
-    Lista elementos = KDTree_t.range_search(arvore, elemento_dentro_rect, &pA, &pB);
+    Lista_t elementos = kdt_range_search(arvore, elemento_dentro_rect, &pA, &pB);
 
     saida[i] = elementos;
   }
@@ -55,25 +55,25 @@ static Lista *comando_q_all(
 }
 
 static void reportar_elementos(
-  struct Comando *this, struct Controlador *controlador, Lista *elementos) {
+  struct Comando *this, struct Controlador *controlador, Lista_t *elementos) {
   for (int i = 0; i < 4; i++) {
-    Lista lista_atual = elementos[i];
+    Lista_t lista_atual = elementos[i];
 
     if (!lista_atual) continue;
 
-    Posic iterator = Lista_t.get_first(lista_atual);
+    Posic_t iterator = lt_get_first(lista_atual);
 
     while (iterator) {
-      Elemento elemento = (Elemento) Lista_t.get(lista_atual, iterator);
+      Elemento elemento = (Elemento) lt_get(lista_atual, iterator);
 
       char *saida = get_info_elemento(elemento);
       strcat(saida, "\n");
-      Lista_t.insert(controlador->saida, (Item) saida);
+      lt_insert(controlador->saida, (void *) saida);
 
-      iterator = Lista_t.get_next(lista_atual, iterator);
+      iterator = lt_get_next(lista_atual, iterator);
     }
 
-    Lista_t.destruir(lista_atual, NULL);
+    lt_destroy(lista_atual, NULL);
   }
 }
 
@@ -96,46 +96,46 @@ int comando_qry_qzin(void *_this, void *_controlador) {
 
   char **params = this->params;
 
-  Ponto2D pos, size;
+  Ponto2D_t pos, size;
   Figura figura;
 
-  pos  = Ponto2D_t.new(strtod(params[0], NULL), strtod(params[1], NULL));
-  size = Ponto2D_t.new(strtod(params[2], NULL), strtod(params[3], NULL));
+  pos  = p2d_new(strtod(params[0], NULL), strtod(params[1], NULL));
+  size = p2d_new(strtod(params[2], NULL), strtod(params[3], NULL));
 
   figura = cria_retangulo(pos.x, pos.y, size.x, size.y, "transparent", "black");
   set_opacity_figura(figura, 0.8);
   set_dashed_figura(figura, FIG_BORDA_TRACEJADA);
-  Lista_t.insert(controlador->saida_svg_qry,
+  lt_insert(controlador->saida_svg_qry,
     cria_desenhavel(figura, get_svg_figura, destruir_figura));
 
-  Ponto2D new_max = Ponto2D_t.add(pos, size);
-  new_max         = Ponto2D_t.add_scalar(new_max, 4);
+  Ponto2D_t new_max = p2d_add(pos, size);
+  new_max         = p2d_add_scalar(new_max, 4);
 
-  controlador->max_qry = Ponto2D_t.maximo(controlador->max_qry, new_max);
+  controlador->max_qry = p2d_maximo(controlador->max_qry, new_max);
 
   char *prefixo = calloc(5, sizeof(char));
   strcpy(prefixo, "q?:\n");
-  Lista_t.insert(controlador->saida, prefixo);
+  lt_insert(controlador->saida, prefixo);
 
-  Ponto2D pA = pos;
-  Ponto2D pB = Ponto2D_t.add(pos, size);
+  Ponto2D_t pA = pos;
+  Ponto2D_t pB = p2d_add(pos, size);
 
-  Lista *elementos = comando_q_all(this, controlador, pA, pB);
+  Lista_t *elementos = comando_q_all(this, controlador, pA, pB);
 
   // Checar se os elementos estão dentro da figura mesmo
   for (int i = 0; i < 4; i++) {
-    Lista lista_atual = elementos[i];
+    Lista_t lista_atual = elementos[i];
 
     if (!lista_atual) continue;
 
-    Posic iterator = Lista_t.get_first(lista_atual);
+    Posic_t iterator = lt_get_first(lista_atual);
 
     while (iterator) {
-      Posic next_iterator = Lista_t.get_next(lista_atual, iterator);
-      Elemento elemento   = Lista_t.get(lista_atual, iterator);
+      Posic_t next_iterator = lt_get_next(lista_atual, iterator);
+      Elemento elemento   = lt_get(lista_atual, iterator);
 
       if (!elemento_dentro_figura(elemento, figura)) {
-        Lista_t.remove(lista_atual, iterator);
+        lt_remove(lista_atual, iterator);
       }
 
       iterator = next_iterator;
@@ -162,42 +162,42 @@ int comando_qry_qzao(void *_this, void *_controlador) {
   char **params = this->params;
 
   double r    = strtod(params[0], NULL);
-  Ponto2D pos = Ponto2D_t.new(strtod(params[1], NULL), strtod(params[2], NULL));
+  Ponto2D_t pos = p2d_new(strtod(params[1], NULL), strtod(params[2], NULL));
 
   Figura figura = cria_circulo(pos.x, pos.y, r, "transparent", "black");
   set_opacity_figura(figura, 0.8);
   set_dashed_figura(figura, FIG_BORDA_TRACEJADA);
 
-  Lista_t.insert(controlador->saida_svg_qry,
+  lt_insert(controlador->saida_svg_qry,
     cria_desenhavel(figura, get_svg_figura, destruir_figura));
 
-  Ponto2D new_max = Ponto2D_t.add_scalar(pos, r + 4);
+  Ponto2D_t new_max = p2d_add_scalar(pos, r + 4);
 
-  controlador->max_qry = Ponto2D_t.maximo(controlador->max_qry, new_max);
+  controlador->max_qry = p2d_maximo(controlador->max_qry, new_max);
 
   char *prefixo = calloc(5, sizeof(char));
   strcpy(prefixo, "Q?:\n");
-  Lista_t.insert(controlador->saida, prefixo);
+  lt_insert(controlador->saida, prefixo);
 
-  Ponto2D pA = Ponto2D_t.sub_scalar(pos, r);
-  Ponto2D pB = Ponto2D_t.add_scalar(pos, r);
+  Ponto2D_t pA = p2d_sub_scalar(pos, r);
+  Ponto2D_t pB = p2d_add_scalar(pos, r);
 
-  Lista *elementos = comando_q_all(this, controlador, pA, pB);
+  Lista_t *elementos = comando_q_all(this, controlador, pA, pB);
 
   // Checar se os elementos estão dentro da figura mesmo
   for (int i = 0; i < 4; i++) {
-    Lista lista_atual = elementos[i];
+    Lista_t lista_atual = elementos[i];
 
     if (!lista_atual) continue;
 
-    Posic iterator = Lista_t.get_first(lista_atual);
+    Posic_t iterator = lt_get_first(lista_atual);
 
     while (iterator) {
-      Posic next_iterator = Lista_t.get_next(lista_atual, iterator);
-      Elemento elemento   = Lista_t.get(lista_atual, iterator);
+      Posic_t next_iterator = lt_get_next(lista_atual, iterator);
+      Elemento elemento   = lt_get(lista_atual, iterator);
 
       if (!elemento_dentro_figura(elemento, figura)) {
-        Lista_t.remove(lista_atual, iterator);
+        lt_remove(lista_atual, iterator);
       }
 
       iterator = next_iterator;

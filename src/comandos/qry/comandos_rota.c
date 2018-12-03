@@ -20,16 +20,16 @@
 #include <string.h>
 
 /** Funcao auxiliar da get_vertice_by_ponto */
-double __distancia_vertice_ponto(const Item _vertice_info, const Item _ponto, int dim) {
+double __distancia_vertice_ponto(void *_vertice_info, void *_ponto, int dim) {
   VerticeInfo vertice_info = (VerticeInfo) _vertice_info;
 
-  Ponto2D ponto         = * (Ponto2D *) _ponto;
-  Ponto2D ponto_vertice = vertice_info->pos;
+  Ponto2D_t ponto         = * (Ponto2D_t *) _ponto;
+  Ponto2D_t ponto_vertice = vertice_info->pos;
 
   switch (dim) {
     case 0:  return sqr(ponto.x - ponto_vertice.x);
     case 1:  return sqr(ponto.y - ponto_vertice.y);
-    case -1: return Ponto2D_t.dist_squared(ponto, ponto_vertice);
+    case -1: return p2d_dist_squared(ponto, ponto_vertice);
   }
 
   return DBL_MAX;
@@ -38,8 +38,8 @@ double __distancia_vertice_ponto(const Item _vertice_info, const Item _ponto, in
 /**
  * Retorna o vertice mais proximo do ponto passado
  */
-static VerticeInfo get_vertice_by_ponto(KDTree vertices, Ponto2D ponto) {
-  return KDTree_t.nearest_neighbor(vertices, &ponto, __distancia_vertice_ponto).point1;
+static VerticeInfo get_vertice_by_ponto(KDTree_t vertices, Ponto2D_t ponto) {
+  return kdt_nearest_neighbor(vertices, &ponto, __distancia_vertice_ponto).point1;
 }
 
 /** FUNCOES PARA USAR NA HORA DE ACHAR O CAMINHO */
@@ -64,15 +64,15 @@ static double get_distancia_vertices(void *_atual, void *_target) {
   VerticeInfo atual  = (VerticeInfo) _atual;
   VerticeInfo target = (VerticeInfo) _target;
 
-  return Ponto2D_t.dist_squared(atual->pos, target->pos);
+  return p2d_dist_squared(atual->pos, target->pos);
 }
 
 /**
  * Retorna o caminho de origem_info até destino_info.
  * Se distancia for true usa a distancia, senao usa a velocidade
  */
-static Lista get_caminho(GrafoD grafo, VerticeInfo origem_info, VerticeInfo destino_info, bool distancia) {
-  Lista caminho;
+static Lista_t get_caminho(GrafoD_t grafo, VerticeInfo origem_info, VerticeInfo destino_info, bool distancia) {
+  Lista_t caminho;
 
   double (*funcao)(void *) = (distancia == true) ? get_distancia_aresta : get_tempo_aresta;
 
@@ -84,24 +84,24 @@ static Lista get_caminho(GrafoD grafo, VerticeInfo origem_info, VerticeInfo dest
 /**
  * Desenha linhas entre os vertices indicados por caminho de cor cor
  */
-static void desenhar_caminho_svg(SVG svg, Lista caminho, GrafoD mapa, char *cor) {
+static void desenhar_caminho_svg(SVG svg, Lista_t caminho, GrafoD_t mapa, char *cor) {
 
-  Lista pontos = Lista_t.create();
+  Lista_t pontos = lt_create();
 
-  Posic it = Lista_t.get_first(caminho);
+  Posic_t it = lt_get_first(caminho);
 
   while (it) {
-    char *label = Lista_t.get(caminho, it);
+    char *label = lt_get(caminho, it);
 
-    VerticeInfo vertice = GrafoD_t.get_info_vertice(mapa, label);
+    VerticeInfo vertice = gd_get_info_vertice(mapa, label);
 
-    Ponto2D *ponto = calloc(1, sizeof(*ponto));
+    Ponto2D_t *ponto = calloc(1, sizeof(*ponto));
     ponto->x = vertice->pos.x;
     ponto->y = vertice->pos.y;
 
-    Lista_t.insert(pontos, ponto);
+    lt_insert(pontos, ponto);
 
-    it = Lista_t.get_next(caminho, it);
+    it = lt_get_next(caminho, it);
   }
 
   void *path = cria_path(pontos, 5, 1, cor);
@@ -112,26 +112,26 @@ static void desenhar_caminho_svg(SVG svg, Lista caminho, GrafoD mapa, char *cor)
 
   desenhavel_destruir(desenhavel);
 
-  Lista_t.destruir(pontos, free);
+  lt_destroy(pontos, free);
 
 }
 
 /**
  * Coloca na saida strings com os nomes das ruas do caminho passado.
  */
-static void escrever_caminho_txt(Lista saida, Lista caminho, GrafoD mapa) {
+static void escrever_caminho_txt(Lista_t saida, Lista_t caminho, GrafoD_t mapa) {
 
   char *ultima_rua = NULL;
 
-  Posic it = Lista_t.get_first(caminho);
-  while (Lista_t.get_next(caminho, it)) {
-    Posic next_it = Lista_t.get_next(caminho, it);
+  Posic_t it = lt_get_first(caminho);
+  while (lt_get_next(caminho, it)) {
+    Posic_t next_it = lt_get_next(caminho, it);
 
-    char *label_prev = Lista_t.get(caminho, Lista_t.get_previous(caminho, it));
-    char *label      = Lista_t.get(caminho, it);
-    char *label_next = Lista_t.get(caminho, next_it);
+    char *label_prev = lt_get(caminho, lt_get_previous(caminho, it));
+    char *label      = lt_get(caminho, it);
+    char *label_next = lt_get(caminho, next_it);
 
-    ArestaInfo rua = GrafoD_t.get_info_aresta(mapa, label, label_next);
+    ArestaInfo rua = gd_get_info_aresta(mapa, label, label_next);
 
     // Ignorar os pontos
     if (!strcmp(rua->nome, ".")) {
@@ -141,7 +141,7 @@ static void escrever_caminho_txt(Lista saida, Lista caminho, GrafoD mapa) {
 
     // Eh o primeiro
     if (ultima_rua == NULL) {
-      Lista_t.insert(saida, format_string("\tSiga pela rua %s\n", rua->nome));
+      lt_insert(saida, format_string("\tSiga pela rua %s\n", rua->nome));
 
       ultima_rua = rua->nome;
       it = next_it;
@@ -155,15 +155,15 @@ static void escrever_caminho_txt(Lista saida, Lista caminho, GrafoD mapa) {
     }
 
     // Vai fazer uma curva
-    VerticeInfo vertice_anterior = GrafoD_t.get_info_vertice(mapa, label_prev);
-    VerticeInfo vertice_atual    = GrafoD_t.get_info_vertice(mapa, label);
-    VerticeInfo vertice_proximo  = GrafoD_t.get_info_vertice(mapa, label_next);
+    VerticeInfo vertice_anterior = gd_get_info_vertice(mapa, label_prev);
+    VerticeInfo vertice_atual    = gd_get_info_vertice(mapa, label);
+    VerticeInfo vertice_proximo  = gd_get_info_vertice(mapa, label_next);
 
-    Ponto2D pos_anterior = vertice_anterior->pos;
-    Ponto2D pos_atual    = vertice_atual->pos;
-    Ponto2D pos_proximo  = vertice_proximo->pos;
+    Ponto2D_t pos_anterior = vertice_anterior->pos;
+    Ponto2D_t pos_atual    = vertice_atual->pos;
+    Ponto2D_t pos_proximo  = vertice_proximo->pos;
 
-    int orientacao = Ponto2D_t.orientation(pos_anterior, pos_atual, pos_proximo);
+    int orientacao = p2d_orientation(pos_anterior, pos_atual, pos_proximo);
 
     // Se a orientacao for zero, esta em linha reta
     // Logo, nao precisa virar
@@ -176,21 +176,21 @@ static void escrever_caminho_txt(Lista saida, Lista caminho, GrafoD mapa) {
 
     char *saida_txt = format_string("\tvire a %s na rua %s\n", direcao, rua->nome);
 
-    Lista_t.insert(saida, saida_txt);
+    lt_insert(saida, saida_txt);
 
 
     ultima_rua = rua->nome;
     it = next_it;
   }
 
-  Lista_t.insert(saida, format_string("\n"));
+  lt_insert(saida, format_string("\n"));
 
 }
 
 /**
  * Desenha um circulo de cor cor nos ponto passado
  */
-static void desenhar_circulo(SVG svg, Ponto2D ponto, char *cor) {
+static void desenhar_circulo(SVG svg, Ponto2D_t ponto, char *cor) {
   #ifdef DEBUG
   Figura ponto1 = cria_circulo(ponto.x,  ponto.y,  5, cor, "transparent");
 
@@ -228,15 +228,15 @@ int comando_qry_p(void *_this, void *_controlador) {
     int registrador_origem = strtol( params[3] + 1, NULL, 10);
     int registrador_destino = strtol( params[4] + 1, NULL, 10);
 
-    Ponto2D origem = controlador->registradores[ registrador_origem ]; // ATENÇÃO, CONSIDERANDO OS REGISTRADORES COMO 1-10 JÁ QUE EXISTEM 11 REGISTRADORES
-    Ponto2D destino = controlador->registradores[ registrador_destino ];
+    Ponto2D_t origem = controlador->registradores[ registrador_origem ]; // ATENÇÃO, CONSIDERANDO OS REGISTRADORES COMO 1-10 JÁ QUE EXISTEM 11 REGISTRADORES
+    Ponto2D_t destino = controlador->registradores[ registrador_destino ];
 
     VerticeInfo origem_info  = get_vertice_by_ponto(controlador->vertices_mapa_viario, origem);
     VerticeInfo destino_info = get_vertice_by_ponto(controlador->vertices_mapa_viario, destino);
 
     char* cor = params[5];
 
-    Lista caminho;
+    Lista_t caminho;
 
     char* menor_tempo = params[2];
     if( menor_tempo[0] == 'T'){
@@ -274,7 +274,7 @@ int comando_qry_p(void *_this, void *_controlador) {
     } else {
       desenhar_caminho_svg( svg_saida, caminho, controlador->mapa_viario, cor);
 
-      Lista_t.destruir(caminho, NULL);
+      lt_destroy(caminho, NULL);
     }
 
     salva_SVG(svg_saida);
@@ -293,13 +293,13 @@ int comando_qry_p(void *_this, void *_controlador) {
   int registrador_origem = strtol( params[2] + 1, NULL, 10);
   int registrador_destino = strtol( params[3] + 1, NULL, 10);
 
-  Ponto2D origem = controlador->registradores[ registrador_origem ]; // ATENÇÃO, CONSIDERANDO OS REGISTRADORES COMO 1-10 JÁ QUE EXISTEM 11 REGISTRADORES
-  Ponto2D destino = controlador->registradores[ registrador_destino ];
+  Ponto2D_t origem = controlador->registradores[ registrador_origem ]; // ATENÇÃO, CONSIDERANDO OS REGISTRADORES COMO 1-10 JÁ QUE EXISTEM 11 REGISTRADORES
+  Ponto2D_t destino = controlador->registradores[ registrador_destino ];
 
   VerticeInfo origem_info = get_vertice_by_ponto( controlador->vertices_mapa_viario, origem );
   VerticeInfo destino_info = get_vertice_by_ponto( controlador->vertices_mapa_viario, destino );
   
-  Lista caminho;
+  Lista_t caminho;
 
   if( menor_tempo[0] == 'T' ){
     caminho = get_caminho( controlador->mapa_viario, origem_info, destino_info, false );
@@ -308,16 +308,16 @@ int comando_qry_p(void *_this, void *_controlador) {
   }
 
   if (caminho == NULL) {
-    Lista_t.insert(controlador->saida, format_string("Nao foi possivel gerar um caminho (comando %s):\n", this->string) );
+    lt_insert(controlador->saida, format_string("Nao foi possivel gerar um caminho (comando %s):\n", this->string) );
     return 1;
   }
 
 
-  Lista_t.insert(controlador->saida, format_string( "Rota gerada pelo comando \"%s\":\n", this->string ) );
+  lt_insert(controlador->saida, format_string( "Rota gerada pelo comando \"%s\":\n", this->string ) );
 
   escrever_caminho_txt(controlador->saida, caminho, controlador->mapa_viario);
   
-  Lista_t.destruir( caminho, NULL );
+  lt_destroy( caminho, NULL );
   // ================ VER SE TEM MAIS ALGO PARA COLOCAR AQUI ==============================================
 
   return 1;
@@ -395,7 +395,7 @@ int comando_qry_sp(void *_this, void *_controlador) {
     desenhar_veiculos(controlador, svg_saida);
 
   } else {
-    Lista_t.insert(controlador->saida,
+    lt_insert(controlador->saida,
       format_string("Rota gerada pelo comando \"%s\": \n", this->string));
   }
 
@@ -405,13 +405,13 @@ int comando_qry_sp(void *_this, void *_controlador) {
     int r1 = strtol(this->params[offset_total + i]     + 1, NULL, 10);
     int r2 = strtol(this->params[offset_total + i + 1] + 1, NULL, 10);
 
-    Ponto2D pos_origem  = controlador->registradores[r1];
-    Ponto2D pos_destino = controlador->registradores[r2];
+    Ponto2D_t pos_origem  = controlador->registradores[r1];
+    Ponto2D_t pos_destino = controlador->registradores[r2];
 
     VerticeInfo origem_info  = get_vertice_by_ponto(controlador->vertices_mapa_viario, pos_origem);
     VerticeInfo destino_info = get_vertice_by_ponto(controlador->vertices_mapa_viario, pos_destino);
 
-    Lista caminho = get_caminho(controlador->mapa_viario, origem_info, destino_info, distancia);
+    Lista_t caminho = get_caminho(controlador->mapa_viario, origem_info, destino_info, distancia);
 
     if (pictorica) {
       desenhar_circulo(svg_saida, pos_origem, cor[i % 2]);
@@ -424,7 +424,7 @@ int comando_qry_sp(void *_this, void *_controlador) {
         escreve_texto(svg_saida, "Caminho inexistente", pos_origem, 20, cor[i % 2]);
 
       } else {
-        Lista_t.insert(controlador->saida,
+        lt_insert(controlador->saida,
           format_string("Nao foi possivel gerar um caminho de \"%s\" ate \"%s\".",
           origem_info->id, destino_info->id));
       }
@@ -441,7 +441,7 @@ int comando_qry_sp(void *_this, void *_controlador) {
         escrever_caminho_txt(controlador->saida, caminho, controlador->mapa_viario);
       }
 
-      Lista_t.destruir(caminho, 0);
+      lt_destroy(caminho, 0);
     }
 
   }

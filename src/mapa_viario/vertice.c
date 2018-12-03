@@ -3,7 +3,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-VerticeInfo create_vertice_info(Ponto2D pos, char *id) {
+VerticeInfo create_vertice_info(Ponto2D_t pos, char *id) {
   VerticeInfo this = calloc(1, sizeof(*this));
 
   this->pos = pos;

@@ -27,9 +27,9 @@ int comando_ec_e(void *_this, void *_controlador) {
   Comercio comercio = cria_comercio(
     params[0], params[1], params[2], face, num, params[5]);
 
-  Lista_t.insert(controlador->comercios, comercio);
+  lt_insert(controlador->comercios, comercio);
 
-  HashTable_t.insert(controlador->tabelas[CNPJ_X_COMERCIO], comercio_get_cnpj(comercio), comercio);
+  ht_insert(controlador->tabelas[CNPJ_X_COMERCIO], comercio_get_cnpj(comercio), comercio);
 
   return 1;
 }

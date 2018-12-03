@@ -23,6 +23,6 @@ void printar_mensagem_final(Controlador this, int eh_erro);
 
 void destruir_controlador(Controlador c);
 
-HashTable get_table_quadras(Controlador this);
+HashTable_t get_table_quadras(Controlador this);
 
 #endif /* __CONTROLADOR_H__ */

@@ -38,48 +38,48 @@ static void escrever_txt_final(void *c);
 
 /** ===== FUNCOES DA ARVORE ===== */
 
-int equalElements(const void *_a, const void *_b) {
-  const Elemento a = (const Elemento) _a;
-  const Elemento b = (const Elemento) _b;
-
-  return (Ponto2D_t.equal(get_pos(a), get_pos(b)) && !strcmp(get_id_elemento(a), get_id_elemento(b)));
-}
-
-int compareX(const void *_a, const void *_b) {
+int equalElements(void *_a, void *_b) {
   Elemento a = (Elemento) _a;
   Elemento b = (Elemento) _b;
 
-  Ponto2D posA = get_pos(a);
-  Ponto2D posB = get_pos(b);
+  return (p2d_equal(get_pos(a), get_pos(b)) && !strcmp(get_id_elemento(a), get_id_elemento(b)));
+}
+
+int compareX(void *_a, void *_b) {
+  Elemento a = (Elemento) _a;
+  Elemento b = (Elemento) _b;
+
+  Ponto2D_t posA = get_pos(a);
+  Ponto2D_t posB = get_pos(b);
 
   return (posA.x - posB.x);
 }
 
-int compareY(const void *_a, const void *_b) {
+int compareY(void *_a, void *_b) {
   Elemento a = (Elemento) _a;
   Elemento b = (Elemento) _b;
 
-  Ponto2D posA = get_pos(a);
-  Ponto2D posB = get_pos(b);
+  Ponto2D_t posA = get_pos(a);
+  Ponto2D_t posB = get_pos(b);
 
   return (posA.y - posB.y);
 }
 
-void desenharElementoSVG(const Item _ele, unsigned prof, va_list list) {
-  const Elemento ele = (const Elemento) _ele;
+void desenharElementoSVG(void *_ele, unsigned prof, va_list list) {
+  Elemento ele = (Elemento) _ele;
   SVG svg = va_arg(list, SVG);
   
   desenha_elemento(svg, ele);
 }
 
-int elementoDentro(Item _this, int dim, Item rect[]) {
+int elementoDentro(void *_this, int dim, void *rect[]) {
   Elemento this = (Elemento) _this;
 
   int result;
 
-  Ponto2D pos = get_pos(this);
-  Ponto2D *a  = (Ponto2D *) rect[0];
-  Ponto2D *b  = (Ponto2D *) rect[1];
+  Ponto2D_t pos = get_pos(this);
+  Ponto2D_t *a  = (Ponto2D_t *) rect[0];
+  Ponto2D_t *b  = (Ponto2D_t *) rect[1];
 
   result = 0;
 
@@ -108,40 +108,40 @@ int elementoDentro(Item _this, int dim, Item rect[]) {
 
 /** FUNCOES ARVORE DO GRAFO */
 
-int equalVertices(const void *_a, const void *_b) {
-  const VerticeInfo a = (const VerticeInfo) _a;
-  const VerticeInfo b = (const VerticeInfo) _b;
+int equalVertices(void *_a, void *_b) {
+  VerticeInfo a = (VerticeInfo) _a;
+  VerticeInfo b = (VerticeInfo) _b;
 
-  return (Ponto2D_t.equal(a->pos, b->pos) && !strcmp(a->id, b->id));
+  return (p2d_equal(a->pos, b->pos) && !strcmp(a->id, b->id));
 }
 
-int compareXVertice(const void *_a, const void *_b) {
-  const VerticeInfo a = (const VerticeInfo) _a;
-  const VerticeInfo b = (const VerticeInfo) _b;
+int compareXVertice(void *_a, void *_b) {
+  VerticeInfo a = (VerticeInfo) _a;
+  VerticeInfo b = (VerticeInfo) _b;
 
   return (a->pos.x - b->pos.x);
 }
 
-int compareYVertice(const void *_a, const void *_b) {
-  const VerticeInfo a = (const VerticeInfo) _a;
-  const VerticeInfo b = (const VerticeInfo) _b;
+int compareYVertice(void *_a, void *_b) {
+  VerticeInfo a = (VerticeInfo) _a;
+  VerticeInfo b = (VerticeInfo) _b;
 
   return (a->pos.y - b->pos.y);
 }
 
-int equalArestas( const void* _this, const void* _other ) {
+int equalArestas( void* _this, void* _other ) {
   ArestaInfo this  = (ArestaInfo) _this;
   ArestaInfo other = (ArestaInfo) _other;
-  return (!strcmp(this->nome, other->nome) && Ponto2D_t.equal(this->pos, other->pos));
+  return (!strcmp(this->nome, other->nome) && p2d_equal(this->pos, other->pos));
 }
 
-int compareXAresta( const void* _this, const void* _other ) {
+int compareXAresta( void* _this, void* _other ) {
   ArestaInfo this  = (ArestaInfo) _this;
   ArestaInfo other = (ArestaInfo) _other;
   return ( this->pos.x - other->pos.x );
 }
 
-int compareYAresta( const void* _this, const void* _other ) {
+int compareYAresta( void* _this, void* _other ) {
   ArestaInfo this  = (ArestaInfo) _this;
   ArestaInfo other = (ArestaInfo) _other;
   return ( this->pos.y - other->pos.y );
@@ -154,8 +154,8 @@ Controlador cria_controlador() {
   struct Controlador *this =
     (struct Controlador *) malloc(sizeof(struct Controlador));
 
-  this->saida         = Lista_t.create();
-  this->saida_svg_qry = Lista_t.create();
+  this->saida         = lt_create();
+  this->saida_svg_qry = lt_create();
 
   this->nome_base   = NULL;
   this->dir_saida   = NULL;
@@ -166,39 +166,39 @@ Controlador cria_controlador() {
   for (i = 0; i < EXTRAS_TOTAL; i++)
     this->extras[i] = NULL;
 
-  this->veiculos = Lista_t.create();
-  this->colisoes = Lista_t.create();
-  this->figuras = Lista_t.create();
+  this->veiculos = lt_create();
+  this->colisoes = lt_create();
+  this->figuras = lt_create();
 
   this->linha_atual = 0;
 
-  this->sobreposicoes = Lista_t.create();
+  this->sobreposicoes = lt_create();
 
   for (i = 0; i < 4; i++) {
-    this->elementos[i] = KDTree_t.create(2, equalElements, compareX, compareY);
+    this->elementos[i] = kdt_create(2, equalElements, compareX, compareY);
 
     this->cores[i]       = NULL;
     this->cores_borda[i] = NULL;
   }
 
-  this->max_geo = Ponto2D_t.new(0, 0);
-  this->max_qry = Ponto2D_t.new(0, 0);
+  this->max_geo = p2d_new(0, 0);
+  this->max_qry = p2d_new(0, 0);
 
-  this->fila_execucao = Lista_t.create();
+  this->fila_execucao = lt_create();
 
-  this->comercios = Lista_t.create();
-  this->pessoas   = Lista_t.create();
+  this->comercios = lt_create();
+  this->pessoas   = lt_create();
 
   for (i = 0; i < TABELAS_TOTAL; i++)
-    this->tabelas[i] = HashTable_t.create(73);
+    this->tabelas[i] = ht_create(73);
 
   for (i = 0; i < 11; i++) {
-    this->registradores[i] = Ponto2D_t.new(0, 0);
+    this->registradores[i] = p2d_new(0, 0);
   }
 
-  this->mapa_viario          = GrafoD_t.create();
-  this->vertices_mapa_viario = KDTree_t.create(2, equalVertices, compareXVertice, compareYVertice);
-  this->arestas_mapa_viario  = KDTree_t.create(2, equalArestas, compareXAresta, compareYAresta);
+  this->mapa_viario          = gd_create();
+  this->vertices_mapa_viario = kdt_create(2, equalVertices, compareXVertice, compareYVertice);
+  this->arestas_mapa_viario  = kdt_create(2, equalArestas, compareXAresta, compareYAresta);
 
   return (void *) this;
 }
@@ -271,10 +271,10 @@ int executar_proximo_comando(Controlador c) {
   struct Controlador *this = (struct Controlador *) c;
   Comando comando;
 
-  Posic inicio_lista = Lista_t.get_first(this->fila_execucao);
+  Posic_t inicio_lista = lt_get_first(this->fila_execucao);
 
-  comando = (Comando) Lista_t.get(this->fila_execucao, inicio_lista);
-  Lista_t.remove(this->fila_execucao, inicio_lista);
+  comando = (Comando) lt_get(this->fila_execucao, inicio_lista);
+  lt_remove(this->fila_execucao, inicio_lista);
 
   this->linha_atual++;
 
@@ -290,18 +290,18 @@ int executar_proximo_comando(Controlador c) {
 int ha_comandos(Controlador c) {
   struct Controlador *this = (struct Controlador *) c;
 
-  return !!Lista_t.length(this->fila_execucao);
+  return !!lt_length(this->fila_execucao);
 }
 
 void gerar_fila_execucao(Controlador _this) {
   struct Controlador *this = (struct Controlador *) _this;
 
   // Adicionar os arquivos a serem verificados na lista
-  Lista arquivos = Lista_t.create();
+  Lista_t arquivos = lt_create();
 
   char *path = format_string(
     "%s%s.geo", this->dir_entrada, this->nome_base);
-  Lista_t.insert(arquivos, path);
+  lt_insert(arquivos, path);
 
   // Se o arquivo de qry foi especificado
   for (int i = 0; i < EXTRAS_TOTAL; i++) {
@@ -309,14 +309,14 @@ void gerar_fila_execucao(Controlador _this) {
 
     path = format_string(
       "%s%s.%s", this->dir_entrada, this->extras[i], extra_extensao[i]);
-    Lista_t.insert(arquivos, path);
+    lt_insert(arquivos, path);
   }
 
   // Adicionando comandos a fila de execução
-  Posic iterator = Lista_t.get_first(arquivos);
+  Posic_t iterator = lt_get_first(arquivos);
 
   while (iterator) {
-    path        = Lista_t.get(arquivos, iterator);
+    path        = lt_get(arquivos, iterator);
     Arquivo arq = abrir_arquivo(path, LEITURA);
 
     char *linha;
@@ -335,7 +335,7 @@ void gerar_fila_execucao(Controlador _this) {
         continue;
       }
       
-      Lista_t.insert(this->fila_execucao, (Item) comando);
+      lt_insert(this->fila_execucao, (void *) comando);
 
       free(linha);
     }
@@ -344,10 +344,10 @@ void gerar_fila_execucao(Controlador _this) {
 
     fechar_arquivo(arq);
 
-    iterator = Lista_t.get_next(arquivos, iterator);
+    iterator = lt_get_next(arquivos, iterator);
   }
 
-  Lista_t.destruir(arquivos, free);
+  lt_destroy(arquivos, free);
 }
 
 /**
@@ -358,7 +358,7 @@ void gerar_fila_execucao(Controlador _this) {
 void finalizar_arquivos(Controlador c) {
   struct Controlador *this = (struct Controlador *) c;
   char *full_path;
-  Posic iterator;
+  Posic_t iterator;
 
   // Escreve o txt do .geo
   escrever_txt_final(c);
@@ -388,10 +388,10 @@ void finalizar_arquivos(Controlador c) {
 
   // Desenhando saida dos comandos
 
-  iterator = Lista_t.get_first(this->saida_svg_qry);
+  iterator = lt_get_first(this->saida_svg_qry);
   while (iterator) {
-    desenha_desenhavel(s, Lista_t.get(this->saida_svg_qry, iterator));
-    iterator = Lista_t.get_next(this->saida_svg_qry, iterator);
+    desenha_desenhavel(s, lt_get(this->saida_svg_qry, iterator));
+    iterator = lt_get_next(this->saida_svg_qry, iterator);
   }
 
   salva_SVG(s);
@@ -433,7 +433,7 @@ void printar_mensagem_final(Controlador _this, int eh_erro) {
 
 }
 
-HashTable get_table_quadras(Controlador _this) {
+HashTable_t get_table_quadras(Controlador _this) {
   struct Controlador * this = (struct Controlador *) _this;
   return this->tabelas[CEP_X_QUADRA];
 }
@@ -444,19 +444,19 @@ void destruir_controlador(Controlador c) {
 
   this = (struct Controlador *) c;
 
-  Lista_t.destruir(this->saida, &free);
-  Lista_t.destruir(this->saida_svg_qry, desenhavel_destruir);
+  lt_destroy(this->saida, &free);
+  lt_destroy(this->saida_svg_qry, desenhavel_destruir);
 
-  Lista_t.destruir(this->veiculos, destruir_veiculo);
-  Lista_t.destruir(this->colisoes, colisao_destroy);
-  Lista_t.destruir(this->figuras, &destruir_figura);
+  lt_destroy(this->veiculos, destruir_veiculo);
+  lt_destroy(this->colisoes, colisao_destroy);
+  lt_destroy(this->figuras, &destruir_figura);
 
   // Sobreposicoes
-  Lista_t.destruir(this->sobreposicoes, &destruir_figura);
+  lt_destroy(this->sobreposicoes, &destruir_figura);
 
   // Elementos
   for (i = 0; i < 4; i++) {
-    KDTree_t.destroy(this->elementos[i], &destruir_elemento);
+    kdt_destroy(this->elementos[i], &destruir_elemento);
     if (!this->cores[i])
       continue;
 
@@ -475,23 +475,23 @@ void destruir_controlador(Controlador c) {
     if (this->extras[i])
       free(this->extras[i]);
 
-  Lista_t.destruir(this->fila_execucao, NULL);
+  lt_destroy(this->fila_execucao, NULL);
 
-  Lista_t.destruir(this->comercios, comercio_destruir);
-  Lista_t.destruir(this->pessoas,     pessoa_destruir);
+  lt_destroy(this->comercios, comercio_destruir);
+  lt_destroy(this->pessoas,     pessoa_destruir);
 
-  HashTable_t.destroy(this->tabelas[CPF_X_CEP],        NULL, 0);
-  HashTable_t.destroy(this->tabelas[CEP_X_QUADRA],     NULL, 0);
-  HashTable_t.destroy(this->tabelas[TIPO_X_DESCRICAO], free, 1);
-  HashTable_t.destroy(this->tabelas[CPF_X_PESSOA],     NULL, 0);
-  HashTable_t.destroy(this->tabelas[CNPJ_X_COMERCIO],  NULL, 0);
-  HashTable_t.destroy(this->tabelas[ID_X_RADIO],       NULL, 0);
-  HashTable_t.destroy(this->tabelas[ID_X_HIDRANTE],    NULL, 0);
-  HashTable_t.destroy(this->tabelas[ID_X_SEMAFORO],    NULL, 0);
+  ht_destroy(this->tabelas[CPF_X_CEP],        NULL, 0);
+  ht_destroy(this->tabelas[CEP_X_QUADRA],     NULL, 0);
+  ht_destroy(this->tabelas[TIPO_X_DESCRICAO], free, 1);
+  ht_destroy(this->tabelas[CPF_X_PESSOA],     NULL, 0);
+  ht_destroy(this->tabelas[CNPJ_X_COMERCIO],  NULL, 0);
+  ht_destroy(this->tabelas[ID_X_RADIO],       NULL, 0);
+  ht_destroy(this->tabelas[ID_X_HIDRANTE],    NULL, 0);
+  ht_destroy(this->tabelas[ID_X_SEMAFORO],    NULL, 0);
 
-  GrafoD_t.destroy(this->mapa_viario);
-  KDTree_t.destroy(this->vertices_mapa_viario, destroy_vertice_info);
-  KDTree_t.destroy(this->arestas_mapa_viario,  destroy_aresta_info);
+  gd_destroy(this->mapa_viario);
+  kdt_destroy(this->vertices_mapa_viario, destroy_vertice_info);
+  kdt_destroy(this->arestas_mapa_viario,  destroy_aresta_info);
 
   free(c);
 }
@@ -526,11 +526,11 @@ static void escrever_txt_final(void *c) {
 
   free(nome_qry);
 
-  Posic iterator = Lista_t.get_first(this->saida);
+  Posic_t iterator = lt_get_first(this->saida);
 
   while (iterator) {
-    escrever_linha(arq, (char *) Lista_t.get(this->saida, iterator));
-    iterator = Lista_t.get_next(this->saida, iterator);
+    escrever_linha(arq, (char *) lt_get(this->saida, iterator));
+    iterator = lt_get_next(this->saida, iterator);
   }
 
   escrever_linha(arq, "\n\n");
@@ -545,12 +545,12 @@ void desenhar_todas_figuras(void *c, void *s) {
 
   this = (struct Controlador *) c;
 
-  Posic iterator = Lista_t.get_first(this->figuras);
+  Posic_t iterator = lt_get_first(this->figuras);
 
   while (iterator) {
-    figAtual = Lista_t.get(this->figuras, iterator);
+    figAtual = lt_get(this->figuras, iterator);
     desenha_figura(s, figAtual, 0.4, FIG_BORDA_SOLIDA);
-    iterator = Lista_t.get_next(this->figuras, iterator);
+    iterator = lt_get_next(this->figuras, iterator);
   }
 }
 
@@ -560,23 +560,23 @@ void desenhar_sobreposicoes(void *c, void *s) {
 
   this = (struct Controlador *) c;
 
-  if (!Lista_t.length(this->sobreposicoes))
+  if (!lt_length(this->sobreposicoes))
     return;
 
   escreve_comentario(s, "INICIO SOBREPOSICOES");
 
   /* Calcular retangulo das sobreposicoes */
-  Posic iterator = Lista_t.get_first(this->sobreposicoes);
+  Posic_t iterator = lt_get_first(this->sobreposicoes);
 
   while (iterator) {
-    figDash = (Figura) Lista_t.get(this->sobreposicoes, iterator);
+    figDash = (Figura) lt_get(this->sobreposicoes, iterator);
 
     desenha_figura(s, figDash, 1.0, FIG_BORDA_TRACEJADA);
-    Ponto2D pos = get_pos(figDash);
+    Ponto2D_t pos = get_pos(figDash);
     pos.y -= 5;
     escreve_texto(s, "sobrepoe", pos, 15, "purple");
 
-    iterator = Lista_t.get_next(this->sobreposicoes, iterator);
+    iterator = lt_get_next(this->sobreposicoes, iterator);
   }
 
   escreve_comentario(s, "FIM SOBREPOSICOES");
@@ -588,18 +588,18 @@ void desenhar_elementos(void *_this, void *svg) {
   LOG_PRINT(LOG_FILE, "Desenhando elementos.");
 
   for (int i = 0; i < 4; i++) {
-    KDTree arvore_atual = this->elementos[i];
+    KDTree_t arvore_atual = this->elementos[i];
     
-    if (KDTree_t.is_empty(arvore_atual))
+    if (kdt_is_empty(arvore_atual))
       continue;
 
-    KDTree_t.passe_simetrico(arvore_atual, desenharElementoSVG, svg);
+    kdt_passe_simetrico(arvore_atual, desenharElementoSVG, svg);
   }
 }
 
-void desenha_veiculo(const Item _veiculo, const void *_svg) {
+void desenha_veiculo(void *_veiculo, void *_svg) {
   Veiculo veiculo = _veiculo;
-  const SVG svg = (const SVG) _svg;
+  SVG svg = (SVG) _svg;
 
   escreve_comentario(svg, "VEICULO: %s", get_placa_veiculo(veiculo));
 
@@ -613,11 +613,11 @@ void desenha_veiculo(const Item _veiculo, const void *_svg) {
 void desenhar_veiculos(void *_this, void *svg) {
   struct Controlador* this = _this;
 
-  Lista_t.map(this->veiculos, svg, desenha_veiculo);
+  lt_map(this->veiculos, svg, desenha_veiculo);
 
 }
 
-void desenhar_vertice(const Item _vertice, unsigned profundidade, va_list list) {
+void desenhar_vertice(void *_vertice, unsigned profundidade, va_list list) {
   VerticeInfo vertice = (VerticeInfo) _vertice;
   SVG svg = va_arg(list, SVG);
 
@@ -630,13 +630,13 @@ void desenhar_vertice(const Item _vertice, unsigned profundidade, va_list list) 
   destruir_figura(fig_vertice);
 }
 
-void desenhar_aresta(const Item _aresta, unsigned profundidade, va_list list) {
+void desenhar_aresta(void *_aresta, unsigned profundidade, va_list list) {
   ArestaInfo aresta  = (ArestaInfo) _aresta;
   SVG svg            = va_arg(list, SVG);
-  GrafoD mapa_viario = va_arg(list, GrafoD);
+  GrafoD_t mapa_viario = va_arg(list, GrafoD_t);
 
-  VerticeInfo origem  = GrafoD_t.get_info_vertice(mapa_viario, aresta->origem);
-  VerticeInfo destino = GrafoD_t.get_info_vertice(mapa_viario, aresta->destino);
+  VerticeInfo origem  = gd_get_info_vertice(mapa_viario, aresta->origem);
+  VerticeInfo destino = gd_get_info_vertice(mapa_viario, aresta->destino);
 
   escreve_comentario(svg, "ARESTA \"%s\" -> \"%s\"", origem->id, destino->id);
 
@@ -657,9 +657,9 @@ void desenhar_mapa_viario(void *_this, void *svg) {
   
   LOG_PRINT(LOG_FILE, "Desenhando mapa viario.");
 
-  KDTree_t.passe_simetrico(this->vertices_mapa_viario, desenhar_vertice, svg);
+  kdt_passe_simetrico(this->vertices_mapa_viario, desenhar_vertice, svg);
 
-  KDTree_t.passe_simetrico(this->arestas_mapa_viario, desenhar_aresta, svg, this->mapa_viario);
+  kdt_passe_simetrico(this->arestas_mapa_viario, desenhar_aresta, svg, this->mapa_viario);
 
   #endif
 }
