@@ -1,7 +1,8 @@
 #include <stdio.h>
 
 #include <controlador.h>
-#include <modules/logger.h>
+
+#include <utils/logger.h>
 
 int main(int argc, const char *argv[]) {
   Controlador controlador;

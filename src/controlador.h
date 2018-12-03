@@ -1,9 +1,11 @@
 #ifndef __CONTROLADOR_H__
 #define __CONTROLADOR_H__
 
-#include <arquivo.h>
 #include <comando.h>
-#include <modules/hash.h>
+
+#include <model/estrutural/arquivo.h>
+
+#include <model/colecao/hash.h>
 
 typedef void *Controlador;
 

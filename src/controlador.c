@@ -6,19 +6,21 @@
 #include <float.h>
 #include <string.h>
 
-#include <SVG.h>
-#include <elemento.h>
-#include <desenhavel.h>
-#include <figura.h>
-#include <comercio.h>
-#include <pessoa.h>
-#include <utils.h>
-#include <modules/logger.h>
-#include <veiculo.h>
-#include <colisao.h>
+#include <model/estrutural/SVG.h>
+#include <model/estrutural/desenhavel.h>
 
-#include <mapa_viario/aresta.h>
-#include <mapa_viario/vertice.h>
+#include <model/trabalho/elemento.h>
+#include <model/trabalho/figura.h>
+#include <model/trabalho/comercio.h>
+#include <model/trabalho/pessoa.h>
+#include <model/trabalho/veiculo.h>
+
+#include <model/trabalho/mapa_viario/aresta.h>
+#include <model/trabalho/mapa_viario/colisao.h>
+#include <model/trabalho/mapa_viario/vertice.h>
+
+#include <utils/logger.h>
+#include <utils/utils.h>
 
 #include "controlador.r"
 

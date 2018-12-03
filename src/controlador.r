@@ -1,11 +1,12 @@
 #ifndef __CONTROLADOR_R__
 #define __CONTROLADOR_R__
 
-#include <modules/lista.h>
-#include <modules/kdtree.h>
-#include <modules/hash.h>
-#include <modules/ponto2d.h>
-#include <modules/grafod.h>
+#include <model/colecao/lista.h>
+#include <model/colecao/kdtree.h>
+#include <model/colecao/hash.h>
+#include <model/colecao/grafod.h>
+
+#include <model/estrutural/ponto2d.h>
 
 #define LISTA_EXTRAS \
   X( ec, "-ec") \
