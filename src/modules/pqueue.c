@@ -7,26 +7,26 @@
 #define left(i)   (2 * (i) + 1)
 #define right(i)  (2 * (i) + 2)
 
-struct PItem {
+struct PItem_t {
   double priority;
   void *value;
 };
 
-struct PQueue {
-  struct PItem *array;
+struct PQueue_t {
+  struct PItem_t *array;
   int size;
   int capacity;
 };
 
 
-static void swap(struct PItem *a, struct PItem *b) {
-  struct PItem aux;
+static void swap(struct PItem_t *a, struct PItem_t *b) {
+  struct PItem_t aux;
   aux = *a;
   *a  = *b;
   *b  = aux;
 }
 
-static void heapify(struct PItem *arr, int size, int i) {
+static void heapify(struct PItem_t *arr, int size, int i) {
   if (i >= size / 2)
     return;
 
@@ -53,7 +53,7 @@ static void heapify(struct PItem *arr, int size, int i) {
   heapify(arr, size, menor);
 }
 
-static int findIndex(struct PQueue *this, void *value) {
+static int findIndex(struct PQueue_t *this, void *value) {
   int i;
   for (i = 0; i < this->size; i++) {
     if (this->array[i].value == value)
@@ -62,8 +62,8 @@ static int findIndex(struct PQueue *this, void *value) {
   return i;
 }
 
-PQueue pq_create(int capacity) {
-  struct PQueue *this = calloc(1, sizeof(*this));
+PQueue_t pq_create(int capacity) {
+  struct PQueue_t *this = calloc(1, sizeof(*this));
 
   this->array    = calloc(capacity, sizeof(*this->array));
   this->size     = 0;
@@ -71,18 +71,18 @@ PQueue pq_create(int capacity) {
   return this;
 }
 
-int pq_getsize(PQueue _this) {
-  struct PQueue * this = (struct PQueue *) _this;
+int pq_getsize(PQueue_t _this) {
+  struct PQueue_t * this = (struct PQueue_t *) _this;
   return this->size;
 }
 
-void *pq_getmin(PQueue _this) {
-  struct PQueue * this = (struct PQueue *) _this;
+void *pq_getmin(PQueue_t _this) {
+  struct PQueue_t * this = (struct PQueue_t *) _this;
   return this->array[0].value;
 }
 
-void *pq_extractmin(PQueue _this) {
-  struct PQueue * this = (struct PQueue *) _this;
+void *pq_extractmin(PQueue_t _this) {
+  struct PQueue_t * this = (struct PQueue_t *) _this;
 
   if (this->size <= 0)
     return NULL;
@@ -92,7 +92,7 @@ void *pq_extractmin(PQueue _this) {
     return this->array[0].value;
   }
 
-  struct PItem raiz = this->array[0];
+  struct PItem_t raiz = this->array[0];
   this->array[0] = this->array[this->size - 1];
   this->size--;
   heapify(this->array, this->size, 0);
@@ -100,8 +100,8 @@ void *pq_extractmin(PQueue _this) {
   return raiz.value;
 }
 
-void pq_decrease(PQueue _this, double priority, void *value) {
-  struct PQueue * this = (struct PQueue *) _this;
+void pq_decrease(PQueue_t _this, double priority, void *value) {
+  struct PQueue_t * this = (struct PQueue_t *) _this;
   
   int indice = findIndex(this, value);
   
@@ -115,8 +115,8 @@ void pq_decrease(PQueue _this, double priority, void *value) {
   }
 }
 
-void pq_insert(PQueue _this, double priority, void *value) {
-  struct PQueue *this = (struct PQueue *) _this;
+void pq_insert(PQueue_t _this, double priority, void *value) {
+  struct PQueue_t *this = (struct PQueue_t *) _this;
 
   if (this->size >= this->capacity) return;
   this->size++;
@@ -136,13 +136,13 @@ void pq_insert(PQueue _this, double priority, void *value) {
   
 }
 
-void pq_remove(PQueue _this, void *value) {
+void pq_remove(PQueue_t _this, void *value) {
   pq_decrease(_this, INT_MIN, value);
   pq_extractmin(_this);
 }
 
-void pq_destroy(PQueue _this, void (*destroy_item)(void *item)) {
-  struct PQueue * this = (struct PQueue *) _this;
+void pq_destroy(PQueue_t _this, void (*destroy_item)(void *item)) {
+  struct PQueue_t * this = (struct PQueue_t *) _this;
   
   if (destroy_item) {
     for (int i = 0; i < this->size; i++) {

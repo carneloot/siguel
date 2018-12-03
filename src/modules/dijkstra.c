@@ -76,7 +76,7 @@ Lista astar(
 
   HashTable vertices = HashTable_t.create(GrafoD_t.total_vertices(grafo));
 
-  PQueue fila = pq_create(HashTable_t.max_size(vertices));
+  PQueue_t fila = pq_create(HashTable_t.max_size(vertices));
 
   void *info_inicial = GrafoD_t.get_info_vertice(grafo, origem);
   void *info_target  = GrafoD_t.get_info_vertice(grafo, destino);
