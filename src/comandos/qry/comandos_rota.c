@@ -71,7 +71,7 @@ static double get_distancia_vertices(void *_atual, void *_target) {
  * Retorna o caminho de origem_info até destino_info.
  * Se distancia for true usa a distancia, senao usa a velocidade
  */
-static Lista_t get_caminho(GrafoD grafo, VerticeInfo origem_info, VerticeInfo destino_info, bool distancia) {
+static Lista_t get_caminho(GrafoD_t grafo, VerticeInfo origem_info, VerticeInfo destino_info, bool distancia) {
   Lista_t caminho;
 
   double (*funcao)(void *) = (distancia == true) ? get_distancia_aresta : get_tempo_aresta;
@@ -84,7 +84,7 @@ static Lista_t get_caminho(GrafoD grafo, VerticeInfo origem_info, VerticeInfo de
 /**
  * Desenha linhas entre os vertices indicados por caminho de cor cor
  */
-static void desenhar_caminho_svg(SVG svg, Lista_t caminho, GrafoD mapa, char *cor) {
+static void desenhar_caminho_svg(SVG svg, Lista_t caminho, GrafoD_t mapa, char *cor) {
 
   Lista_t pontos = lt_create();
 
@@ -93,7 +93,7 @@ static void desenhar_caminho_svg(SVG svg, Lista_t caminho, GrafoD mapa, char *co
   while (it) {
     char *label = lt_get(caminho, it);
 
-    VerticeInfo vertice = GrafoD_t.get_info_vertice(mapa, label);
+    VerticeInfo vertice = gd_get_info_vertice(mapa, label);
 
     Ponto2D_t *ponto = calloc(1, sizeof(*ponto));
     ponto->x = vertice->pos.x;
@@ -119,7 +119,7 @@ static void desenhar_caminho_svg(SVG svg, Lista_t caminho, GrafoD mapa, char *co
 /**
  * Coloca na saida strings com os nomes das ruas do caminho passado.
  */
-static void escrever_caminho_txt(Lista_t saida, Lista_t caminho, GrafoD mapa) {
+static void escrever_caminho_txt(Lista_t saida, Lista_t caminho, GrafoD_t mapa) {
 
   char *ultima_rua = NULL;
 
@@ -131,7 +131,7 @@ static void escrever_caminho_txt(Lista_t saida, Lista_t caminho, GrafoD mapa) {
     char *label      = lt_get(caminho, it);
     char *label_next = lt_get(caminho, next_it);
 
-    ArestaInfo rua = GrafoD_t.get_info_aresta(mapa, label, label_next);
+    ArestaInfo rua = gd_get_info_aresta(mapa, label, label_next);
 
     // Ignorar os pontos
     if (!strcmp(rua->nome, ".")) {
@@ -155,9 +155,9 @@ static void escrever_caminho_txt(Lista_t saida, Lista_t caminho, GrafoD mapa) {
     }
 
     // Vai fazer uma curva
-    VerticeInfo vertice_anterior = GrafoD_t.get_info_vertice(mapa, label_prev);
-    VerticeInfo vertice_atual    = GrafoD_t.get_info_vertice(mapa, label);
-    VerticeInfo vertice_proximo  = GrafoD_t.get_info_vertice(mapa, label_next);
+    VerticeInfo vertice_anterior = gd_get_info_vertice(mapa, label_prev);
+    VerticeInfo vertice_atual    = gd_get_info_vertice(mapa, label);
+    VerticeInfo vertice_proximo  = gd_get_info_vertice(mapa, label_next);
 
     Ponto2D_t pos_anterior = vertice_anterior->pos;
     Ponto2D_t pos_atual    = vertice_atual->pos;

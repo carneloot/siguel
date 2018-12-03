@@ -196,7 +196,7 @@ Controlador cria_controlador() {
     this->registradores[i] = p2d_new(0, 0);
   }
 
-  this->mapa_viario          = GrafoD_t.create();
+  this->mapa_viario          = gd_create();
   this->vertices_mapa_viario = kdt_create(2, equalVertices, compareXVertice, compareYVertice);
   this->arestas_mapa_viario  = kdt_create(2, equalArestas, compareXAresta, compareYAresta);
 
@@ -489,7 +489,7 @@ void destruir_controlador(Controlador c) {
   ht_destroy(this->tabelas[ID_X_HIDRANTE],    NULL, 0);
   ht_destroy(this->tabelas[ID_X_SEMAFORO],    NULL, 0);
 
-  GrafoD_t.destroy(this->mapa_viario);
+  gd_destroy(this->mapa_viario);
   kdt_destroy(this->vertices_mapa_viario, destroy_vertice_info);
   kdt_destroy(this->arestas_mapa_viario,  destroy_aresta_info);
 
@@ -633,10 +633,10 @@ void desenhar_vertice(void *_vertice, unsigned profundidade, va_list list) {
 void desenhar_aresta(void *_aresta, unsigned profundidade, va_list list) {
   ArestaInfo aresta  = (ArestaInfo) _aresta;
   SVG svg            = va_arg(list, SVG);
-  GrafoD mapa_viario = va_arg(list, GrafoD);
+  GrafoD_t mapa_viario = va_arg(list, GrafoD_t);
 
-  VerticeInfo origem  = GrafoD_t.get_info_vertice(mapa_viario, aresta->origem);
-  VerticeInfo destino = GrafoD_t.get_info_vertice(mapa_viario, aresta->destino);
+  VerticeInfo origem  = gd_get_info_vertice(mapa_viario, aresta->origem);
+  VerticeInfo destino = gd_get_info_vertice(mapa_viario, aresta->destino);
 
   escreve_comentario(svg, "ARESTA \"%s\" -> \"%s\"", origem->id, destino->id);
 

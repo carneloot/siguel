@@ -23,8 +23,8 @@ int comando_via_v(void *_this, void *_controlador) {
 
   VerticeInfo vertice_info = create_vertice_info(pos, id);
 
-  GrafoD_t.insert_vertice(controlador->mapa_viario, id);
-  GrafoD_t.define_info_vertice(controlador->mapa_viario, id, vertice_info);
+  gd_insert_vertice(controlador->mapa_viario, id);
+  gd_define_info_vertice(controlador->mapa_viario, id, vertice_info);
 
   kdt_insert(controlador->vertices_mapa_viario, vertice_info);
 
@@ -58,8 +58,8 @@ int comando_via_e(void *_this, void *_controlador) {
 
   char *nome_rua = this->params[6];
 
-  VerticeInfo info_origem = GrafoD_t.get_info_vertice( controlador->mapa_viario, label_origem );
-  VerticeInfo info_destino = GrafoD_t.get_info_vertice( controlador->mapa_viario, label_destino );
+  VerticeInfo info_origem = gd_get_info_vertice( controlador->mapa_viario, label_origem );
+  VerticeInfo info_destino = gd_get_info_vertice( controlador->mapa_viario, label_destino );
 
   Ponto2D_t pos_origem = info_origem->pos;
   Ponto2D_t pos_destino = info_destino->pos;
@@ -76,8 +76,8 @@ int comando_via_e(void *_this, void *_controlador) {
     pos_aresta
   );
 
-  GrafoD_t.insert_aresta(controlador->mapa_viario, label_origem, label_destino);
-  GrafoD_t.define_info_aresta(controlador->mapa_viario, label_origem, label_destino, aresta_info);
+  gd_insert_aresta(controlador->mapa_viario, label_origem, label_destino);
+  gd_define_info_aresta(controlador->mapa_viario, label_origem, label_destino, aresta_info);
 
   kdt_insert(controlador->arestas_mapa_viario, aresta_info);
 

@@ -67,7 +67,7 @@ struct Controlador {
   // O valor padrão dos registradores é (0, 0)
   Ponto2D_t registradores[11];
 
-  GrafoD mapa_viario;
+  GrafoD_t mapa_viario;
   KDTree_t vertices_mapa_viario;
   KDTree_t arestas_mapa_viario;
 };

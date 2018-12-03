@@ -132,8 +132,8 @@ static bool linhas_intersectam( Ponto2D_t p, Ponto2D_t r, Ponto2D_t q, Ponto2D_t
 
 static bool aresta_corresponde_colisao(struct Controlador* controlador, ArestaInfo aresta, Figura fig_colisao ){
   
-  VerticeInfo vertice_origem  = GrafoD_t.get_info_vertice( controlador->mapa_viario, aresta->origem );
-  VerticeInfo vertice_destino = GrafoD_t.get_info_vertice( controlador->mapa_viario, aresta->destino );
+  VerticeInfo vertice_origem  = gd_get_info_vertice( controlador->mapa_viario, aresta->origem );
+  VerticeInfo vertice_destino = gd_get_info_vertice( controlador->mapa_viario, aresta->destino );
 
   // Verificar se a reta da aresta cruza uma das retas dos lados dos retângulos
   

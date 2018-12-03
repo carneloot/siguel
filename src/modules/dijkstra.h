@@ -16,7 +16,7 @@
  * prioridade ao vertice atual
  */
 Lista_t astar(
-  GrafoD grafo,
+  GrafoD_t grafo,
   char *origem, char *destino,
   double (*get_dist_aresta)(void *aresta_info),
   double (*get_heuristica)(void *atual, void *destino));
@@ -29,7 +29,7 @@ Lista_t astar(
  * e retorna a distancia utilizada para o calculo do algoritmo
  */
 Lista_t dijkstra(
-  GrafoD grafo,
+  GrafoD_t grafo,
   char *origem, char *destino,
   double (*get_dist_aresta)(void *aresta_info));
 

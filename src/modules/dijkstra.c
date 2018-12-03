@@ -68,18 +68,18 @@ static Lista_t gerarCaminho(DVInfo target) {
  * Funcao do A* em si. Baseado no algoritmo encontrado no site do Geeks for Geeks
  */
 Lista_t astar(
-  GrafoD grafo,
+  GrafoD_t grafo,
   char *origem, char *destino,
   double (*get_dist_aresta)(void *aresta_info),
   double (*get_heuristica)(void *atual, void *destino)) {
   LOG_PRINT(LOG_FILE, "A*: gerando caminho de \"%s\" ate \"%s\".", origem, destino);
 
-  HashTable_t vertices = ht_create(GrafoD_t.total_vertices(grafo));
+  HashTable_t vertices = ht_create(gd_total_vertices(grafo));
 
   PQueue_t fila = pq_create(ht_max_size(vertices));
 
-  void *info_inicial = GrafoD_t.get_info_vertice(grafo, origem);
-  void *info_target  = GrafoD_t.get_info_vertice(grafo, destino);
+  void *info_inicial = gd_get_info_vertice(grafo, origem);
+  void *info_target  = gd_get_info_vertice(grafo, destino);
 
   DVInfo inicial = create_dvinfo(origem, 0, get_heuristica(info_inicial, info_target));
   ht_insert(vertices, inicial->label, inicial);
@@ -96,7 +96,7 @@ Lista_t astar(
     if (menorDistancia == target)
       break;
 
-    Lista_t adjacentes = GrafoD_t.adjacentes(grafo, menorDistancia->label);
+    Lista_t adjacentes = gd_adjacentes(grafo, menorDistancia->label);
 
     for (Posic_t it = lt_get_first(adjacentes); it != NULL; it = lt_get_next(adjacentes, it)) {
       char *labelAdjacente = lt_get(adjacentes, it);
@@ -106,12 +106,12 @@ Lista_t astar(
       if (ht_exists(vertices, labelAdjacente)) {
         adjacente = ht_get(vertices, labelAdjacente);
       } else {
-        void *info_adjacente = GrafoD_t.get_info_vertice(grafo, labelAdjacente);
+        void *info_adjacente = gd_get_info_vertice(grafo, labelAdjacente);
         adjacente = create_dvinfo(labelAdjacente, DBL_MAX, get_heuristica(info_adjacente, info_target));
         ht_insert(vertices, adjacente->label, adjacente);
       }
 
-      void *infoAresta = GrafoD_t.get_info_aresta(grafo, menorDistancia->label, labelAdjacente);
+      void *infoAresta = gd_get_info_aresta(grafo, menorDistancia->label, labelAdjacente);
 
       double newDist = menorDistancia->distancia + get_dist_aresta(infoAresta);
 
@@ -140,7 +140,7 @@ static double return_zero(void *atual, void *target) {
 }
 
 Lista_t dijkstra(
-  GrafoD grafo,
+  GrafoD_t grafo,
   char *origem, char *destino,
   double (*get_dist_aresta)(void *aresta_info)) {
   return astar(grafo, origem, destino, get_dist_aresta, return_zero);

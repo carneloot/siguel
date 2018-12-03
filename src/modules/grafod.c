@@ -11,13 +11,13 @@
 /** ===== ARESTA ===== */
 
 struct Aresta {
-  InfoG info;
+  void *info;
 
   char *label_origem;
   char *label_destino;
 };
 
-static struct Aresta *create_aresta(InfoG info, char *label_origem, char *label_destino) {
+static struct Aresta *create_aresta(void *info, char *label_origem, char *label_destino) {
   struct Aresta *this = calloc(1, sizeof(*this));
 
   this->info = info;
@@ -37,13 +37,13 @@ static void destroy_aresta(void *_this) {
 /** ===== VERTICE ===== */
 
 struct Vertice {
-  InfoG info;
+  void *info;
 
   char *label;
   HashTable_t arestas;
 };
 
-static struct Vertice *create_vertice(InfoG info, char *label) {
+static struct Vertice *create_vertice(void *info, char *label) {
   struct Vertice *this = calloc(1, sizeof(*this));
 
   this->info = info;
@@ -67,15 +67,15 @@ static void destroy_vertice(void *_this) {
 
 /** ===== GRAFO DIRECIONADO ===== */
 
-struct GrafoD {
+struct GrafoD_t {
   int num_vertices;
 
   Lista_t vertices;
   HashTable_t label_x_vertice;
 };
 
-static GrafoD __create_grafod() {
-  struct GrafoD *this = calloc(1, sizeof(*this));
+GrafoD_t gd_create() {
+  struct GrafoD_t *this = calloc(1, sizeof(*this));
 
   this->num_vertices = 0;
 
@@ -85,8 +85,8 @@ static GrafoD __create_grafod() {
   return this;
 }
 
-static void __destroy_grafod(GrafoD _this) {
-  struct GrafoD *this = (struct GrafoD *) _this;
+void gd_destroy(GrafoD_t _this) {
+  struct GrafoD_t *this = (struct GrafoD_t *) _this;
 
   lt_destroy(this->vertices, NULL);
   ht_destroy(this->label_x_vertice, destroy_vertice, false);
@@ -94,8 +94,8 @@ static void __destroy_grafod(GrafoD _this) {
   free(this);
 }
 
-static char **__get_all_vertices_grafod(GrafoD _this) {
-  struct GrafoD *this = (struct GrafoD *) _this;
+char **gd_get_all_vertices(GrafoD_t _this) {
+  struct GrafoD_t *this = (struct GrafoD_t *) _this;
 
   char **retorno = calloc(this->num_vertices, sizeof(*retorno));
 
@@ -114,13 +114,13 @@ static char **__get_all_vertices_grafod(GrafoD _this) {
   return retorno;
 }
 
-static int __total_vertices_grafod(GrafoD _this) {
-  struct GrafoD *this = (struct GrafoD *) _this;
+int gd_total_vertices(GrafoD_t _this) {
+  struct GrafoD_t *this = (struct GrafoD_t *) _this;
 
   return this->num_vertices;
 }
 
-static void __imprimir_aresta_dot(void *_aresta, void *_fp) {
+void __imprimir_aresta_dot(void *_aresta, void *_fp) {
   struct Aresta *aresta = (struct Aresta *) _aresta;
   FILE *fp = (FILE *) _fp;
 
@@ -128,8 +128,8 @@ static void __imprimir_aresta_dot(void *_aresta, void *_fp) {
 
 }
 
-static void __generate_dot_grafod(GrafoD _this, FILE *fp) {
-  struct GrafoD *this = _this;
+void gd_generate_dot(GrafoD_t _this, FILE *fp) {
+  struct GrafoD_t *this = _this;
   fprintf(fp, "digraph T {\n");
   fprintf(fp, "graph [rankdir=LR];\n");
   fprintf(fp, "node [fontname=\"Arial\"];\n");
@@ -154,8 +154,8 @@ static void __generate_dot_grafod(GrafoD _this, FILE *fp) {
 
 /* ===== FUNCOES ARESTA ===== */
 
-static void __insert_aresta_grafod(GrafoD _this, char *origem, char *destino) {
-  struct GrafoD *this = _this;
+void gd_insert_aresta(GrafoD_t _this, char *origem, char *destino) {
+  struct GrafoD_t *this = _this;
 
   if (!ht_exists(this->label_x_vertice, origem)) {
     LOG_ERRO("ERRO INSERIR ARESTA: Vertice de nome \"%s\" nao existe.", origem);
@@ -176,8 +176,8 @@ static void __insert_aresta_grafod(GrafoD _this, char *origem, char *destino) {
 
 }
 
-static void __define_info_aresta_grafod(GrafoD _this, char *origem, char *destino, InfoG info) {
-  struct GrafoD *this = _this;
+void gd_define_info_aresta(GrafoD_t _this, char *origem, char *destino, void *info) {
+  struct GrafoD_t *this = _this;
 
   if (!ht_exists(this->label_x_vertice, origem)) {
     LOG_ERRO("ERRO DEFINIR INFO ARESTA: Vertice de nome \"%s\" nao existe.", origem);
@@ -204,8 +204,8 @@ static void __define_info_aresta_grafod(GrafoD _this, char *origem, char *destin
   aresta->info = info;
 }
 
-static InfoG __get_info_aresta_grafod(GrafoD _this, char *origem, char *destino) {
-  struct GrafoD *this = _this;
+void *gd_get_info_aresta(GrafoD_t _this, char *origem, char *destino) {
+  struct GrafoD_t *this = _this;
 
   if (!ht_exists(this->label_x_vertice, origem)) {
     LOG_ERRO("ERRO GET INFO ARESTA: Vertice de nome \"%s\" nao existe.", origem);
@@ -232,8 +232,8 @@ static InfoG __get_info_aresta_grafod(GrafoD _this, char *origem, char *destino)
   return aresta->info;
 }
 
-static void __remove_aresta_grafod(GrafoD _this, char *origem, char *destino) {
-  struct GrafoD *this = _this;
+void gd_remove_aresta(GrafoD_t _this, char *origem, char *destino) {
+  struct GrafoD_t *this = _this;
 
   if (!ht_exists(this->label_x_vertice, origem)) {
     LOG_ERRO("ERRO REMOVER ARESTA: Vertice de nome \"%s\" nao existe.", origem);
@@ -262,8 +262,8 @@ static void __remove_aresta_grafod(GrafoD _this, char *origem, char *destino) {
   destroy_aresta(aresta);
 }
 
-static bool __adjacente_grafod(GrafoD _this, char *origem, char *destino) {
-  struct GrafoD *this = _this;
+bool gd_adjacente(GrafoD_t _this, char *origem, char *destino) {
+  struct GrafoD_t *this = _this;
 
   if (!ht_exists(this->label_x_vertice, origem)) {
     LOG_ERRO("ERRO CHECAR ADJACENTE: Vertice de nome \"%s\" nao existe.", origem);
@@ -282,8 +282,8 @@ static bool __adjacente_grafod(GrafoD _this, char *origem, char *destino) {
 
 /* ===== FUNCOES VERTICE ===== */
 
-static void __insert_vertice_grafod(GrafoD _this, char *node) {
-  struct GrafoD *this = _this;
+void gd_insert_vertice(GrafoD_t _this, char *node) {
+  struct GrafoD_t *this = _this;
 
   if (ht_exists(this->label_x_vertice, node)) {
     LOG_ERRO("ERRO INSERIR VERTICE: Vertice com nome \"%s\" ja existe.", node);
@@ -298,8 +298,8 @@ static void __insert_vertice_grafod(GrafoD _this, char *node) {
   this->num_vertices++;
 }
 
-static void __define_info_vertice_grafod(GrafoD _this, char *node, InfoG info) {
-  struct GrafoD *this = _this;
+void gd_define_info_vertice(GrafoD_t _this, char *node, void *info) {
+  struct GrafoD_t *this = _this;
 
   if (!ht_exists(this->label_x_vertice, node)) {
     LOG_ERRO("ERRO DEFINIR INFO VERTICE: Vertice de nome \"%s\" nao existe.", node);
@@ -311,8 +311,8 @@ static void __define_info_vertice_grafod(GrafoD _this, char *node, InfoG info) {
   vertice->info = info;
 }
 
-static InfoG __get_info_vertice_grafod(GrafoD _this, char *node) {
-  struct GrafoD *this = _this;
+void *gd_get_info_vertice(GrafoD_t _this, char *node) {
+  struct GrafoD_t *this = _this;
 
   if (!ht_exists(this->label_x_vertice, node)) {
     LOG_ERRO("ERRO GET INFO VERTICE: Vertice de nome \"%s\" nao encontrado.", node);
@@ -324,8 +324,8 @@ static InfoG __get_info_vertice_grafod(GrafoD _this, char *node) {
   return vertice->info;
 }
 
-static void __remove_vertice_grafod(GrafoD _this, char *node) {
-  struct GrafoD *this = _this;
+void gd_remove_vertice(GrafoD_t _this, char *node) {
+  struct GrafoD_t *this = _this;
 
   if (!ht_exists(this->label_x_vertice, node)) {
     LOG_ERRO("ERRO REMOVER VERTICE: Vertice com nome \"%s\" nao encontrado.", node);
@@ -348,15 +348,15 @@ static void __remove_vertice_grafod(GrafoD _this, char *node) {
   destroy_vertice(vertice);
 }
 
-static void __adicionar_lista(void *_aresta, void *_lista) {
+void __adicionar_lista(void *_aresta, void *_lista) {
   const struct Aresta *aresta = (const struct Aresta *) _aresta;
   Lista_t lista = _lista;
 
   lt_insert(lista, aresta->label_destino);
 }
 
-static Lista_t __adjacentes_grafod(GrafoD _this, char *node) {
-  struct GrafoD *this = _this;
+Lista_t gd_adjacentes(GrafoD_t _this, char *node) {
+  struct GrafoD_t *this = _this;
 
   Lista_t lista = lt_create();
 
@@ -366,21 +366,3 @@ static Lista_t __adjacentes_grafod(GrafoD _this, char *node) {
 
   return lista;
 }
-
-const struct GrafoD_t GrafoD_t = { //
-  .create              = &__create_grafod,
-  .destroy             = &__destroy_grafod,
-  .get_all_vertices    = &__get_all_vertices_grafod,
-  .total_vertices      = &__total_vertices_grafod,
-  .generate_dot        = &__generate_dot_grafod,
-  .insert_aresta       = &__insert_aresta_grafod,
-  .define_info_aresta  = &__define_info_aresta_grafod,
-  .get_info_aresta     = &__get_info_aresta_grafod,
-  .remove_aresta       = &__remove_aresta_grafod,
-  .adjacente           = &__adjacente_grafod,
-  .insert_vertice      = &__insert_vertice_grafod,
-  .define_info_vertice = &__define_info_vertice_grafod,
-  .get_info_vertice    = &__get_info_vertice_grafod,
-  .remove_vertice      = &__remove_vertice_grafod,
-  .adjacentes          = &__adjacentes_grafod,
-};
