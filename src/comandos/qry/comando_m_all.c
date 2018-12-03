@@ -95,7 +95,7 @@ int comando_qry_m(void *_this, void *_controlador) {
   char **params = this->params;
   char *cep = params[0];
 
-  if (!HashTable_t.exists(controlador->tabelas[CEP_X_QUADRA], cep)) {
+  if (!ht_exists(controlador->tabelas[CEP_X_QUADRA], cep)) {
     lt_insert(controlador->saida,
       format_string("A quadra \"%s\" nao foi encontrada.\n", cep));
     return 1;

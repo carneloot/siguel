@@ -31,17 +31,17 @@ int comando_qry_de(void *_this, void *_controlador) {
   char **params = this->params;
   char *cnpj    = params[0];
 
-  HashTable tabela = controlador->tabelas[CNPJ_X_COMERCIO];
+  HashTable_t tabela = controlador->tabelas[CNPJ_X_COMERCIO];
 
-  if (!HashTable_t.exists(tabela, cnpj)) {
+  if (!ht_exists(tabela, cnpj)) {
     lt_insert(controlador->saida, 
       format_string("Nao foi encontrado o comercio de CNPJ %s.\n", cnpj));
     return 1;
   }
 
-  Comercio comercio = HashTable_t.get(tabela, cnpj);
+  Comercio comercio = ht_get(tabela, cnpj);
 
-  char *tipo_desc = HashTable_t.get(controlador->tabelas[TIPO_X_DESCRICAO], comercio_get_tipo(comercio));
+  char *tipo_desc = ht_get(controlador->tabelas[TIPO_X_DESCRICAO], comercio_get_tipo(comercio));
 
   char *info_comercio = comercio_get_info(comercio, tipo_desc);
   strcat(info_comercio, "\n");

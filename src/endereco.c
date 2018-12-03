@@ -28,13 +28,13 @@ void endereco_destruir(Endereco this) {
 
 Ponto2D_t endereco_get_coordenada(Endereco this, void *controlador) {
 
-  HashTable tabela_quadras = get_table_quadras(controlador);
+  HashTable_t tabela_quadras = get_table_quadras(controlador);
 
-  if (!HashTable_t.exists(tabela_quadras, this->cep)) {
+  if (!ht_exists(tabela_quadras, this->cep)) {
     return p2d_new(0,0);
   }
 
-  Elemento quadra = HashTable_t.get(tabela_quadras, this->cep);
+  Elemento quadra = ht_get(tabela_quadras, this->cep);
 
   Ponto2D_t pos = get_pos(quadra);
 

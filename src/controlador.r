@@ -44,7 +44,7 @@ struct Controlador {
 
   Lista_t comercios;
   Lista_t pessoas;
-  HashTable tabelas[TABELAS_TOTAL];
+  HashTable_t tabelas[TABELAS_TOTAL];
 
   Lista_t veiculos;
 

@@ -78,7 +78,7 @@ static Lista_t __get_elementos_dentro(KDTree_t arvore, Ponto2D_t pos, Ponto2D_t 
 }
 
 static void __adicionarHashComercio(void * comercio, void *tabela) {
-  HashTable_t.insert((HashTable) tabela, comercio_get_cnpj(comercio), comercio);
+  ht_insert((HashTable_t) tabela, comercio_get_cnpj(comercio), comercio);
 }
 
 static int __pessoaDentro(void * pessoa, void *cep_quadra) {
@@ -88,7 +88,7 @@ static int __pessoaDentro(void * pessoa, void *cep_quadra) {
 
 static void __removerEnderecoPessoa(void * pessoa, void *tabela) {
   pessoa_remover_endereco(pessoa);
-  HashTable_t.remove((HashTable) tabela, pessoa_get_cpf(pessoa));
+  ht_remove((HashTable_t) tabela, pessoa_get_cpf(pessoa));
 }
 
 
@@ -164,15 +164,15 @@ int comando_qry_dpr(void *_this, void *_controlador) {
       // Destruir os comercios nas quadras e tirar da tabela CNPJ/COMERCIO
       Lista_t new_comercios = lt_filter(controlador->comercios, get_cep_elemento(quadra), __comercioDentro);
       lt_destroy(controlador->comercios, 0);
-      HashTable_t.destroy(controlador->tabelas[CNPJ_X_COMERCIO], NULL, 0);
+      ht_destroy(controlador->tabelas[CNPJ_X_COMERCIO], NULL, 0);
 
       controlador->comercios = new_comercios;
-      controlador->tabelas[CNPJ_X_COMERCIO] = HashTable_t.create(lt_length(new_comercios));
+      controlador->tabelas[CNPJ_X_COMERCIO] = ht_create(lt_length(new_comercios));
 
       lt_map(new_comercios, controlador->tabelas[CNPJ_X_COMERCIO], __adicionarHashComercio);
 
       // Remover da tabela CEP/QUADRA as quadras removidas
-      HashTable_t.remove(controlador->tabelas[CEP_X_QUADRA], get_cep_elemento(quadra));
+      ht_remove(controlador->tabelas[CEP_X_QUADRA], get_cep_elemento(quadra));
 
       it = lt_get_next(elementos_dentro[QUADRA], it);
     }
@@ -183,7 +183,7 @@ int comando_qry_dpr(void *_this, void *_controlador) {
     Posic_t it = lt_get_first(elementos_dentro[RADIO_BASE]);
     while (it) {
       Elemento radio_base = lt_get(elementos_dentro[RADIO_BASE], it);
-      HashTable_t.remove(controlador->tabelas[ID_X_RADIO], get_id_elemento(radio_base));
+      ht_remove(controlador->tabelas[ID_X_RADIO], get_id_elemento(radio_base));
       it = lt_get_next(elementos_dentro[RADIO_BASE], it);
     }
   }

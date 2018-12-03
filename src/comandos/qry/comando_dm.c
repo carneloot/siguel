@@ -32,15 +32,15 @@ int comando_qry_dm(void *_this, void *_controlador) {
   char **params = this->params;
   char *cpf     = params[0];
 
-  HashTable tabela = controlador->tabelas[CPF_X_PESSOA];
+  HashTable_t tabela = controlador->tabelas[CPF_X_PESSOA];
 
-  if (!HashTable_t.exists(tabela, cpf)) {
+  if (!ht_exists(tabela, cpf)) {
     char *saida = format_string("CPF \"%s\" nao encontrado.\n", cpf);
     lt_insert(controlador->saida, saida);
     return 1;
   }
 
-  Pessoa pessoa = HashTable_t.get(tabela, cpf);
+  Pessoa pessoa = ht_get(tabela, cpf);
 
 
   char *info_pessoa = pessoa_get_info(pessoa, controlador);

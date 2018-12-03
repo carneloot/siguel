@@ -25,15 +25,15 @@ int comando_qry_fec(void *_this, void *_controlador) {
   struct Controlador *controlador = (struct Controlador *) _controlador;
 
   char *cnpj = this->params[0];
-  HashTable tabela = controlador->tabelas[CNPJ_X_COMERCIO];
+  HashTable_t tabela = controlador->tabelas[CNPJ_X_COMERCIO];
 
-  if (!HashTable_t.exists(tabela, cnpj)) {
+  if (!ht_exists(tabela, cnpj)) {
     lt_insert(controlador->saida, 
       format_string("CNPJ \"%s\" nao encontrado.", cnpj));
     return 1;
   }
 
-  Comercio comercio = HashTable_t.get(tabela, cnpj);
+  Comercio comercio = ht_get(tabela, cnpj);
 
   Lista_t comercios = controlador->comercios;
   Posic_t posic   = lt_get_first(comercios);
@@ -44,11 +44,11 @@ int comando_qry_fec(void *_this, void *_controlador) {
     exit(EXIT_FAILURE);
   }
 
-  HashTable_t.remove(tabela, cnpj);
+  ht_remove(tabela, cnpj);
   lt_remove(comercios, posic);
 
   // Mostrar informacoes
-  char *tipo_desc = HashTable_t.get(controlador->tabelas[TIPO_X_DESCRICAO], comercio_get_tipo(comercio));
+  char *tipo_desc = ht_get(controlador->tabelas[TIPO_X_DESCRICAO], comercio_get_tipo(comercio));
   char *info_comercio = comercio_get_info(comercio, tipo_desc);
   char *rip_message = format_string(
     "Nota de fechamento de comercio:\n\t%s\n", info_comercio);

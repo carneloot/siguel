@@ -57,7 +57,7 @@ static void remover_elementos(
     while (it) {
       Elemento elemento = lt_get(elementos[QUADRA], it);
 
-      HashTable_t.remove(controlador->tabelas[CEP_X_QUADRA], get_cep_elemento(elemento));
+      ht_remove(controlador->tabelas[CEP_X_QUADRA], get_cep_elemento(elemento));
 
       it = lt_get_next(elementos[QUADRA], it);
     }
@@ -68,7 +68,7 @@ static void remover_elementos(
     while (it) {
       Elemento elemento = lt_get(elementos[RADIO_BASE], it);
 
-      HashTable_t.remove(controlador->tabelas[ID_X_RADIO], get_id_elemento(elemento));
+      ht_remove(controlador->tabelas[ID_X_RADIO], get_id_elemento(elemento));
 
       it = lt_get_next(elementos[RADIO_BASE], it);
     }

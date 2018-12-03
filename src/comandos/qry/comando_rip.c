@@ -39,15 +39,15 @@ int comando_qry_rip(void *_this, void *_controlador) {
   struct Controlador *controlador = (struct Controlador *) _controlador;
 
   char *cpf = this->params[0];
-  HashTable tabela = controlador->tabelas[CPF_X_PESSOA];
+  HashTable_t tabela = controlador->tabelas[CPF_X_PESSOA];
 
-  if (!HashTable_t.exists(tabela, cpf)) {
+  if (!ht_exists(tabela, cpf)) {
     lt_insert(controlador->saida,
       format_string("CPF \"%s\" nao encontrado.\n", cpf));
     return 1;
   }
 
-  Pessoa pessoa = HashTable_t.get(tabela, cpf);
+  Pessoa pessoa = ht_get(tabela, cpf);
 
   Lista_t pessoas = controlador->pessoas;
   Posic_t posic   = lt_get_first(pessoas);
@@ -58,8 +58,8 @@ int comando_qry_rip(void *_this, void *_controlador) {
     return 0;
   }
 
-  HashTable_t.remove(controlador->tabelas[CPF_X_PESSOA], cpf);
-  HashTable_t.remove(controlador->tabelas[CPF_X_CEP],    cpf);
+  ht_remove(controlador->tabelas[CPF_X_PESSOA], cpf);
+  ht_remove(controlador->tabelas[CPF_X_CEP],    cpf);
   lt_remove(pessoas, posic);
 
   // Mostrar informacoes

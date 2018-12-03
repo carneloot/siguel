@@ -27,16 +27,16 @@ int comando_qry_mud(void *_this, void *_controlador) {
 
   char *cpf = this->params[0];
 
-  HashTable tabela_pessoa = controlador->tabelas[CPF_X_PESSOA];
-  HashTable tabela_cep    = controlador->tabelas[CPF_X_CEP];
+  HashTable_t tabela_pessoa = controlador->tabelas[CPF_X_PESSOA];
+  HashTable_t tabela_cep    = controlador->tabelas[CPF_X_CEP];
 
-  if (!HashTable_t.exists(tabela_pessoa, cpf)) {
+  if (!ht_exists(tabela_pessoa, cpf)) {
     char *saida = format_string("CPF \"%s\" nao encontrado.\n", cpf);
     lt_insert(controlador->saida, saida);
     return 1;
   } 
 
-  Pessoa pessoa = HashTable_t.get(tabela_pessoa, cpf);
+  Pessoa pessoa = ht_get(tabela_pessoa, cpf);
 
   char *cep   = this->params[1];
   int face    = char_to_face(this->params[2][0]);
@@ -46,10 +46,10 @@ int comando_qry_mud(void *_this, void *_controlador) {
   Ponto2D_t pos_antiga = endereco_get_coordenada(pessoa_get_endereco(pessoa), controlador);
   char *info_pessoa = pessoa_get_info(pessoa, controlador);
 
-  HashTable_t.remove(tabela_cep, cpf);
+  ht_remove(tabela_cep, cpf);
   pessoa_set_endereco(pessoa, cep, face, numero, compl);
 
-  HashTable_t.insert(tabela_cep, pessoa_get_cpf(pessoa), pessoa_get_cep(pessoa));
+  ht_insert(tabela_cep, pessoa_get_cpf(pessoa), pessoa_get_cep(pessoa));
 
   Ponto2D_t pos_atual = endereco_get_coordenada(pessoa_get_endereco(pessoa), controlador);
   char *info_endereco_atual = endereco_get_info(pessoa_get_endereco(pessoa));

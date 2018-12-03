@@ -84,7 +84,7 @@ int comando_reg_m(void *_this, void *_controlador) {
   int numero_registrador = strtol(this->params[0] + 1, NULL, 10);
   char *cpf = this->params[1];
 
-  Pessoa pessoa = HashTable_t.get(controlador->tabelas[CPF_X_PESSOA], cpf);
+  Pessoa pessoa = ht_get(controlador->tabelas[CPF_X_PESSOA], cpf);
 
   if (pessoa == NULL) {
     LOG_ERRO("Nao foi possivel encontrar a pessoa de CPF \"%s\".", cpf);
@@ -116,8 +116,8 @@ int comando_reg_g(void *_this, void *_controlador) {
   Elemento encontrado = NULL;
 
   for (int i = ID_X_RADIO; i <= ID_X_SEMAFORO; i++) {
-    if (HashTable_t.exists(controlador->tabelas[i], id_equipamento)) {
-      encontrado = HashTable_t.get(controlador->tabelas[i], id_equipamento);
+    if (ht_exists(controlador->tabelas[i], id_equipamento)) {
+      encontrado = ht_get(controlador->tabelas[i], id_equipamento);
       break;
     }
   }

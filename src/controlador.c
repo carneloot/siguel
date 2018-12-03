@@ -190,7 +190,7 @@ Controlador cria_controlador() {
   this->pessoas   = lt_create();
 
   for (i = 0; i < TABELAS_TOTAL; i++)
-    this->tabelas[i] = HashTable_t.create(73);
+    this->tabelas[i] = ht_create(73);
 
   for (i = 0; i < 11; i++) {
     this->registradores[i] = p2d_new(0, 0);
@@ -433,7 +433,7 @@ void printar_mensagem_final(Controlador _this, int eh_erro) {
 
 }
 
-HashTable get_table_quadras(Controlador _this) {
+HashTable_t get_table_quadras(Controlador _this) {
   struct Controlador * this = (struct Controlador *) _this;
   return this->tabelas[CEP_X_QUADRA];
 }
@@ -480,14 +480,14 @@ void destruir_controlador(Controlador c) {
   lt_destroy(this->comercios, comercio_destruir);
   lt_destroy(this->pessoas,     pessoa_destruir);
 
-  HashTable_t.destroy(this->tabelas[CPF_X_CEP],        NULL, 0);
-  HashTable_t.destroy(this->tabelas[CEP_X_QUADRA],     NULL, 0);
-  HashTable_t.destroy(this->tabelas[TIPO_X_DESCRICAO], free, 1);
-  HashTable_t.destroy(this->tabelas[CPF_X_PESSOA],     NULL, 0);
-  HashTable_t.destroy(this->tabelas[CNPJ_X_COMERCIO],  NULL, 0);
-  HashTable_t.destroy(this->tabelas[ID_X_RADIO],       NULL, 0);
-  HashTable_t.destroy(this->tabelas[ID_X_HIDRANTE],    NULL, 0);
-  HashTable_t.destroy(this->tabelas[ID_X_SEMAFORO],    NULL, 0);
+  ht_destroy(this->tabelas[CPF_X_CEP],        NULL, 0);
+  ht_destroy(this->tabelas[CEP_X_QUADRA],     NULL, 0);
+  ht_destroy(this->tabelas[TIPO_X_DESCRICAO], free, 1);
+  ht_destroy(this->tabelas[CPF_X_PESSOA],     NULL, 0);
+  ht_destroy(this->tabelas[CNPJ_X_COMERCIO],  NULL, 0);
+  ht_destroy(this->tabelas[ID_X_RADIO],       NULL, 0);
+  ht_destroy(this->tabelas[ID_X_HIDRANTE],    NULL, 0);
+  ht_destroy(this->tabelas[ID_X_SEMAFORO],    NULL, 0);
 
   GrafoD_t.destroy(this->mapa_viario);
   kdt_destroy(this->vertices_mapa_viario, destroy_vertice_info);

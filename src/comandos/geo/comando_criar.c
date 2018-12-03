@@ -97,7 +97,7 @@ int comando_geo_q(void *_this, void *_controlador) {
   kdt_insert(controlador->elementos[QUADRA], elemento);
 
   // Inserir na HashTable a quadra
-  HashTable_t.insert(controlador->tabelas[CEP_X_QUADRA], get_cep_elemento(elemento), elemento);
+  ht_insert(controlador->tabelas[CEP_X_QUADRA], get_cep_elemento(elemento), elemento);
 
   Ponto2D_t new_max = p2d_add(size, pos);
   new_max         = p2d_add_scalar(new_max, 4);
@@ -129,7 +129,7 @@ int comando_geo_h(void *_this, void *_controlador) {
 
   kdt_insert(controlador->elementos[HIDRANTE], elemento);
 
-  HashTable_t.insert(controlador->tabelas[ID_X_HIDRANTE], get_id_elemento(elemento), elemento);
+  ht_insert(controlador->tabelas[ID_X_HIDRANTE], get_id_elemento(elemento), elemento);
 
   Ponto2D_t new_max = p2d_add_scalar(pos, RAIO_EQUIPAMENTOS + 4);
 
@@ -160,7 +160,7 @@ int comando_geo_s(void *_this, void *_controlador) {
 
   kdt_insert(controlador->elementos[SEMAFORO], elemento);
 
-  HashTable_t.insert(controlador->tabelas[ID_X_SEMAFORO], get_id_elemento(elemento), elemento);
+  ht_insert(controlador->tabelas[ID_X_SEMAFORO], get_id_elemento(elemento), elemento);
 
   Ponto2D_t new_max = p2d_add_scalar(pos, RAIO_EQUIPAMENTOS + 4);
 
@@ -191,7 +191,7 @@ int comando_geo_t(void *_this, void *_controlador) {
 
   kdt_insert(controlador->elementos[RADIO_BASE], elemento);
 
-  HashTable_t.insert(controlador->tabelas[ID_X_RADIO], get_id_elemento(elemento), elemento);
+  ht_insert(controlador->tabelas[ID_X_RADIO], get_id_elemento(elemento), elemento);
 
   Ponto2D_t new_max = p2d_add_scalar(pos, RAIO_EQUIPAMENTOS + 4);
 

@@ -102,9 +102,9 @@ int comando_qry_tecq(void *_this, void *_controlador) {
 
   char *cep = this->params[0];
 
-  HashTable tabela = controlador->tabelas[CEP_X_QUADRA];
+  HashTable_t tabela = controlador->tabelas[CEP_X_QUADRA];
 
-  if (!HashTable_t.exists(tabela, cep)) {
+  if (!ht_exists(tabela, cep)) {
     lt_insert(controlador->saida, 
       format_string("O CEP \"%s\" nao foi encontrado.\n", cep));
     return 1;
@@ -130,7 +130,7 @@ int comando_qry_tecq(void *_this, void *_controlador) {
   // Passar printando os tipos
   char **tipos_it = tipos;
   while (*tipos_it) {
-    char *tipo_desc = HashTable_t.get(controlador->tabelas[TIPO_X_DESCRICAO], *tipos_it);
+    char *tipo_desc = ht_get(controlador->tabelas[TIPO_X_DESCRICAO], *tipos_it);
 
     lt_insert(controlador->saida, 
       format_string("\t%s:\n", tipo_desc));
@@ -192,7 +192,7 @@ int comando_qry_tecr(void *_this, void *_controlador) {
   // Printar os tipos na area
   char **tipos_it = tipos;
   while (!!*tipos_it) {
-    char *tipo_desc = HashTable_t.get(controlador->tabelas[TIPO_X_DESCRICAO], *tipos_it);
+    char *tipo_desc = ht_get(controlador->tabelas[TIPO_X_DESCRICAO], *tipos_it);
 
     lt_insert(controlador->saida, 
       format_string("\t%s\n", tipo_desc));
@@ -230,7 +230,7 @@ int comando_qry_ecr(void *_this, void *_controlador) {
     comercios = lt_copy(controlador->comercios);
   }
 
-  char *tipo_desc = HashTable_t.get(controlador->tabelas[TIPO_X_DESCRICAO], tipo);
+  char *tipo_desc = ht_get(controlador->tabelas[TIPO_X_DESCRICAO], tipo);
 
   // Filtra somente os comercios com o tipo passado
   Lista_t comercios_tipo = lt_filter(comercios, tipo, compararTIPO);
@@ -299,7 +299,7 @@ int comando_qry_ecq(void *_this, void *_controlador) {
   while (it) {
     Comercio comercio = lt_get(comercios, it);
 
-    char *tipo_desc = HashTable_t.get(controlador->tabelas[TIPO_X_DESCRICAO], comercio_get_tipo(comercio));
+    char *tipo_desc = ht_get(controlador->tabelas[TIPO_X_DESCRICAO], comercio_get_tipo(comercio));
     char *info_comercio = comercio_get_info(comercio, tipo_desc);
 
     lt_insert(controlador->saida, format_string("\t%s\n", info_comercio));

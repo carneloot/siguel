@@ -74,18 +74,18 @@ Lista_t astar(
   double (*get_heuristica)(void *atual, void *destino)) {
   LOG_PRINT(LOG_FILE, "A*: gerando caminho de \"%s\" ate \"%s\".", origem, destino);
 
-  HashTable vertices = HashTable_t.create(GrafoD_t.total_vertices(grafo));
+  HashTable_t vertices = ht_create(GrafoD_t.total_vertices(grafo));
 
-  PQueue_t fila = pq_create(HashTable_t.max_size(vertices));
+  PQueue_t fila = pq_create(ht_max_size(vertices));
 
   void *info_inicial = GrafoD_t.get_info_vertice(grafo, origem);
   void *info_target  = GrafoD_t.get_info_vertice(grafo, destino);
 
   DVInfo inicial = create_dvinfo(origem, 0, get_heuristica(info_inicial, info_target));
-  HashTable_t.insert(vertices, inicial->label, inicial);
+  ht_insert(vertices, inicial->label, inicial);
 
   DVInfo target = create_dvinfo(destino, DBL_MAX, 0);
-  HashTable_t.insert(vertices, target->label, target);
+  ht_insert(vertices, target->label, target);
 
   pq_insert(fila, inicial->distancia + inicial->heuristica, inicial);
 
@@ -103,12 +103,12 @@ Lista_t astar(
 
       DVInfo adjacente;
 
-      if (HashTable_t.exists(vertices, labelAdjacente)) {
-        adjacente = HashTable_t.get(vertices, labelAdjacente);
+      if (ht_exists(vertices, labelAdjacente)) {
+        adjacente = ht_get(vertices, labelAdjacente);
       } else {
         void *info_adjacente = GrafoD_t.get_info_vertice(grafo, labelAdjacente);
         adjacente = create_dvinfo(labelAdjacente, DBL_MAX, get_heuristica(info_adjacente, info_target));
-        HashTable_t.insert(vertices, adjacente->label, adjacente);
+        ht_insert(vertices, adjacente->label, adjacente);
       }
 
       void *infoAresta = GrafoD_t.get_info_aresta(grafo, menorDistancia->label, labelAdjacente);
@@ -130,7 +130,7 @@ Lista_t astar(
 
   Lista_t caminho = gerarCaminho(target);
 
-  HashTable_t.destroy(vertices, free, 0);
+  ht_destroy(vertices, free, 0);
 
   return caminho;
 }

@@ -49,7 +49,7 @@ int comando_qry_hmp(void *_this, void *_controlador) {
 
   char *id = this->params[0];
 
-  Elemento radio_base = HashTable_t.get(controlador->tabelas[ID_X_RADIO], id);
+  Elemento radio_base = ht_get(controlador->tabelas[ID_X_RADIO], id);
 
   Pair pair = hidrante_mais_proximo(controlador, radio_base);
   pair.distance = sqrt(pair.distance);

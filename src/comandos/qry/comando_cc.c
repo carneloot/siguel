@@ -25,13 +25,13 @@ int comando_qry_cc(void *_this, void *_controlador) {
   char *cor       = params[2];
 
   for (int i = CEP_X_QUADRA; i < ID_X_SEMAFORO; i++) {
-    HashTable tabela = controlador->tabelas[i];
+    HashTable_t tabela = controlador->tabelas[i];
 
     // Se nao achar nessa tabela, vai para a proxima
-    if (!HashTable_t.exists(tabela, info))
+    if (!ht_exists(tabela, info))
       continue;
 
-    Elemento elemento = HashTable_t.get(tabela, info);
+    Elemento elemento = ht_get(tabela, info);
 
     set_cor_elemento(elemento, cor);
     set_cor_borda_elemento(elemento, cor_borda);

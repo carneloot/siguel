@@ -40,7 +40,7 @@ struct Vertice {
   InfoG info;
 
   char *label;
-  HashTable arestas;
+  HashTable_t arestas;
 };
 
 static struct Vertice *create_vertice(InfoG info, char *label) {
@@ -51,14 +51,14 @@ static struct Vertice *create_vertice(InfoG info, char *label) {
   this->label = calloc(strlen(label) + 1, sizeof(char));
   strcpy(this->label, label);
 
-  this->arestas = HashTable_t.create(7);
+  this->arestas = ht_create(7);
 
   return this;
 }
 
 static void destroy_vertice(void *_this) {
   struct Vertice *this = _this;
-  HashTable_t.destroy(this->arestas, destroy_aresta, 0);
+  ht_destroy(this->arestas, destroy_aresta, 0);
 
   free(this->label);
 
@@ -71,7 +71,7 @@ struct GrafoD {
   int num_vertices;
 
   Lista_t vertices;
-  HashTable label_x_vertice;
+  HashTable_t label_x_vertice;
 };
 
 static GrafoD __create_grafod() {
@@ -80,7 +80,7 @@ static GrafoD __create_grafod() {
   this->num_vertices = 0;
 
   this->vertices = lt_create();
-  this->label_x_vertice = HashTable_t.create(199);
+  this->label_x_vertice = ht_create(199);
   
   return this;
 }
@@ -89,7 +89,7 @@ static void __destroy_grafod(GrafoD _this) {
   struct GrafoD *this = (struct GrafoD *) _this;
 
   lt_destroy(this->vertices, NULL);
-  HashTable_t.destroy(this->label_x_vertice, destroy_vertice, false);
+  ht_destroy(this->label_x_vertice, destroy_vertice, false);
 
   free(this);
 }
@@ -144,7 +144,7 @@ static void __generate_dot_grafod(GrafoD _this, FILE *fp) {
     
     fprintf(fp, "\"%p\" [label=\"%s\"];\n", vertice->label, vertice->label);
 
-    HashTable_t.map(vertice->arestas, fp, __imprimir_aresta_dot);
+    ht_map(vertice->arestas, fp, __imprimir_aresta_dot);
 
     it = lt_get_next(this->vertices, it);
   }
@@ -157,41 +157,41 @@ static void __generate_dot_grafod(GrafoD _this, FILE *fp) {
 static void __insert_aresta_grafod(GrafoD _this, char *origem, char *destino) {
   struct GrafoD *this = _this;
 
-  if (!HashTable_t.exists(this->label_x_vertice, origem)) {
+  if (!ht_exists(this->label_x_vertice, origem)) {
     LOG_ERRO("ERRO INSERIR ARESTA: Vertice de nome \"%s\" nao existe.", origem);
     return;
   }
 
-  if (!HashTable_t.exists(this->label_x_vertice, destino)) {
+  if (!ht_exists(this->label_x_vertice, destino)) {
     LOG_ERRO("ERRO INSERIR ARESTA: Vertice de nome \"%s\" nao existe.", destino);
     return;
   }
 
-  struct Vertice *vertice_origem  = HashTable_t.get(this->label_x_vertice, origem);
-  struct Vertice *vertice_destino = HashTable_t.get(this->label_x_vertice, destino);
+  struct Vertice *vertice_origem  = ht_get(this->label_x_vertice, origem);
+  struct Vertice *vertice_destino = ht_get(this->label_x_vertice, destino);
 
   struct Aresta *aresta = create_aresta(NULL, vertice_origem->label, vertice_destino->label);
 
-  HashTable_t.insert(vertice_origem->arestas, vertice_destino->label, aresta);
+  ht_insert(vertice_origem->arestas, vertice_destino->label, aresta);
 
 }
 
 static void __define_info_aresta_grafod(GrafoD _this, char *origem, char *destino, InfoG info) {
   struct GrafoD *this = _this;
 
-  if (!HashTable_t.exists(this->label_x_vertice, origem)) {
+  if (!ht_exists(this->label_x_vertice, origem)) {
     LOG_ERRO("ERRO DEFINIR INFO ARESTA: Vertice de nome \"%s\" nao existe.", origem);
     return;
   }
 
-  if (!HashTable_t.exists(this->label_x_vertice, destino)) {
+  if (!ht_exists(this->label_x_vertice, destino)) {
     LOG_ERRO("ERRO DEFINIR INFO ARESTA: Vertice de nome \"%s\" nao existe.", destino);
     return;
   }
 
-  struct Vertice *vertice_origem = HashTable_t.get(this->label_x_vertice, origem);
+  struct Vertice *vertice_origem = ht_get(this->label_x_vertice, origem);
 
-  if (!HashTable_t.exists(vertice_origem->arestas, destino)) {
+  if (!ht_exists(vertice_origem->arestas, destino)) {
     LOG_ERRO(
       "ERRO DEFINIR INFO ARESTA: "
       "Aresta de \"%s\" a \"%s\" nao existe. Por favor, crie a "
@@ -199,7 +199,7 @@ static void __define_info_aresta_grafod(GrafoD _this, char *origem, char *destin
     return;
   }
 
-  struct Aresta *aresta = HashTable_t.get(vertice_origem->arestas, destino);
+  struct Aresta *aresta = ht_get(vertice_origem->arestas, destino);
 
   aresta->info = info;
 }
@@ -207,19 +207,19 @@ static void __define_info_aresta_grafod(GrafoD _this, char *origem, char *destin
 static InfoG __get_info_aresta_grafod(GrafoD _this, char *origem, char *destino) {
   struct GrafoD *this = _this;
 
-  if (!HashTable_t.exists(this->label_x_vertice, origem)) {
+  if (!ht_exists(this->label_x_vertice, origem)) {
     LOG_ERRO("ERRO GET INFO ARESTA: Vertice de nome \"%s\" nao existe.", origem);
     return NULL;
   }
 
-  if (!HashTable_t.exists(this->label_x_vertice, destino)) {
+  if (!ht_exists(this->label_x_vertice, destino)) {
     LOG_ERRO("ERRO GET INFO ARESTA: Vertice de nome \"%s\" nao existe.", destino);
     return NULL;
   }
 
-  struct Vertice *vertice_origem = HashTable_t.get(this->label_x_vertice, origem);
+  struct Vertice *vertice_origem = ht_get(this->label_x_vertice, origem);
 
-  if (!HashTable_t.exists(vertice_origem->arestas, destino)) {
+  if (!ht_exists(vertice_origem->arestas, destino)) {
     LOG_ERRO(
       "ERRO GET INFO ARESTA: "
       "Aresta de \"%s\" a \"%s\" nao existe. Por favor, crie a "
@@ -227,7 +227,7 @@ static InfoG __get_info_aresta_grafod(GrafoD _this, char *origem, char *destino)
     return NULL;
   }
 
-  struct Aresta *aresta = HashTable_t.get(vertice_origem->arestas, destino);
+  struct Aresta *aresta = ht_get(vertice_origem->arestas, destino);
 
   return aresta->info;
 }
@@ -235,19 +235,19 @@ static InfoG __get_info_aresta_grafod(GrafoD _this, char *origem, char *destino)
 static void __remove_aresta_grafod(GrafoD _this, char *origem, char *destino) {
   struct GrafoD *this = _this;
 
-  if (!HashTable_t.exists(this->label_x_vertice, origem)) {
+  if (!ht_exists(this->label_x_vertice, origem)) {
     LOG_ERRO("ERRO REMOVER ARESTA: Vertice de nome \"%s\" nao existe.", origem);
     return;
   }
 
-  if (!HashTable_t.exists(this->label_x_vertice, destino)) {
+  if (!ht_exists(this->label_x_vertice, destino)) {
     LOG_ERRO("ERRO REMOVER ARESTA: Vertice de nome \"%s\" nao existe.", destino);
     return;
   }
 
-  struct Vertice *vertice_origem = HashTable_t.get(this->label_x_vertice, origem);
+  struct Vertice *vertice_origem = ht_get(this->label_x_vertice, origem);
 
-  if (!HashTable_t.exists(vertice_origem->arestas, destino)) {
+  if (!ht_exists(vertice_origem->arestas, destino)) {
     LOG_ERRO(
       "ERRO REMOVER ARESTA: "
       "Aresta de \"%s\" a \"%s\" nao existe. Por favor, crie a "
@@ -255,9 +255,9 @@ static void __remove_aresta_grafod(GrafoD _this, char *origem, char *destino) {
     return;
   }
 
-  struct Aresta *aresta = HashTable_t.get(vertice_origem->arestas, destino);
+  struct Aresta *aresta = ht_get(vertice_origem->arestas, destino);
 
-  HashTable_t.remove(vertice_origem->arestas, destino);
+  ht_remove(vertice_origem->arestas, destino);
 
   destroy_aresta(aresta);
 }
@@ -265,19 +265,19 @@ static void __remove_aresta_grafod(GrafoD _this, char *origem, char *destino) {
 static bool __adjacente_grafod(GrafoD _this, char *origem, char *destino) {
   struct GrafoD *this = _this;
 
-  if (!HashTable_t.exists(this->label_x_vertice, origem)) {
+  if (!ht_exists(this->label_x_vertice, origem)) {
     LOG_ERRO("ERRO CHECAR ADJACENTE: Vertice de nome \"%s\" nao existe.", origem);
     return false;
   }
 
-  if (!HashTable_t.exists(this->label_x_vertice, destino)) {
+  if (!ht_exists(this->label_x_vertice, destino)) {
     LOG_ERRO("ERRO CHECAR ADJACENTE: Vertice de nome \"%s\" nao existe.", destino);
     return false;
   }
 
-  struct Vertice *vertice_origem = HashTable_t.get(this->label_x_vertice, origem);
+  struct Vertice *vertice_origem = ht_get(this->label_x_vertice, origem);
 
-  return HashTable_t.exists(vertice_origem->arestas, destino);
+  return ht_exists(vertice_origem->arestas, destino);
 }
 
 /* ===== FUNCOES VERTICE ===== */
@@ -285,7 +285,7 @@ static bool __adjacente_grafod(GrafoD _this, char *origem, char *destino) {
 static void __insert_vertice_grafod(GrafoD _this, char *node) {
   struct GrafoD *this = _this;
 
-  if (HashTable_t.exists(this->label_x_vertice, node)) {
+  if (ht_exists(this->label_x_vertice, node)) {
     LOG_ERRO("ERRO INSERIR VERTICE: Vertice com nome \"%s\" ja existe.", node);
     return;
   }
@@ -293,7 +293,7 @@ static void __insert_vertice_grafod(GrafoD _this, char *node) {
   struct Vertice *vertice = create_vertice(NULL, node);
 
   lt_insert(this->vertices, vertice);
-  HashTable_t.insert(this->label_x_vertice, vertice->label, vertice);
+  ht_insert(this->label_x_vertice, vertice->label, vertice);
 
   this->num_vertices++;
 }
@@ -301,12 +301,12 @@ static void __insert_vertice_grafod(GrafoD _this, char *node) {
 static void __define_info_vertice_grafod(GrafoD _this, char *node, InfoG info) {
   struct GrafoD *this = _this;
 
-  if (!HashTable_t.exists(this->label_x_vertice, node)) {
+  if (!ht_exists(this->label_x_vertice, node)) {
     LOG_ERRO("ERRO DEFINIR INFO VERTICE: Vertice de nome \"%s\" nao existe.", node);
     return;
   }
 
-  struct Vertice *vertice = HashTable_t.get(this->label_x_vertice, node);
+  struct Vertice *vertice = ht_get(this->label_x_vertice, node);
 
   vertice->info = info;
 }
@@ -314,12 +314,12 @@ static void __define_info_vertice_grafod(GrafoD _this, char *node, InfoG info) {
 static InfoG __get_info_vertice_grafod(GrafoD _this, char *node) {
   struct GrafoD *this = _this;
 
-  if (!HashTable_t.exists(this->label_x_vertice, node)) {
+  if (!ht_exists(this->label_x_vertice, node)) {
     LOG_ERRO("ERRO GET INFO VERTICE: Vertice de nome \"%s\" nao encontrado.", node);
     return NULL;
   }
 
-  struct Vertice *vertice = HashTable_t.get(this->label_x_vertice, node);
+  struct Vertice *vertice = ht_get(this->label_x_vertice, node);
 
   return vertice->info;
 }
@@ -327,15 +327,15 @@ static InfoG __get_info_vertice_grafod(GrafoD _this, char *node) {
 static void __remove_vertice_grafod(GrafoD _this, char *node) {
   struct GrafoD *this = _this;
 
-  if (!HashTable_t.exists(this->label_x_vertice, node)) {
+  if (!ht_exists(this->label_x_vertice, node)) {
     LOG_ERRO("ERRO REMOVER VERTICE: Vertice com nome \"%s\" nao encontrado.", node);
     return;
   }
 
-  struct Vertice *vertice = HashTable_t.get(this->label_x_vertice, node);
+  struct Vertice *vertice = ht_get(this->label_x_vertice, node);
 
   // Checar se tem alguma ligacao saindo dele
-  if (HashTable_t.length(vertice->arestas) != 0) {
+  if (ht_length(vertice->arestas) != 0) {
     LOG_ERRO("ERRO REMOVER VERTICE: Vertice \"%s\" contem arestas, e nao pode ser removido.", node);
     return;
   }
@@ -343,7 +343,7 @@ static void __remove_vertice_grafod(GrafoD _this, char *node) {
   // Checar se tem alguma ligacao chegando nele
   // Todo: 
 
-  HashTable_t.remove(this->label_x_vertice, node);
+  ht_remove(this->label_x_vertice, node);
 
   destroy_vertice(vertice);
 }
@@ -360,9 +360,9 @@ static Lista_t __adjacentes_grafod(GrafoD _this, char *node) {
 
   Lista_t lista = lt_create();
 
-  struct Vertice *vertice = HashTable_t.get(this->label_x_vertice, node);
+  struct Vertice *vertice = ht_get(this->label_x_vertice, node);
 
-  HashTable_t.map(vertice->arestas, lista, __adicionar_lista);
+  ht_map(vertice->arestas, lista, __adicionar_lista);
 
   return lista;
 }
