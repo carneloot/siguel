@@ -35,7 +35,7 @@ static int compare_x( const void* _this, const void* _other ){
   return -1;
 }
 
-static double __distancia_quadra_ponto(const Item _quadra, const Item _ponto, int dim) {
+static double __distancia_quadra_ponto(void *_quadra, void *_ponto, int dim) {
   Elemento quadra = (Elemento) _quadra;
   Ponto2D_t ponto_quadra = get_pos( quadra );
   Ponto2D_t ponto = * (Ponto2D_t *) _ponto;
@@ -49,7 +49,7 @@ static double __distancia_quadra_ponto(const Item _quadra, const Item _ponto, in
   return DBL_MAX;
 }
 
-static int __aresta_dentro(const Item value, int dim, const Item _ponto_a, const Item _ponto_b ){
+static int __aresta_dentro(void *value, int dim, void *_ponto_a, void *_ponto_b ){
   ArestaInfo aresta = (ArestaInfo) value;
   Ponto2D_t ponto_a = * (Ponto2D_t *) _ponto_a;
   Ponto2D_t ponto_b = * (Ponto2D_t *) _ponto_b;
@@ -179,10 +179,10 @@ static bool aresta_corresponde_colisao(struct Controlador* controlador, ArestaIn
 
 static Lista_t pegar_aresta_correspondente(struct Controlador* controlador, Figura fig_colisao ) {
   Ponto2D_t colisao_centro = get_centro_massa( fig_colisao );
-  KDTree arestas = controlador->arestas_mapa_viario;
-  KDTree quadras = controlador->elementos[QUADRA];
+  KDTree_t arestas = controlador->arestas_mapa_viario;
+  KDTree_t quadras = controlador->elementos[QUADRA];
   // Encontrar quadra mais próxima
-  Elemento quadra = KDTree_t.nearest_neighbor( quadras, &colisao_centro, __distancia_quadra_ponto ).point1;
+  Elemento quadra = kdt_nearest_neighbor( quadras, &colisao_centro, __distancia_quadra_ponto ).point1;
 
   Ponto2D_t tamanho_quadra;
   tamanho_quadra.x = get_largura(quadra);
@@ -195,7 +195,7 @@ static Lista_t pegar_aresta_correspondente(struct Controlador* controlador, Figu
   Ponto2D_t ponto_b = p2d_add(colisao_centro, tamanho_quadra);
 
   // Encontrar arestas num "raio" de uma quadra
-  Lista_t lista_arestas = KDTree_t.range_search( arestas, __aresta_dentro, &ponto_a, &ponto_b );
+  Lista_t lista_arestas = kdt_range_search( arestas, __aresta_dentro, &ponto_a, &ponto_b );
   Lista_t arestas_colisao = lt_create();
 
   figura_expandir(fig_colisao, 2, 2);

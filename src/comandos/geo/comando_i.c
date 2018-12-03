@@ -43,7 +43,7 @@ int comando_geo_i(void *_this, void *_controlador) {
   else
     saida = format_string("i %s %s %s\nNAO\n", params[0], params[1], params[2]);
 
-  lt_insert(controlador->saida, (Item) saida);
+  lt_insert(controlador->saida, (void *) saida);
 
   return 1;
 }

@@ -20,7 +20,7 @@
 #include <string.h>
 
 /** Funcao auxiliar da get_vertice_by_ponto */
-double __distancia_vertice_ponto(const Item _vertice_info, const Item _ponto, int dim) {
+double __distancia_vertice_ponto(void *_vertice_info, void *_ponto, int dim) {
   VerticeInfo vertice_info = (VerticeInfo) _vertice_info;
 
   Ponto2D_t ponto         = * (Ponto2D_t *) _ponto;
@@ -38,8 +38,8 @@ double __distancia_vertice_ponto(const Item _vertice_info, const Item _ponto, in
 /**
  * Retorna o vertice mais proximo do ponto passado
  */
-static VerticeInfo get_vertice_by_ponto(KDTree vertices, Ponto2D_t ponto) {
-  return KDTree_t.nearest_neighbor(vertices, &ponto, __distancia_vertice_ponto).point1;
+static VerticeInfo get_vertice_by_ponto(KDTree_t vertices, Ponto2D_t ponto) {
+  return kdt_nearest_neighbor(vertices, &ponto, __distancia_vertice_ponto).point1;
 }
 
 /** FUNCOES PARA USAR NA HORA DE ACHAR O CAMINHO */

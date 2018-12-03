@@ -51,7 +51,7 @@ static void __reportar_pessoas(Lista_t pessoas, struct Controlador *controlador)
   }
 }
 
-static Lista_t __quadras_dentro(KDTree arvore, Figura figura) {
+static Lista_t __quadras_dentro(KDTree_t arvore, Figura figura) {
 
   Ponto2D_t pA = get_pos(figura);
 
@@ -59,7 +59,7 @@ static Lista_t __quadras_dentro(KDTree arvore, Figura figura) {
   pB.y += get_h(figura);
   pB.x += get_w(figura);
 
-  Lista_t quadras = KDTree_t.range_search(arvore, elemento_dentro_rect, &pA, &pB);
+  Lista_t quadras = kdt_range_search(arvore, elemento_dentro_rect, &pA, &pB);
 
   Posic_t it = lt_get_first(quadras);
   Posic_t next_it;

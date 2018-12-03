@@ -41,7 +41,7 @@ int comando_reg_tp(void *_this, void *_controlador) {
 
   // Itera por todos os do tipo especificado encontrando o mais proximo
   // Sei que isso é muito porco, mas os comercios sao guardados numa lista,
-  // e mesmo se fossem guardados numa KDTree, os tipo sao diferentes.
+  // e mesmo se fossem guardados numa KDTree_t, os tipo sao diferentes.
   // Entao esse foi o melhor jeito que encontrei de fazer esse comando
   Posic_t it = lt_get_first(controlador->comercios);
   it = lt_search(controlador->comercios, it, tipo, search_tp);

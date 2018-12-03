@@ -80,7 +80,7 @@ Posic_t lt_get_previous(Lista_t this, Posic_t posicao);
 
 /**
  * Retorna o indicador da primeira posicao a partir de start que encontrar o
- * elemento de acordo com a funcao compare. Se nao encontrar um Item que caiba
+ * elemento de acordo com a funcao compare. Se nao encontrar um void *que caiba
  * na funcao compare retorna um indicador invalido.
  */
 Posic_t lt_search(
@@ -105,7 +105,7 @@ Lista_t lt_filter(Lista_t this, void *other, int (*compare)(void *item, void *ot
 void lt_map(Lista_t this, void *other, void (*map_function)(void *item, void *other));
 
 /**
- * Retorna uma array de Item com todos os itens da lista.
+ * Retorna uma array de void *com todos os itens da lista.
  * O tamanho do array é o mesmo da lista. Deve ser dado free no retorno.
  */
 void **lt_to_array(Lista_t this);

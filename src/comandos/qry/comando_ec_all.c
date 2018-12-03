@@ -10,7 +10,7 @@
 
 static void *__controlador = NULL;
 
-static int contemCep(Item item, void *other) {
+static int contemCep(void *item, void *other) {
   Comercio comercio = item;
   char *cep   = other;
 

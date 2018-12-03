@@ -34,11 +34,11 @@ static Lista_t *comando_d_all(
     if (!tipos_pesquisa[i])
       continue;
       
-    KDTree arvore = controlador->elementos[i];
+    KDTree_t arvore = controlador->elementos[i];
     
-    if (KDTree_t.is_empty(arvore)) continue;
+    if (kdt_is_empty(arvore)) continue;
     
-    Lista_t elementos = KDTree_t.range_search(arvore, elemento_dentro_rect, &pA, &pB);
+    Lista_t elementos = kdt_range_search(arvore, elemento_dentro_rect, &pA, &pB);
     
     saida[i] = elementos;
   }
@@ -83,7 +83,7 @@ static void remover_elementos(
     while (it) {
       Elemento elemento = lt_get(elementos[h], it);
 
-      KDTree_t.remove(controlador->elementos[h], elemento);
+      kdt_remove(controlador->elementos[h], elemento);
       char *cep   = get_cep_elemento(elemento);
       char *saida = format_string("%s: %s deletado (a).\n", tipo_elemento, cep);
       lt_insert(controlador->saida, saida);

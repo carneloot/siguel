@@ -51,7 +51,7 @@ int comando_geo_d(void *_this, void *_controlador) {
 
   char *saida = format_string("d %s %s\n%4.1f\n", params[0], params[1], distancia);
 
-  lt_insert(controlador->saida, (Item) saida);
+  lt_insert(controlador->saida, (void *) saida);
 
   return 1;
 }

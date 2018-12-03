@@ -50,11 +50,11 @@ static int __comercioDentro(void *comercio, void *cep_quadra) {
   return result;
 }
 
-static Lista_t __get_elementos_dentro(KDTree arvore, Ponto2D_t pos, Ponto2D_t size, enum TipoElemento tipo) {
+static Lista_t __get_elementos_dentro(KDTree_t arvore, Ponto2D_t pos, Ponto2D_t size, enum TipoElemento tipo) {
   Ponto2D_t pA = pos;
   Ponto2D_t pB = p2d_add(pos, size);
 
-  Lista_t saida = KDTree_t.range_search(arvore, elemento_dentro_rect, &pA, &pB);
+  Lista_t saida = kdt_range_search(arvore, elemento_dentro_rect, &pA, &pB);
 
   if (tipo == QUADRA) {
     Figura figura = cria_retangulo(pos.x, pos.y, size.x, size.y, "", "");
@@ -106,7 +106,7 @@ static void __remover_elementos(
     while (it) {
       Elemento elemento = lt_get(elementos[h], it);
 
-      KDTree_t.remove(controlador->elementos[h], elemento);
+      kdt_remove(controlador->elementos[h], elemento);
       char *cep   = get_cep_elemento(elemento);
       char *saida = format_string("\t%s: %s deletado (a).\n", tipo_elemento, cep);
       lt_insert(controlador->saida, saida);
@@ -142,7 +142,7 @@ int comando_qry_dpr(void *_this, void *_controlador) {
   Lista_t elementos_dentro[4];
 
   for (int i = 0; i < 4; i++) {
-    KDTree arvore = controlador->elementos[i];
+    KDTree_t arvore = controlador->elementos[i];
     elementos_dentro[i] = __get_elementos_dentro(arvore, pos, size, i);
   }
 

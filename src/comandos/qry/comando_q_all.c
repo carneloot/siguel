@@ -42,11 +42,11 @@ static Lista_t *comando_q_all(
   Lista_t *saida = calloc(4, sizeof(*saida));
 
   for (int i = 0; i < 4; i++) {
-    KDTree arvore = controlador->elementos[i];
+    KDTree_t arvore = controlador->elementos[i];
 
-    if (KDTree_t.is_empty(arvore)) continue;
+    if (kdt_is_empty(arvore)) continue;
 
-    Lista_t elementos = KDTree_t.range_search(arvore, elemento_dentro_rect, &pA, &pB);
+    Lista_t elementos = kdt_range_search(arvore, elemento_dentro_rect, &pA, &pB);
 
     saida[i] = elementos;
   }
@@ -68,7 +68,7 @@ static void reportar_elementos(
 
       char *saida = get_info_elemento(elemento);
       strcat(saida, "\n");
-      lt_insert(controlador->saida, (Item) saida);
+      lt_insert(controlador->saida, (void *) saida);
 
       iterator = lt_get_next(lista_atual, iterator);
     }

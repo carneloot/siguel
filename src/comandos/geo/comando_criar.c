@@ -94,7 +94,7 @@ int comando_geo_q(void *_this, void *_controlador) {
   set_cor_elemento(elemento, controlador->cores[QUADRA]);
   set_cor_borda_elemento(elemento, controlador->cores_borda[QUADRA]);
 
-  KDTree_t.insert(controlador->elementos[QUADRA], elemento);
+  kdt_insert(controlador->elementos[QUADRA], elemento);
 
   // Inserir na HashTable a quadra
   HashTable_t.insert(controlador->tabelas[CEP_X_QUADRA], get_cep_elemento(elemento), elemento);
@@ -127,7 +127,7 @@ int comando_geo_h(void *_this, void *_controlador) {
   set_cor_elemento(elemento, controlador->cores[HIDRANTE]);
   set_cor_borda_elemento(elemento, controlador->cores_borda[HIDRANTE]);
 
-  KDTree_t.insert(controlador->elementos[HIDRANTE], elemento);
+  kdt_insert(controlador->elementos[HIDRANTE], elemento);
 
   HashTable_t.insert(controlador->tabelas[ID_X_HIDRANTE], get_id_elemento(elemento), elemento);
 
@@ -158,7 +158,7 @@ int comando_geo_s(void *_this, void *_controlador) {
   set_cor_elemento(elemento, controlador->cores[SEMAFORO]);
   set_cor_borda_elemento(elemento, controlador->cores_borda[SEMAFORO]);
 
-  KDTree_t.insert(controlador->elementos[SEMAFORO], elemento);
+  kdt_insert(controlador->elementos[SEMAFORO], elemento);
 
   HashTable_t.insert(controlador->tabelas[ID_X_SEMAFORO], get_id_elemento(elemento), elemento);
 
@@ -189,7 +189,7 @@ int comando_geo_t(void *_this, void *_controlador) {
   set_cor_elemento(elemento, controlador->cores[RADIO_BASE]);
   set_cor_borda_elemento(elemento, controlador->cores_borda[RADIO_BASE]);
 
-  KDTree_t.insert(controlador->elementos[RADIO_BASE], elemento);
+  kdt_insert(controlador->elementos[RADIO_BASE], elemento);
 
   HashTable_t.insert(controlador->tabelas[ID_X_RADIO], get_id_elemento(elemento), elemento);
 

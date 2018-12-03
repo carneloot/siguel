@@ -11,7 +11,7 @@
 
 #define RAIO_RADIOS_PROXIMOS 25
 
-double distanciaElementos(const Item _this, const Item _other, int dim) {
+double distanciaElementos(void *_this, void *_other, int dim) {
   struct Elemento *this  = (struct Elemento *) _this;
   struct Elemento *other = (struct Elemento *) _other;
 
@@ -41,14 +41,14 @@ int comando_qry_crb(void *_this, void *_controlador) {
   char *saida;
 
   // Se nao houver torres
-  if (KDTree_t.is_empty(controlador->elementos[RADIO_BASE])) {
+  if (kdt_is_empty(controlador->elementos[RADIO_BASE])) {
     saida = format_string(
       "Nao ha torres de celular suficientes para checar a distancia.\n");
     lt_insert(controlador->saida, saida);
     return 1;
   }
 
-  Pair pair = KDTree_t.closest_pair(
+  Pair pair = kdt_closest_pair(
     controlador->elementos[RADIO_BASE], distanciaElementos);
 
   Elemento radio1, radio2;

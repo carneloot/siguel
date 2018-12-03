@@ -56,7 +56,7 @@ struct Controlador {
 
   Lista_t sobreposicoes;
 
-  KDTree elementos[4];
+  KDTree_t elementos[4];
   char *cores[4];
   char *cores_borda[4];
 
@@ -68,8 +68,8 @@ struct Controlador {
   Ponto2D_t registradores[11];
 
   GrafoD mapa_viario;
-  KDTree vertices_mapa_viario;
-  KDTree arestas_mapa_viario;
+  KDTree_t vertices_mapa_viario;
+  KDTree_t arestas_mapa_viario;
 };
 
 extern void desenhar_todas_figuras(void *controlador, void *svg);

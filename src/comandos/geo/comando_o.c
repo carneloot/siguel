@@ -55,11 +55,11 @@ int comando_geo_o(void *_this, void *_controlador) {
     /* Desenhar retangulo no lugar da sobreposicao */
     lt_insert(
       controlador->sobreposicoes,
-      (Item) get_rect_sobreposicao(figura1, figura2, "purple"));
+      (void *) get_rect_sobreposicao(figura1, figura2, "purple"));
   } else
     saida = format_string("o %s %s\nNAO\n", params[0], params[1]);
 
-  lt_insert(controlador->saida, (Item) saida);
+  lt_insert(controlador->saida, (void *) saida);
 
   return 1;
 }

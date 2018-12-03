@@ -29,7 +29,7 @@ static double distancia(void * const _a, void * const _b, int dim) {
 
 static Pair hidrante_mais_proximo(
   struct Controlador *controlador, Ponto2D_t *ponto) {
-  return KDTree_t.nearest_neighbor(controlador->elementos[HIDRANTE],
+  return kdt_nearest_neighbor(controlador->elementos[HIDRANTE],
     ponto, distancia);
 }
 

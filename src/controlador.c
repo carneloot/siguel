@@ -38,14 +38,14 @@ static void escrever_txt_final(void *c);
 
 /** ===== FUNCOES DA ARVORE ===== */
 
-int equalElements(const void *_a, const void *_b) {
-  const Elemento a = (const Elemento) _a;
-  const Elemento b = (const Elemento) _b;
+int equalElements(void *_a, void *_b) {
+  Elemento a = (Elemento) _a;
+  Elemento b = (Elemento) _b;
 
   return (p2d_equal(get_pos(a), get_pos(b)) && !strcmp(get_id_elemento(a), get_id_elemento(b)));
 }
 
-int compareX(const void *_a, const void *_b) {
+int compareX(void *_a, void *_b) {
   Elemento a = (Elemento) _a;
   Elemento b = (Elemento) _b;
 
@@ -55,7 +55,7 @@ int compareX(const void *_a, const void *_b) {
   return (posA.x - posB.x);
 }
 
-int compareY(const void *_a, const void *_b) {
+int compareY(void *_a, void *_b) {
   Elemento a = (Elemento) _a;
   Elemento b = (Elemento) _b;
 
@@ -65,14 +65,14 @@ int compareY(const void *_a, const void *_b) {
   return (posA.y - posB.y);
 }
 
-void desenharElementoSVG(const Item _ele, unsigned prof, va_list list) {
-  const Elemento ele = (const Elemento) _ele;
+void desenharElementoSVG(void *_ele, unsigned prof, va_list list) {
+  Elemento ele = (Elemento) _ele;
   SVG svg = va_arg(list, SVG);
   
   desenha_elemento(svg, ele);
 }
 
-int elementoDentro(Item _this, int dim, Item rect[]) {
+int elementoDentro(void *_this, int dim, void *rect[]) {
   Elemento this = (Elemento) _this;
 
   int result;
@@ -108,40 +108,40 @@ int elementoDentro(Item _this, int dim, Item rect[]) {
 
 /** FUNCOES ARVORE DO GRAFO */
 
-int equalVertices(const void *_a, const void *_b) {
-  const VerticeInfo a = (const VerticeInfo) _a;
-  const VerticeInfo b = (const VerticeInfo) _b;
+int equalVertices(void *_a, void *_b) {
+  VerticeInfo a = (VerticeInfo) _a;
+  VerticeInfo b = (VerticeInfo) _b;
 
   return (p2d_equal(a->pos, b->pos) && !strcmp(a->id, b->id));
 }
 
-int compareXVertice(const void *_a, const void *_b) {
-  const VerticeInfo a = (const VerticeInfo) _a;
-  const VerticeInfo b = (const VerticeInfo) _b;
+int compareXVertice(void *_a, void *_b) {
+  VerticeInfo a = (VerticeInfo) _a;
+  VerticeInfo b = (VerticeInfo) _b;
 
   return (a->pos.x - b->pos.x);
 }
 
-int compareYVertice(const void *_a, const void *_b) {
-  const VerticeInfo a = (const VerticeInfo) _a;
-  const VerticeInfo b = (const VerticeInfo) _b;
+int compareYVertice(void *_a, void *_b) {
+  VerticeInfo a = (VerticeInfo) _a;
+  VerticeInfo b = (VerticeInfo) _b;
 
   return (a->pos.y - b->pos.y);
 }
 
-int equalArestas( const void* _this, const void* _other ) {
+int equalArestas( void* _this, void* _other ) {
   ArestaInfo this  = (ArestaInfo) _this;
   ArestaInfo other = (ArestaInfo) _other;
   return (!strcmp(this->nome, other->nome) && p2d_equal(this->pos, other->pos));
 }
 
-int compareXAresta( const void* _this, const void* _other ) {
+int compareXAresta( void* _this, void* _other ) {
   ArestaInfo this  = (ArestaInfo) _this;
   ArestaInfo other = (ArestaInfo) _other;
   return ( this->pos.x - other->pos.x );
 }
 
-int compareYAresta( const void* _this, const void* _other ) {
+int compareYAresta( void* _this, void* _other ) {
   ArestaInfo this  = (ArestaInfo) _this;
   ArestaInfo other = (ArestaInfo) _other;
   return ( this->pos.y - other->pos.y );
@@ -175,7 +175,7 @@ Controlador cria_controlador() {
   this->sobreposicoes = lt_create();
 
   for (i = 0; i < 4; i++) {
-    this->elementos[i] = KDTree_t.create(2, equalElements, compareX, compareY);
+    this->elementos[i] = kdt_create(2, equalElements, compareX, compareY);
 
     this->cores[i]       = NULL;
     this->cores_borda[i] = NULL;
@@ -197,8 +197,8 @@ Controlador cria_controlador() {
   }
 
   this->mapa_viario          = GrafoD_t.create();
-  this->vertices_mapa_viario = KDTree_t.create(2, equalVertices, compareXVertice, compareYVertice);
-  this->arestas_mapa_viario  = KDTree_t.create(2, equalArestas, compareXAresta, compareYAresta);
+  this->vertices_mapa_viario = kdt_create(2, equalVertices, compareXVertice, compareYVertice);
+  this->arestas_mapa_viario  = kdt_create(2, equalArestas, compareXAresta, compareYAresta);
 
   return (void *) this;
 }
@@ -335,7 +335,7 @@ void gerar_fila_execucao(Controlador _this) {
         continue;
       }
       
-      lt_insert(this->fila_execucao, (Item) comando);
+      lt_insert(this->fila_execucao, (void *) comando);
 
       free(linha);
     }
@@ -456,7 +456,7 @@ void destruir_controlador(Controlador c) {
 
   // Elementos
   for (i = 0; i < 4; i++) {
-    KDTree_t.destroy(this->elementos[i], &destruir_elemento);
+    kdt_destroy(this->elementos[i], &destruir_elemento);
     if (!this->cores[i])
       continue;
 
@@ -490,8 +490,8 @@ void destruir_controlador(Controlador c) {
   HashTable_t.destroy(this->tabelas[ID_X_SEMAFORO],    NULL, 0);
 
   GrafoD_t.destroy(this->mapa_viario);
-  KDTree_t.destroy(this->vertices_mapa_viario, destroy_vertice_info);
-  KDTree_t.destroy(this->arestas_mapa_viario,  destroy_aresta_info);
+  kdt_destroy(this->vertices_mapa_viario, destroy_vertice_info);
+  kdt_destroy(this->arestas_mapa_viario,  destroy_aresta_info);
 
   free(c);
 }
@@ -588,16 +588,16 @@ void desenhar_elementos(void *_this, void *svg) {
   LOG_PRINT(LOG_FILE, "Desenhando elementos.");
 
   for (int i = 0; i < 4; i++) {
-    KDTree arvore_atual = this->elementos[i];
+    KDTree_t arvore_atual = this->elementos[i];
     
-    if (KDTree_t.is_empty(arvore_atual))
+    if (kdt_is_empty(arvore_atual))
       continue;
 
-    KDTree_t.passe_simetrico(arvore_atual, desenharElementoSVG, svg);
+    kdt_passe_simetrico(arvore_atual, desenharElementoSVG, svg);
   }
 }
 
-void desenha_veiculo(Item _veiculo, void *_svg) {
+void desenha_veiculo(void *_veiculo, void *_svg) {
   Veiculo veiculo = _veiculo;
   SVG svg = (SVG) _svg;
 
@@ -617,7 +617,7 @@ void desenhar_veiculos(void *_this, void *svg) {
 
 }
 
-void desenhar_vertice(const Item _vertice, unsigned profundidade, va_list list) {
+void desenhar_vertice(void *_vertice, unsigned profundidade, va_list list) {
   VerticeInfo vertice = (VerticeInfo) _vertice;
   SVG svg = va_arg(list, SVG);
 
@@ -630,7 +630,7 @@ void desenhar_vertice(const Item _vertice, unsigned profundidade, va_list list) 
   destruir_figura(fig_vertice);
 }
 
-void desenhar_aresta(const Item _aresta, unsigned profundidade, va_list list) {
+void desenhar_aresta(void *_aresta, unsigned profundidade, va_list list) {
   ArestaInfo aresta  = (ArestaInfo) _aresta;
   SVG svg            = va_arg(list, SVG);
   GrafoD mapa_viario = va_arg(list, GrafoD);
@@ -657,9 +657,9 @@ void desenhar_mapa_viario(void *_this, void *svg) {
   
   LOG_PRINT(LOG_FILE, "Desenhando mapa viario.");
 
-  KDTree_t.passe_simetrico(this->vertices_mapa_viario, desenhar_vertice, svg);
+  kdt_passe_simetrico(this->vertices_mapa_viario, desenhar_vertice, svg);
 
-  KDTree_t.passe_simetrico(this->arestas_mapa_viario, desenhar_aresta, svg, this->mapa_viario);
+  kdt_passe_simetrico(this->arestas_mapa_viario, desenhar_aresta, svg, this->mapa_viario);
 
   #endif
 }
