@@ -27,7 +27,7 @@ int comando_qry_au( void* _this, void* _controlador ){
   struct Comando *this = _this;
   struct Controlador *controlador = _controlador;
 
-  Ponto2D pos = Ponto2D_t.new( strtod(this->params[1], NULL), strtod(this->params[2], NULL) );
+  Ponto2D_t pos = p2d_new( strtod(this->params[1], NULL), strtod(this->params[2], NULL) );
 
   double w = strtod(this->params[3], NULL);
   double h = strtod(this->params[4], NULL);

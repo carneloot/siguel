@@ -25,16 +25,16 @@ int comando_geo_c(void *_this, void *_controlador) {
   char *cor_borda = params[1];
   char *cor       = params[2];
   double r        = strtod(params[3], NULL);
-  Ponto2D pos = Ponto2D_t.new(strtod(params[4], NULL), strtod(params[5], NULL));
+  Ponto2D_t pos = p2d_new(strtod(params[4], NULL), strtod(params[5], NULL));
 
   Figura figura = cria_circulo(pos.x, pos.y, r, cor, cor_borda);
   set_id_figura(figura, id);
 
   Lista_t.insert((Lista) controlador->figuras, figura);
   
-  Ponto2D new_max = Ponto2D_t.add_scalar(pos, r + 4);
+  Ponto2D_t new_max = p2d_add_scalar(pos, r + 4);
 
-  controlador->max_geo = Ponto2D_t.maximo(controlador->max_geo, new_max);
+  controlador->max_geo = p2d_maximo(controlador->max_geo, new_max);
   
   return 1;
 }
@@ -56,19 +56,19 @@ int comando_geo_r(void *_this, void *_controlador) {
   char *cor_borda = params[1];
   char *cor       = params[2];
 
-  Ponto2D size =
-    Ponto2D_t.new(strtod(params[3], NULL), strtod(params[4], NULL));
-  Ponto2D pos = Ponto2D_t.new(strtod(params[5], NULL), strtod(params[6], NULL));
+  Ponto2D_t size =
+    p2d_new(strtod(params[3], NULL), strtod(params[4], NULL));
+  Ponto2D_t pos = p2d_new(strtod(params[5], NULL), strtod(params[6], NULL));
 
   Figura figura = cria_retangulo(pos.x, pos.y, size.x, size.y, cor, cor_borda);
   set_id_figura(figura, id);
 
   Lista_t.insert((Lista) controlador->figuras, figura);
 
-  Ponto2D new_max = Ponto2D_t.add(pos, size);
-  new_max = Ponto2D_t.add_scalar(new_max, 4);
+  Ponto2D_t new_max = p2d_add(pos, size);
+  new_max = p2d_add_scalar(new_max, 4);
 
-  controlador->max_geo = Ponto2D_t.maximo(controlador->max_geo, new_max);
+  controlador->max_geo = p2d_maximo(controlador->max_geo, new_max);
 
   return 1;
 }
@@ -85,9 +85,9 @@ int comando_geo_q(void *_this, void *_controlador) {
   char **params = this->params;
 
   char *cep   = params[0];
-  Ponto2D pos = Ponto2D_t.new( strtod(params[1], NULL), strtod(params[2], NULL));
-  Ponto2D size =
-    Ponto2D_t.new(strtod(params[3], NULL), strtod(params[4], NULL));
+  Ponto2D_t pos = p2d_new( strtod(params[1], NULL), strtod(params[2], NULL));
+  Ponto2D_t size =
+    p2d_new(strtod(params[3], NULL), strtod(params[4], NULL));
 
   Elemento elemento = cria_quadra(pos.x, pos.y, cep, size.x, size.y);
 
@@ -99,11 +99,11 @@ int comando_geo_q(void *_this, void *_controlador) {
   // Inserir na HashTable a quadra
   HashTable_t.insert(controlador->tabelas[CEP_X_QUADRA], get_cep_elemento(elemento), elemento);
 
-  Ponto2D new_max = Ponto2D_t.add(size, pos);
-  new_max         = Ponto2D_t.add_scalar(new_max, 4);
+  Ponto2D_t new_max = p2d_add(size, pos);
+  new_max         = p2d_add_scalar(new_max, 4);
 
-  controlador->max_geo = Ponto2D_t.maximo(controlador->max_geo, new_max);
-  controlador->max_qry = Ponto2D_t.maximo(controlador->max_qry, new_max);
+  controlador->max_geo = p2d_maximo(controlador->max_geo, new_max);
+  controlador->max_qry = p2d_maximo(controlador->max_qry, new_max);
 
   return 1;
 }
@@ -120,7 +120,7 @@ int comando_geo_h(void *_this, void *_controlador) {
   char **params = this->params;
 
   char *cep   = params[0];
-  Ponto2D pos = Ponto2D_t.new(strtod(params[1], NULL), strtod(params[2], NULL));
+  Ponto2D_t pos = p2d_new(strtod(params[1], NULL), strtod(params[2], NULL));
 
   Elemento elemento = cria_hidrante(pos.x, pos.y, cep);
 
@@ -131,10 +131,10 @@ int comando_geo_h(void *_this, void *_controlador) {
 
   HashTable_t.insert(controlador->tabelas[ID_X_HIDRANTE], get_id_elemento(elemento), elemento);
 
-  Ponto2D new_max = Ponto2D_t.add_scalar(pos, RAIO_EQUIPAMENTOS + 4);
+  Ponto2D_t new_max = p2d_add_scalar(pos, RAIO_EQUIPAMENTOS + 4);
 
-  controlador->max_geo = Ponto2D_t.maximo(controlador->max_geo, new_max);
-  controlador->max_qry = Ponto2D_t.maximo(controlador->max_qry, new_max);
+  controlador->max_geo = p2d_maximo(controlador->max_geo, new_max);
+  controlador->max_qry = p2d_maximo(controlador->max_qry, new_max);
 
   return 1;
 }
@@ -151,7 +151,7 @@ int comando_geo_s(void *_this, void *_controlador) {
   char **params = this->params;
 
   char *cep   = params[0];
-  Ponto2D pos = Ponto2D_t.new(strtod(params[1], NULL), strtod(params[2], NULL));
+  Ponto2D_t pos = p2d_new(strtod(params[1], NULL), strtod(params[2], NULL));
 
   Elemento elemento = cria_semaforo(pos.x, pos.y, cep);
 
@@ -162,10 +162,10 @@ int comando_geo_s(void *_this, void *_controlador) {
 
   HashTable_t.insert(controlador->tabelas[ID_X_SEMAFORO], get_id_elemento(elemento), elemento);
 
-  Ponto2D new_max = Ponto2D_t.add_scalar(pos, RAIO_EQUIPAMENTOS + 4);
+  Ponto2D_t new_max = p2d_add_scalar(pos, RAIO_EQUIPAMENTOS + 4);
 
-  controlador->max_geo = Ponto2D_t.maximo(controlador->max_geo, new_max);
-  controlador->max_qry = Ponto2D_t.maximo(controlador->max_qry, new_max);
+  controlador->max_geo = p2d_maximo(controlador->max_geo, new_max);
+  controlador->max_qry = p2d_maximo(controlador->max_qry, new_max);
 
   return 1;
 }
@@ -182,7 +182,7 @@ int comando_geo_t(void *_this, void *_controlador) {
   char **params = this->params;
 
   char *cep   = params[0];
-  Ponto2D pos = Ponto2D_t.new(strtod(params[1], NULL), strtod(params[2], NULL));
+  Ponto2D_t pos = p2d_new(strtod(params[1], NULL), strtod(params[2], NULL));
 
   Elemento elemento = cria_radio_base(pos.x, pos.y, cep);
 
@@ -193,11 +193,11 @@ int comando_geo_t(void *_this, void *_controlador) {
 
   HashTable_t.insert(controlador->tabelas[ID_X_RADIO], get_id_elemento(elemento), elemento);
 
-  Ponto2D new_max = Ponto2D_t.add_scalar(pos, RAIO_EQUIPAMENTOS + 4);
+  Ponto2D_t new_max = p2d_add_scalar(pos, RAIO_EQUIPAMENTOS + 4);
 
-  controlador->max_geo = Ponto2D_t.maximo(controlador->max_geo, new_max);
+  controlador->max_geo = p2d_maximo(controlador->max_geo, new_max);
 
-  controlador->max_qry = Ponto2D_t.maximo(controlador->max_qry, new_max);
+  controlador->max_qry = p2d_maximo(controlador->max_qry, new_max);
 
   return 1;
 }

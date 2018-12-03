@@ -62,7 +62,7 @@ int comando_geo_a(void *_this, void *_controlador) {
 
   desenhar_todas_figuras(controlador, svg_saida);
 
-  Ponto2D pos, pos2;
+  Ponto2D_t pos, pos2;
 
   pos = get_centro_massa(figura);
 
@@ -85,8 +85,8 @@ int comando_geo_a(void *_this, void *_controlador) {
 
     saida = format_string("%.1f", distancia);
 
-    Ponto2D aux = Ponto2D_t.add(pos, pos2);
-    aux         = Ponto2D_t.mult(aux, 0.5);
+    Ponto2D_t aux = p2d_add(pos, pos2);
+    aux         = p2d_mult(aux, 0.5);
     aux.x += 10;
 
     escreve_texto(svg_saida, saida, aux, 15, cor);

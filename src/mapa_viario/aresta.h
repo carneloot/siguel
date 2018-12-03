@@ -6,7 +6,7 @@
 #include <stdbool.h>
 
 struct ArestaInfo {
-  Ponto2D pos;
+  Ponto2D_t pos;
 
   char *nome;
 
@@ -33,7 +33,7 @@ ArestaInfo create_aresta_info(
   char *quadra_esquerda,
   double comprimento,
   double velocidade_media,
-  Ponto2D pos
+  Ponto2D_t pos
 );
 
 void destroy_aresta_info(void *this);

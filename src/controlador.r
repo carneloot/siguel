@@ -60,12 +60,12 @@ struct Controlador {
   char *cores[4];
   char *cores_borda[4];
 
-  Ponto2D max_geo, max_qry;
+  Ponto2D_t max_geo, max_qry;
 
   Lista fila_execucao;
 
   // O valor padrão dos registradores é (0, 0)
-  Ponto2D registradores[11];
+  Ponto2D_t registradores[11];
 
   GrafoD mapa_viario;
   KDTree vertices_mapa_viario;

@@ -24,7 +24,7 @@ static char *gerar_string_pontos(Lista pontos) {
 
   Posic it = Lista_t.get_first(pontos);
   while (it) {
-    Ponto2D *ponto = Lista_t.get(pontos, it);
+    Ponto2D_t *ponto = Lista_t.get(pontos, it);
 
     char *ponto_string = format_string("%10.1f %10.1f,",
       ponto->x, ponto->y);

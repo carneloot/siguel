@@ -50,9 +50,9 @@ static int __comercioDentro(void * const comercio, const void *cep_quadra) {
   return result;
 }
 
-static Lista __get_elementos_dentro(KDTree arvore, Ponto2D pos, Ponto2D size, enum TipoElemento tipo) {
-  Ponto2D pA = pos;
-  Ponto2D pB = Ponto2D_t.add(pos, size);
+static Lista __get_elementos_dentro(KDTree arvore, Ponto2D_t pos, Ponto2D_t size, enum TipoElemento tipo) {
+  Ponto2D_t pA = pos;
+  Ponto2D_t pB = p2d_add(pos, size);
 
   Lista saida = KDTree_t.range_search(arvore, elemento_dentro_rect, &pA, &pB);
 
@@ -136,8 +136,8 @@ int comando_qry_dpr(void *_this, void *_controlador) {
   struct Comando     *this        = _this;
   struct Controlador *controlador = _controlador;
 
-  Ponto2D pos  = Ponto2D_t.new(strtod(this->params[0], 0), strtod(this->params[1], 0));
-  Ponto2D size = Ponto2D_t.new(strtod(this->params[2], 0), strtod(this->params[3], 0));
+  Ponto2D_t pos  = p2d_new(strtod(this->params[0], 0), strtod(this->params[1], 0));
+  Ponto2D_t size = p2d_new(strtod(this->params[2], 0), strtod(this->params[3], 0));
 
   Lista elementos_dentro[4];
 
@@ -196,12 +196,12 @@ int comando_qry_dpr(void *_this, void *_controlador) {
   Figura area_afetada = cria_retangulo(pos.x, pos.y, size.x, size.y, "transparent", "teal");
   set_dashed_figura(area_afetada, FIG_BORDA_TRACEJADA);
   
-  Ponto2D posicao_asset = Ponto2D_t.new(0, 0);
-  posicao_asset = Ponto2D_t.sub_scalar(posicao_asset, tamanho / 2);
+  Ponto2D_t posicao_asset = p2d_new(0, 0);
+  posicao_asset = p2d_sub_scalar(posicao_asset, tamanho / 2);
 
   // posicao_asset agora marca o centro do local
   // Agora é só adicionar a posicao do centro do retangulo para posicao_asset
-  posicao_asset = Ponto2D_t.add(posicao_asset, get_centro_massa(area_afetada));
+  posicao_asset = p2d_add(posicao_asset, get_centro_massa(area_afetada));
 
   void *custom = cria_custom(posicao_asset, tamanho, NUCLEAR_SVG, NULL);
 

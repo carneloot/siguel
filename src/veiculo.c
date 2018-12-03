@@ -11,17 +11,17 @@
 #define COR_BORDA_VEICULO "dimgray"
 
 struct Veiculo{
-  Ponto2D pos;  // [   X    ,  Y    ]
-  Ponto2D size; // [ width , height ]
+  Ponto2D_t pos;  // [   X    ,  Y    ]
+  Ponto2D_t size; // [ width , height ]
   char* placa;
   Figura figura;
 };
 
-Veiculo cria_veiculo( Ponto2D pos, double w, double h, char *placa ) {
+Veiculo cria_veiculo( Ponto2D_t pos, double w, double h, char *placa ) {
   struct Veiculo* this =  malloc(sizeof(struct Veiculo));
 
   this->pos = pos;
-  this->size = Ponto2D_t.new(w, h);
+  this->size = p2d_new(w, h);
   
   this->placa = calloc(  strlen( placa ) + 1, sizeof(char) );
   strcpy(this->placa, placa);

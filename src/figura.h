@@ -20,9 +20,9 @@ Figura cria_circulo(double x, double y, double r, char *cor, char *cor_borda);
 
 int sobrepoe_figura(Figura f, Figura f2);
 
-int contem_ponto(Figura f, Ponto2D ponto);
+int contem_ponto(Figura f, Ponto2D_t ponto);
 
-Ponto2D get_centro_massa(Figura f);
+Ponto2D_t get_centro_massa(Figura f);
 
 Figura get_rect_sobreposicao(Figura f1, Figura f2, char* cor_borda);
 
@@ -39,7 +39,7 @@ void figura_expandir(Figura this, double dx, double dy);
 
 /** Getters */
 
-Ponto2D get_pos(Figura f);
+Ponto2D_t get_pos(Figura f);
 
 double get_x(Figura f);
 

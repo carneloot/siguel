@@ -4,7 +4,7 @@
 #include <modules/ponto2d.h>
 
 struct Seta {
-  Ponto2D a, b;
+  Ponto2D_t a, b;
   char *cor;
   int seta;
   int tracejada;
@@ -12,7 +12,7 @@ struct Seta {
 
 typedef struct Seta *Seta;
 
-Seta cria_svg_pontos(Ponto2D a, Ponto2D b, char *cor, int seta, int tracejada);
+Seta cria_svg_pontos(Ponto2D_t a, Ponto2D_t b, char *cor, int seta, int tracejada);
 
 char *svg_pontos(void *_pontos);
 

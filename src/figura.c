@@ -19,7 +19,7 @@
 #define DASHED_STRING "stroke-dasharray=\"5, 5\" "
 
 struct Figura {
-  Ponto2D pos;
+  Ponto2D_t pos;
   char *cor, *cor_borda;
   double opacity;
   int is_dashed;
@@ -49,7 +49,7 @@ static struct Figura *__cria_figura(
   double x, double y, char *cor, char *cor_borda) {
   struct Figura *this = (struct Figura *) malloc(sizeof(struct Figura));
 
-  this->pos = Ponto2D_t.new(x, y);
+  this->pos = p2d_new(x, y);
   this->id  = -1;
 
   this->opacity   = 1;
@@ -90,7 +90,7 @@ int sobrepoe_figura(Figura f, Figura f2) {
 
   if (this->tipo == CIRCULO && other->tipo == CIRCULO) {
     return (
-      Ponto2D_t.dist_squared(this->pos, other->pos) <= sqr(r(this) + r(other)));
+      p2d_dist_squared(this->pos, other->pos) <= sqr(r(this) + r(other)));
   }
 
   if (this->tipo == RETANGULO && other->tipo == RETANGULO) {
@@ -107,19 +107,19 @@ int sobrepoe_figura(Figura f, Figura f2) {
     rect = this;
   }
 
-  Ponto2D perto = Ponto2D_t.new(
+  Ponto2D_t perto = p2d_new(
     max(x(rect), min(x(circ), x(rect) + w(rect))),
     max(y(rect), min(y(circ), y(rect) + h(rect))));
 
-  return (Ponto2D_t.dist_squared(circ->pos, perto) <= sqr(r(circ)));
+  return (p2d_dist_squared(circ->pos, perto) <= sqr(r(circ)));
 }
 
-int contem_ponto(Figura f, Ponto2D p) {
+int contem_ponto(Figura f, Ponto2D_t p) {
   struct Figura *this;
   this = (struct Figura *) f;
 
   if (this->tipo == CIRCULO) {
-    return (Ponto2D_t.dist_squared(this->pos, p) < sqr(r(this)));
+    return (p2d_dist_squared(this->pos, p) < sqr(r(this)));
   }
 
   if (this->tipo == RETANGULO) {
@@ -131,11 +131,11 @@ int contem_ponto(Figura f, Ponto2D p) {
   return 0;
 }
 
-Ponto2D get_centro_massa(Figura f) {
+Ponto2D_t get_centro_massa(Figura f) {
   struct Figura *this;
   this = (struct Figura *) f;
 
-  Ponto2D result = Ponto2D_t.new(x(this), y(this));
+  Ponto2D_t result = p2d_new(x(this), y(this));
 
   if (this->tipo == RETANGULO) {
     result.x += w(this) / 2;
@@ -149,24 +149,24 @@ Figura get_rect_sobreposicao(Figura f1, Figura f2, char* cor_borda) {
   struct Figura *this  = (struct Figura *) f1;
   struct Figura *other = (struct Figura *) f2;
 
-  Ponto2D pos, size;
+  Ponto2D_t pos, size;
 
   if (this->tipo == CIRCULO && other->tipo == CIRCULO) {
-    pos = Ponto2D_t.new(
+    pos = p2d_new(
       min(x(this) - r(this), x(other) - r(other)),
       min(y(this) - r(this), y(other) - r(other)));
 
-    size = Ponto2D_t.new(
+    size = p2d_new(
       max(x(this) + r(this), x(other) + r(other)),
       max(y(this) + r(this), y(other) + r(other)));
   }
 
   else if (this->tipo == RETANGULO && other->tipo == RETANGULO) {
-    pos = Ponto2D_t.new(  //
+    pos = p2d_new(  //
       min(x(this), x(other)),
       min(y(this), y(other)));
 
-    size = Ponto2D_t.new(
+    size = p2d_new(
       max(x(this) + w(this), x(other) + w(other)),
       max(y(this) + h(this), y(other) + h(other)));
   }
@@ -181,25 +181,25 @@ Figura get_rect_sobreposicao(Figura f1, Figura f2, char* cor_borda) {
       circ = other;
       rect = this;
     }
-    pos = Ponto2D_t.new(  //
+    pos = p2d_new(  //
       min(x(rect), x(circ) - r(circ)),
       min(y(rect), y(circ) - r(circ)));
 
-    size = Ponto2D_t.new(
+    size = p2d_new(
       max(x(rect) + w(rect), x(circ) + r(circ)),
       max(y(rect) + h(rect), y(circ) + r(circ)));
   }
 
-  size = Ponto2D_t.sub(size, pos);
+  size = p2d_sub(size, pos);
 
-  pos  = Ponto2D_t.sub_scalar(pos, STROKE_SIZE);
-  size = Ponto2D_t.add_scalar(size, 2 * STROKE_SIZE);
+  pos  = p2d_sub_scalar(pos, STROKE_SIZE);
+  size = p2d_add_scalar(size, 2 * STROKE_SIZE);
 
   return cria_retangulo(pos.x, pos.y, size.x, size.y, "transparent", cor_borda);
 }
 
 double distancia_figuras(Figura this, Figura other) {
-  return Ponto2D_t.dist(get_centro_massa(this), get_centro_massa(other));
+  return p2d_dist(get_centro_massa(this), get_centro_massa(other));
 }
 
 void destruir_figura(Figura f) {
@@ -218,7 +218,7 @@ int dentro_figura(Figura _this, Figura _other) {
 
   if (this->tipo == CIRCULO && other->tipo == RETANGULO) {
     int result;
-    Ponto2D pos_other = other->pos;
+    Ponto2D_t pos_other = other->pos;
 
     result = contem_ponto(this, pos_other);
 
@@ -298,7 +298,7 @@ char *get_svg_figura(Figura _this) {
 
 /** Getters */
 
-Ponto2D get_pos(Figura f) {
+Ponto2D_t get_pos(Figura f) {
   return ((struct Figura *) f)->pos;
 }
 

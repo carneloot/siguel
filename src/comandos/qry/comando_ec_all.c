@@ -23,11 +23,11 @@ static int contemCep(const Item item, const void *other) {
 }
 
 static int compararDentro(void * const comercio, const void *outro) {
-  const Ponto2D *pontos = outro;
-  Ponto2D pos  = pontos[0];
-  Ponto2D size = pontos[1];
+  const Ponto2D_t *pontos = outro;
+  Ponto2D_t pos  = pontos[0];
+  Ponto2D_t size = pontos[1];
 
-  Ponto2D pos_comercio = endereco_get_coordenada(comercio_get_endereco(comercio), __controlador);
+  Ponto2D_t pos_comercio = endereco_get_coordenada(comercio_get_endereco(comercio), __controlador);
 
   Figura ret = cria_retangulo(pos.x, pos.y, size.x, size.y, "", "");
 
@@ -71,8 +71,8 @@ char **__get_tipos(Lista comercios) {
   return tipos;
 }
 
-Lista __get_comercios_area(Lista comercios, Ponto2D pos, Ponto2D size) {
-  Ponto2D pontos[2] = {pos, size};
+Lista __get_comercios_area(Lista comercios, Ponto2D_t pos, Ponto2D_t size) {
+  Ponto2D_t pontos[2] = {pos, size};
 
   Posic it = Lista_t.get_first(comercios);
 
@@ -170,8 +170,8 @@ int comando_qry_tecr(void *_this, void *_controlador) {
 
   __controlador = controlador;
 
-  Ponto2D pos  = Ponto2D_t.new(strtod(this->params[0], 0), strtod(this->params[1], 0));
-  Ponto2D size = Ponto2D_t.new(strtod(this->params[2], 0), strtod(this->params[3], 0));
+  Ponto2D_t pos  = p2d_new(strtod(this->params[0], 0), strtod(this->params[1], 0));
+  Ponto2D_t size = p2d_new(strtod(this->params[2], 0), strtod(this->params[3], 0));
 
   Lista comercios_na_area = __get_comercios_area(controlador->comercios, pos, size);
 
@@ -220,11 +220,11 @@ int comando_qry_ecr(void *_this, void *_controlador) {
   char *tipo = this->params[0];
 
   Lista comercios;
-  Ponto2D pos, size;
+  Ponto2D_t pos, size;
 
   if (this->num_param > 1) {
-    pos  = Ponto2D_t.new(strtod(this->params[1], 0), strtod(this->params[2], 0));
-    size = Ponto2D_t.new(strtod(this->params[3], 0), strtod(this->params[4], 0));
+    pos  = p2d_new(strtod(this->params[1], 0), strtod(this->params[2], 0));
+    size = p2d_new(strtod(this->params[3], 0), strtod(this->params[4], 0));
     comercios = __get_comercios_area(controlador->comercios, pos, size);
   } else {
     comercios = Lista_t.copy(controlador->comercios);

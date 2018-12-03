@@ -37,13 +37,13 @@ static int compare_x( const void* _this, const void* _other ){
 
 static double __distancia_quadra_ponto(const Item _quadra, const Item _ponto, int dim) {
   Elemento quadra = (Elemento) _quadra;
-  Ponto2D ponto_quadra = get_pos( quadra );
-  Ponto2D ponto = * (Ponto2D *) _ponto;
+  Ponto2D_t ponto_quadra = get_pos( quadra );
+  Ponto2D_t ponto = * (Ponto2D_t *) _ponto;
 
   switch(dim){
     case  0: return sqr(ponto.x - ponto_quadra.x);
     case  1: return sqr(ponto.y - ponto_quadra.y);
-    case -1: return Ponto2D_t.dist_squared( ponto, ponto_quadra );
+    case -1: return p2d_dist_squared( ponto, ponto_quadra );
   }
 
   return DBL_MAX;
@@ -51,9 +51,9 @@ static double __distancia_quadra_ponto(const Item _quadra, const Item _ponto, in
 
 static int __aresta_dentro(const Item value, int dim, const Item _ponto_a, const Item _ponto_b ){
   ArestaInfo aresta = (ArestaInfo) value;
-  Ponto2D ponto_a = * (Ponto2D *) _ponto_a;
-  Ponto2D ponto_b = * (Ponto2D *) _ponto_b;
-  Ponto2D pos_aresta = aresta->pos;
+  Ponto2D_t ponto_a = * (Ponto2D_t *) _ponto_a;
+  Ponto2D_t ponto_b = * (Ponto2D_t *) _ponto_b;
+  Ponto2D_t pos_aresta = aresta->pos;
   
   switch(dim){
     case 0:
@@ -111,18 +111,18 @@ static void desenhar_colisoes(Lista colisoes, SVG svg_saida) {
   }
 }
 
-static bool linhas_intersectam( Ponto2D p, Ponto2D r, Ponto2D q, Ponto2D s ){
+static bool linhas_intersectam( Ponto2D_t p, Ponto2D_t r, Ponto2D_t q, Ponto2D_t s ){
 
-  double rxs = Ponto2D_t.vetorial( r, s );
+  double rxs = p2d_vetorial( r, s );
   if(rxs == 0) return false;
 
-  Ponto2D qmp = Ponto2D_t.sub( q, p );
+  Ponto2D_t qmp = p2d_sub( q, p );
 
   // t = (q − p) × s / (r × s)
-  double t = Ponto2D_t.vetorial( qmp, s ) / rxs;
+  double t = p2d_vetorial( qmp, s ) / rxs;
 
   // u = (q − p) × r / (r × s)
-  double u = Ponto2D_t.vetorial( qmp, r ) / rxs;
+  double u = p2d_vetorial( qmp, r ) / rxs;
 
   if( between(t, 0, 1) && between(u, 0, 1) )
     return true;
@@ -137,62 +137,62 @@ static bool aresta_corresponde_colisao(struct Controlador* controlador, ArestaIn
 
   // Verificar se a reta da aresta cruza uma das retas dos lados dos retângulos
   
-  Ponto2D origem  = vertice_origem->pos;
-  Ponto2D destino = vertice_destino->pos;
-  Ponto2D colisao = get_pos(fig_colisao);
-  Ponto2D colisao_tamanho;
+  Ponto2D_t origem  = vertice_origem->pos;
+  Ponto2D_t destino = vertice_destino->pos;
+  Ponto2D_t colisao = get_pos(fig_colisao);
+  Ponto2D_t colisao_tamanho;
 
   colisao_tamanho.x = get_w( fig_colisao );
   colisao_tamanho.y = get_h( fig_colisao );
 
   // q e s Representarão cada lado do retângulo
-  Ponto2D q;
-  Ponto2D s;
+  Ponto2D_t q;
+  Ponto2D_t s;
 
-  Ponto2D p = origem;
-  Ponto2D r = Ponto2D_t.sub( destino, origem );
+  Ponto2D_t p = origem;
+  Ponto2D_t r = p2d_sub( destino, origem );
 
   // Borda de cima
   q = colisao;
-  s = Ponto2D_t.new(colisao_tamanho.x, 0);
+  s = p2d_new(colisao_tamanho.x, 0);
   if( linhas_intersectam( p, r, q, s ) ) return true;
 
   // Borda da esquerda
   q = colisao;
-  s = Ponto2D_t.new(0, colisao_tamanho.y);
+  s = p2d_new(0, colisao_tamanho.y);
   if( linhas_intersectam( p, r, q, s ) ) return true;
 
   // Borda de baixo
   q    = colisao;
   q.y += colisao_tamanho.y;
-  s    = Ponto2D_t.new(colisao_tamanho.x, 0);
+  s    = p2d_new(colisao_tamanho.x, 0);
   if( linhas_intersectam( p, r, q, s ) ) return true;
 
   // Borda da direita
   q    = colisao;
   q.x += colisao_tamanho.x;
-  s    = Ponto2D_t.new(0, colisao_tamanho.y);
+  s    = p2d_new(0, colisao_tamanho.y);
   if( linhas_intersectam( p, r, q, s ) ) return true;
 
   return false;
 }
 
 static Lista pegar_aresta_correspondente(struct Controlador* controlador, Figura fig_colisao ) {
-  Ponto2D colisao_centro = get_centro_massa( fig_colisao );
+  Ponto2D_t colisao_centro = get_centro_massa( fig_colisao );
   KDTree arestas = controlador->arestas_mapa_viario;
   KDTree quadras = controlador->elementos[QUADRA];
   // Encontrar quadra mais próxima
   Elemento quadra = KDTree_t.nearest_neighbor( quadras, &colisao_centro, __distancia_quadra_ponto ).point1;
 
-  Ponto2D tamanho_quadra;
+  Ponto2D_t tamanho_quadra;
   tamanho_quadra.x = get_largura(quadra);
   tamanho_quadra.y = get_altura(quadra);
 
-  tamanho_quadra = Ponto2D_t.mult(tamanho_quadra, 0.5);
+  tamanho_quadra = p2d_mult(tamanho_quadra, 0.5);
 
   // Pontos de busca
-  Ponto2D ponto_a = Ponto2D_t.sub(colisao_centro, tamanho_quadra);
-  Ponto2D ponto_b = Ponto2D_t.add(colisao_centro, tamanho_quadra);
+  Ponto2D_t ponto_a = p2d_sub(colisao_centro, tamanho_quadra);
+  Ponto2D_t ponto_b = p2d_add(colisao_centro, tamanho_quadra);
 
   // Encontrar arestas num "raio" de uma quadra
   Lista lista_arestas = KDTree_t.range_search( arestas, __aresta_dentro, &ponto_a, &ponto_b );

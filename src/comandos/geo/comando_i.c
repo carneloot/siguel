@@ -22,7 +22,7 @@ int comando_geo_i(void *_this, void *_controlador) {
   char **params = this->params;
 
   int id      = (int) strtol(params[0], NULL, 10);
-  Ponto2D pos = Ponto2D_t.new(strtod(params[1], NULL), strtod(params[2], NULL));
+  Ponto2D_t pos = p2d_new(strtod(params[1], NULL), strtod(params[2], NULL));
 
   Posic posic_figura1 = Lista_t.get_first(controlador->figuras);
   posic_figura1 =

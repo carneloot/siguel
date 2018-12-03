@@ -43,7 +43,7 @@ int comando_qry_mud(void *_this, void *_controlador) {
   int numero  = strtol(this->params[3], NULL, 10);
   char *compl = this->params[4];
 
-  Ponto2D pos_antiga = endereco_get_coordenada(pessoa_get_endereco(pessoa), controlador);
+  Ponto2D_t pos_antiga = endereco_get_coordenada(pessoa_get_endereco(pessoa), controlador);
   char *info_pessoa = pessoa_get_info(pessoa, controlador);
 
   HashTable_t.remove(tabela_cep, cpf);
@@ -51,7 +51,7 @@ int comando_qry_mud(void *_this, void *_controlador) {
 
   HashTable_t.insert(tabela_cep, pessoa_get_cpf(pessoa), pessoa_get_cep(pessoa));
 
-  Ponto2D pos_atual = endereco_get_coordenada(pessoa_get_endereco(pessoa), controlador);
+  Ponto2D_t pos_atual = endereco_get_coordenada(pessoa_get_endereco(pessoa), controlador);
   char *info_endereco_atual = endereco_get_info(pessoa_get_endereco(pessoa));
 
   char *saida = format_string(
@@ -65,8 +65,8 @@ int comando_qry_mud(void *_this, void *_controlador) {
   // Desenhar uma linha de pos_antiga ate pos_atual
   Seta pontos = cria_svg_pontos(pos_antiga, pos_atual, "green", 1, 0);
 
-  Ponto2D new_max = Ponto2D_t.maximo(pos_antiga, pos_atual);
-  controlador->max_qry = Ponto2D_t.maximo(controlador->max_qry, new_max);
+  Ponto2D_t new_max = p2d_maximo(pos_antiga, pos_atual);
+  controlador->max_qry = p2d_maximo(controlador->max_qry, new_max);
 
   Lista_t.insert(controlador->saida_svg_qry, 
     cria_desenhavel(pontos, svg_pontos, free_svg_pontos)

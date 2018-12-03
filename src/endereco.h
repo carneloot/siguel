@@ -17,7 +17,7 @@ Endereco cria_endereco(char *cep, enum Face face, int numero);
 
 void endereco_destruir(Endereco this);
 
-Ponto2D endereco_get_coordenada(Endereco this, void *controlador);
+Ponto2D_t endereco_get_coordenada(Endereco this, void *controlador);
 
 char *endereco_get_info(Endereco this);
 

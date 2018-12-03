@@ -37,7 +37,7 @@ static int elemento_dentro_figura(const void *_elemento, const void *_figura) {
 static Lista *comando_q_all(
   struct Comando *this,
   struct Controlador *controlador,
-  Ponto2D pA, Ponto2D pB) {
+  Ponto2D_t pA, Ponto2D_t pB) {
   
   Lista *saida = calloc(4, sizeof(*saida));
 
@@ -96,11 +96,11 @@ int comando_qry_qzin(void *_this, void *_controlador) {
 
   char **params = this->params;
 
-  Ponto2D pos, size;
+  Ponto2D_t pos, size;
   Figura figura;
 
-  pos  = Ponto2D_t.new(strtod(params[0], NULL), strtod(params[1], NULL));
-  size = Ponto2D_t.new(strtod(params[2], NULL), strtod(params[3], NULL));
+  pos  = p2d_new(strtod(params[0], NULL), strtod(params[1], NULL));
+  size = p2d_new(strtod(params[2], NULL), strtod(params[3], NULL));
 
   figura = cria_retangulo(pos.x, pos.y, size.x, size.y, "transparent", "black");
   set_opacity_figura(figura, 0.8);
@@ -108,17 +108,17 @@ int comando_qry_qzin(void *_this, void *_controlador) {
   Lista_t.insert(controlador->saida_svg_qry,
     cria_desenhavel(figura, get_svg_figura, destruir_figura));
 
-  Ponto2D new_max = Ponto2D_t.add(pos, size);
-  new_max         = Ponto2D_t.add_scalar(new_max, 4);
+  Ponto2D_t new_max = p2d_add(pos, size);
+  new_max         = p2d_add_scalar(new_max, 4);
 
-  controlador->max_qry = Ponto2D_t.maximo(controlador->max_qry, new_max);
+  controlador->max_qry = p2d_maximo(controlador->max_qry, new_max);
 
   char *prefixo = calloc(5, sizeof(char));
   strcpy(prefixo, "q?:\n");
   Lista_t.insert(controlador->saida, prefixo);
 
-  Ponto2D pA = pos;
-  Ponto2D pB = Ponto2D_t.add(pos, size);
+  Ponto2D_t pA = pos;
+  Ponto2D_t pB = p2d_add(pos, size);
 
   Lista *elementos = comando_q_all(this, controlador, pA, pB);
 
@@ -162,7 +162,7 @@ int comando_qry_qzao(void *_this, void *_controlador) {
   char **params = this->params;
 
   double r    = strtod(params[0], NULL);
-  Ponto2D pos = Ponto2D_t.new(strtod(params[1], NULL), strtod(params[2], NULL));
+  Ponto2D_t pos = p2d_new(strtod(params[1], NULL), strtod(params[2], NULL));
 
   Figura figura = cria_circulo(pos.x, pos.y, r, "transparent", "black");
   set_opacity_figura(figura, 0.8);
@@ -171,16 +171,16 @@ int comando_qry_qzao(void *_this, void *_controlador) {
   Lista_t.insert(controlador->saida_svg_qry,
     cria_desenhavel(figura, get_svg_figura, destruir_figura));
 
-  Ponto2D new_max = Ponto2D_t.add_scalar(pos, r + 4);
+  Ponto2D_t new_max = p2d_add_scalar(pos, r + 4);
 
-  controlador->max_qry = Ponto2D_t.maximo(controlador->max_qry, new_max);
+  controlador->max_qry = p2d_maximo(controlador->max_qry, new_max);
 
   char *prefixo = calloc(5, sizeof(char));
   strcpy(prefixo, "Q?:\n");
   Lista_t.insert(controlador->saida, prefixo);
 
-  Ponto2D pA = Ponto2D_t.sub_scalar(pos, r);
-  Ponto2D pB = Ponto2D_t.add_scalar(pos, r);
+  Ponto2D_t pA = p2d_sub_scalar(pos, r);
+  Ponto2D_t pB = p2d_add_scalar(pos, r);
 
   Lista *elementos = comando_q_all(this, controlador, pA, pB);
 

@@ -4,13 +4,13 @@
 #include <modules/ponto2d.h>
 
 struct Custom {
-  Ponto2D pos;
+  Ponto2D_t pos;
   double tamanho;
   char *string;
   char *cor;
 };
 
-void *cria_custom(Ponto2D pos, double tamanho, char *string, char *cor);
+void *cria_custom(Ponto2D_t pos, double tamanho, char *string, char *cor);
 
 char *print_custom_asset(void *_custom);
 

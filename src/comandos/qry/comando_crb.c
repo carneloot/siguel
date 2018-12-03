@@ -19,7 +19,7 @@ double distanciaElementos(const Item _this, const Item _other, int dim) {
 
   switch (dim) {
     case -1:
-      result = Ponto2D_t.dist_squared(get_pos(this), get_pos(other));
+      result = p2d_dist_squared(get_pos(this), get_pos(other));
       break;
     case 0: result = sqr(get_x(this) - get_x(other)); break;
     case 1: result = sqr(get_y(this) - get_y(other)); break;
@@ -70,7 +70,7 @@ int comando_qry_crb(void *_this, void *_controlador) {
   Lista_t.insert(controlador->saida, saida);
 
   // Desenhar os circulos nas torres mais proximas
-  Ponto2D pos;
+  Ponto2D_t pos;
 
   pos = get_pos(radio1);
 
@@ -85,9 +85,9 @@ int comando_qry_crb(void *_this, void *_controlador) {
       controlador->saida_svg_qry,
       cria_desenhavel(circ, get_svg_figura, destruir_figura));
 
-    Ponto2D new_max = Ponto2D_t.add_scalar(pos, RAIO_RADIOS_PROXIMOS);
+    Ponto2D_t new_max = p2d_add_scalar(pos, RAIO_RADIOS_PROXIMOS);
     
-    controlador->max_qry = Ponto2D_t.maximo(controlador->max_qry, new_max);
+    controlador->max_qry = p2d_maximo(controlador->max_qry, new_max);
 
     pos = get_pos(radio2);
   }

@@ -19,7 +19,7 @@ int comando_via_v(void *_this, void *_controlador) {
 
   char *id = this->params[0];
 
-  Ponto2D pos = Ponto2D_t.new(strtod(this->params[1], NULL), strtod(this->params[2], NULL));
+  Ponto2D_t pos = p2d_new(strtod(this->params[1], NULL), strtod(this->params[2], NULL));
 
   VerticeInfo vertice_info = create_vertice_info(pos, id);
 
@@ -28,8 +28,8 @@ int comando_via_v(void *_this, void *_controlador) {
 
   KDTree_t.insert(controlador->vertices_mapa_viario, vertice_info);
 
-  Ponto2D new_max = Ponto2D_t.add_scalar(pos, 10);
-  controlador->max_qry = Ponto2D_t.maximo(new_max, controlador->max_qry);
+  Ponto2D_t new_max = p2d_add_scalar(pos, 10);
+  controlador->max_qry = p2d_maximo(new_max, controlador->max_qry);
 
   return 1;
 }
@@ -61,11 +61,11 @@ int comando_via_e(void *_this, void *_controlador) {
   VerticeInfo info_origem = GrafoD_t.get_info_vertice( controlador->mapa_viario, label_origem );
   VerticeInfo info_destino = GrafoD_t.get_info_vertice( controlador->mapa_viario, label_destino );
 
-  Ponto2D pos_origem = info_origem->pos;
-  Ponto2D pos_destino = info_destino->pos;
+  Ponto2D_t pos_origem = info_origem->pos;
+  Ponto2D_t pos_destino = info_destino->pos;
 
-  Ponto2D pos_aresta = Ponto2D_t.add( pos_origem, pos_destino );
-  pos_aresta = Ponto2D_t.mult( pos_aresta, 0.5 );
+  Ponto2D_t pos_aresta = p2d_add( pos_origem, pos_destino );
+  pos_aresta = p2d_mult( pos_aresta, 0.5 );
   
 
   ArestaInfo aresta_info = create_aresta_info(

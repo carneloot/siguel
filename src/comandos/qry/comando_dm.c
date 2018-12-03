@@ -48,7 +48,7 @@ int comando_qry_dm(void *_this, void *_controlador) {
 
   Lista_t.insert(controlador->saida, info_pessoa);
 
-  Ponto2D posicao = endereco_get_coordenada(
+  Ponto2D_t posicao = endereco_get_coordenada(
     pessoa_get_endereco(pessoa), controlador);
 
   Figura figura = cria_circulo(

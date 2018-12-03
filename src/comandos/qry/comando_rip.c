@@ -63,11 +63,11 @@ int comando_qry_rip(void *_this, void *_controlador) {
   Lista_t.remove(pessoas, posic);
 
   // Mostrar informacoes
-  Ponto2D posicao = endereco_get_coordenada(pessoa_get_endereco(pessoa), controlador);
-  Ponto2D new_max = Ponto2D_t.add_scalar(posicao, TAMANHO_CRUZ);
-  posicao = Ponto2D_t.sub_scalar(posicao, TAMANHO_CRUZ / 2);
+  Ponto2D_t posicao = endereco_get_coordenada(pessoa_get_endereco(pessoa), controlador);
+  Ponto2D_t new_max = p2d_add_scalar(posicao, TAMANHO_CRUZ);
+  posicao = p2d_sub_scalar(posicao, TAMANHO_CRUZ / 2);
 
-  controlador->max_qry = Ponto2D_t.maximo(controlador->max_qry, new_max);
+  controlador->max_qry = p2d_maximo(controlador->max_qry, new_max);
   
   void *custom = cria_custom(posicao, TAMANHO_CRUZ, SVG_FIGURA_CRUZ, 0);
   Lista_t.insert(controlador->saida_svg_qry, cria_desenhavel(

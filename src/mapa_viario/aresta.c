@@ -12,7 +12,7 @@ ArestaInfo create_aresta_info(
   char *quadra_esquerda,
   double comprimento,
   double velocidade_media,
-  Ponto2D pos) {
+  Ponto2D_t pos) {
 
   ArestaInfo this = calloc(1, sizeof(*this));
 

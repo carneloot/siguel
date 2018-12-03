@@ -23,13 +23,13 @@
 double __distancia_vertice_ponto(const Item _vertice_info, const Item _ponto, int dim) {
   VerticeInfo vertice_info = (VerticeInfo) _vertice_info;
 
-  Ponto2D ponto         = * (Ponto2D *) _ponto;
-  Ponto2D ponto_vertice = vertice_info->pos;
+  Ponto2D_t ponto         = * (Ponto2D_t *) _ponto;
+  Ponto2D_t ponto_vertice = vertice_info->pos;
 
   switch (dim) {
     case 0:  return sqr(ponto.x - ponto_vertice.x);
     case 1:  return sqr(ponto.y - ponto_vertice.y);
-    case -1: return Ponto2D_t.dist_squared(ponto, ponto_vertice);
+    case -1: return p2d_dist_squared(ponto, ponto_vertice);
   }
 
   return DBL_MAX;
@@ -38,7 +38,7 @@ double __distancia_vertice_ponto(const Item _vertice_info, const Item _ponto, in
 /**
  * Retorna o vertice mais proximo do ponto passado
  */
-static VerticeInfo get_vertice_by_ponto(KDTree vertices, Ponto2D ponto) {
+static VerticeInfo get_vertice_by_ponto(KDTree vertices, Ponto2D_t ponto) {
   return KDTree_t.nearest_neighbor(vertices, &ponto, __distancia_vertice_ponto).point1;
 }
 
@@ -64,7 +64,7 @@ static double get_distancia_vertices(void *_atual, void *_target) {
   VerticeInfo atual  = (VerticeInfo) _atual;
   VerticeInfo target = (VerticeInfo) _target;
 
-  return Ponto2D_t.dist_squared(atual->pos, target->pos);
+  return p2d_dist_squared(atual->pos, target->pos);
 }
 
 /**
@@ -95,7 +95,7 @@ static void desenhar_caminho_svg(SVG svg, Lista caminho, GrafoD mapa, char *cor)
 
     VerticeInfo vertice = GrafoD_t.get_info_vertice(mapa, label);
 
-    Ponto2D *ponto = calloc(1, sizeof(*ponto));
+    Ponto2D_t *ponto = calloc(1, sizeof(*ponto));
     ponto->x = vertice->pos.x;
     ponto->y = vertice->pos.y;
 
@@ -159,11 +159,11 @@ static void escrever_caminho_txt(Lista saida, Lista caminho, GrafoD mapa) {
     VerticeInfo vertice_atual    = GrafoD_t.get_info_vertice(mapa, label);
     VerticeInfo vertice_proximo  = GrafoD_t.get_info_vertice(mapa, label_next);
 
-    Ponto2D pos_anterior = vertice_anterior->pos;
-    Ponto2D pos_atual    = vertice_atual->pos;
-    Ponto2D pos_proximo  = vertice_proximo->pos;
+    Ponto2D_t pos_anterior = vertice_anterior->pos;
+    Ponto2D_t pos_atual    = vertice_atual->pos;
+    Ponto2D_t pos_proximo  = vertice_proximo->pos;
 
-    int orientacao = Ponto2D_t.orientation(pos_anterior, pos_atual, pos_proximo);
+    int orientacao = p2d_orientation(pos_anterior, pos_atual, pos_proximo);
 
     // Se a orientacao for zero, esta em linha reta
     // Logo, nao precisa virar
@@ -190,7 +190,7 @@ static void escrever_caminho_txt(Lista saida, Lista caminho, GrafoD mapa) {
 /**
  * Desenha um circulo de cor cor nos ponto passado
  */
-static void desenhar_circulo(SVG svg, Ponto2D ponto, char *cor) {
+static void desenhar_circulo(SVG svg, Ponto2D_t ponto, char *cor) {
   #ifdef DEBUG
   Figura ponto1 = cria_circulo(ponto.x,  ponto.y,  5, cor, "transparent");
 
@@ -228,8 +228,8 @@ int comando_qry_p(void *_this, void *_controlador) {
     int registrador_origem = strtol( params[3] + 1, NULL, 10);
     int registrador_destino = strtol( params[4] + 1, NULL, 10);
 
-    Ponto2D origem = controlador->registradores[ registrador_origem ]; // ATENÇÃO, CONSIDERANDO OS REGISTRADORES COMO 1-10 JÁ QUE EXISTEM 11 REGISTRADORES
-    Ponto2D destino = controlador->registradores[ registrador_destino ];
+    Ponto2D_t origem = controlador->registradores[ registrador_origem ]; // ATENÇÃO, CONSIDERANDO OS REGISTRADORES COMO 1-10 JÁ QUE EXISTEM 11 REGISTRADORES
+    Ponto2D_t destino = controlador->registradores[ registrador_destino ];
 
     VerticeInfo origem_info  = get_vertice_by_ponto(controlador->vertices_mapa_viario, origem);
     VerticeInfo destino_info = get_vertice_by_ponto(controlador->vertices_mapa_viario, destino);
@@ -293,8 +293,8 @@ int comando_qry_p(void *_this, void *_controlador) {
   int registrador_origem = strtol( params[2] + 1, NULL, 10);
   int registrador_destino = strtol( params[3] + 1, NULL, 10);
 
-  Ponto2D origem = controlador->registradores[ registrador_origem ]; // ATENÇÃO, CONSIDERANDO OS REGISTRADORES COMO 1-10 JÁ QUE EXISTEM 11 REGISTRADORES
-  Ponto2D destino = controlador->registradores[ registrador_destino ];
+  Ponto2D_t origem = controlador->registradores[ registrador_origem ]; // ATENÇÃO, CONSIDERANDO OS REGISTRADORES COMO 1-10 JÁ QUE EXISTEM 11 REGISTRADORES
+  Ponto2D_t destino = controlador->registradores[ registrador_destino ];
 
   VerticeInfo origem_info = get_vertice_by_ponto( controlador->vertices_mapa_viario, origem );
   VerticeInfo destino_info = get_vertice_by_ponto( controlador->vertices_mapa_viario, destino );
@@ -405,8 +405,8 @@ int comando_qry_sp(void *_this, void *_controlador) {
     int r1 = strtol(this->params[offset_total + i]     + 1, NULL, 10);
     int r2 = strtol(this->params[offset_total + i + 1] + 1, NULL, 10);
 
-    Ponto2D pos_origem  = controlador->registradores[r1];
-    Ponto2D pos_destino = controlador->registradores[r2];
+    Ponto2D_t pos_origem  = controlador->registradores[r1];
+    Ponto2D_t pos_destino = controlador->registradores[r2];
 
     VerticeInfo origem_info  = get_vertice_by_ponto(controlador->vertices_mapa_viario, pos_origem);
     VerticeInfo destino_info = get_vertice_by_ponto(controlador->vertices_mapa_viario, pos_destino);

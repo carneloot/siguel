@@ -42,15 +42,15 @@ int equalElements(const void *_a, const void *_b) {
   const Elemento a = (const Elemento) _a;
   const Elemento b = (const Elemento) _b;
 
-  return (Ponto2D_t.equal(get_pos(a), get_pos(b)) && !strcmp(get_id_elemento(a), get_id_elemento(b)));
+  return (p2d_equal(get_pos(a), get_pos(b)) && !strcmp(get_id_elemento(a), get_id_elemento(b)));
 }
 
 int compareX(const void *_a, const void *_b) {
   Elemento a = (Elemento) _a;
   Elemento b = (Elemento) _b;
 
-  Ponto2D posA = get_pos(a);
-  Ponto2D posB = get_pos(b);
+  Ponto2D_t posA = get_pos(a);
+  Ponto2D_t posB = get_pos(b);
 
   return (posA.x - posB.x);
 }
@@ -59,8 +59,8 @@ int compareY(const void *_a, const void *_b) {
   Elemento a = (Elemento) _a;
   Elemento b = (Elemento) _b;
 
-  Ponto2D posA = get_pos(a);
-  Ponto2D posB = get_pos(b);
+  Ponto2D_t posA = get_pos(a);
+  Ponto2D_t posB = get_pos(b);
 
   return (posA.y - posB.y);
 }
@@ -77,9 +77,9 @@ int elementoDentro(Item _this, int dim, Item rect[]) {
 
   int result;
 
-  Ponto2D pos = get_pos(this);
-  Ponto2D *a  = (Ponto2D *) rect[0];
-  Ponto2D *b  = (Ponto2D *) rect[1];
+  Ponto2D_t pos = get_pos(this);
+  Ponto2D_t *a  = (Ponto2D_t *) rect[0];
+  Ponto2D_t *b  = (Ponto2D_t *) rect[1];
 
   result = 0;
 
@@ -112,7 +112,7 @@ int equalVertices(const void *_a, const void *_b) {
   const VerticeInfo a = (const VerticeInfo) _a;
   const VerticeInfo b = (const VerticeInfo) _b;
 
-  return (Ponto2D_t.equal(a->pos, b->pos) && !strcmp(a->id, b->id));
+  return (p2d_equal(a->pos, b->pos) && !strcmp(a->id, b->id));
 }
 
 int compareXVertice(const void *_a, const void *_b) {
@@ -132,7 +132,7 @@ int compareYVertice(const void *_a, const void *_b) {
 int equalArestas( const void* _this, const void* _other ) {
   ArestaInfo this  = (ArestaInfo) _this;
   ArestaInfo other = (ArestaInfo) _other;
-  return (!strcmp(this->nome, other->nome) && Ponto2D_t.equal(this->pos, other->pos));
+  return (!strcmp(this->nome, other->nome) && p2d_equal(this->pos, other->pos));
 }
 
 int compareXAresta( const void* _this, const void* _other ) {
@@ -181,8 +181,8 @@ Controlador cria_controlador() {
     this->cores_borda[i] = NULL;
   }
 
-  this->max_geo = Ponto2D_t.new(0, 0);
-  this->max_qry = Ponto2D_t.new(0, 0);
+  this->max_geo = p2d_new(0, 0);
+  this->max_qry = p2d_new(0, 0);
 
   this->fila_execucao = Lista_t.create();
 
@@ -193,7 +193,7 @@ Controlador cria_controlador() {
     this->tabelas[i] = HashTable_t.create(73);
 
   for (i = 0; i < 11; i++) {
-    this->registradores[i] = Ponto2D_t.new(0, 0);
+    this->registradores[i] = p2d_new(0, 0);
   }
 
   this->mapa_viario          = GrafoD_t.create();
@@ -572,7 +572,7 @@ void desenhar_sobreposicoes(void *c, void *s) {
     figDash = (Figura) Lista_t.get(this->sobreposicoes, iterator);
 
     desenha_figura(s, figDash, 1.0, FIG_BORDA_TRACEJADA);
-    Ponto2D pos = get_pos(figDash);
+    Ponto2D_t pos = get_pos(figDash);
     pos.y -= 5;
     escreve_texto(s, "sobrepoe", pos, 15, "purple");
 

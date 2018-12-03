@@ -4,7 +4,7 @@
 
 #include <utils.h>
 
-void *cria_custom(Ponto2D pos, double tamanho, char *string, char *cor) {
+void *cria_custom(Ponto2D_t pos, double tamanho, char *string, char *cor) {
   struct Custom *custom = malloc(sizeof(*custom));
 
   custom->pos     = pos;

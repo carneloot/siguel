@@ -10,7 +10,7 @@
 
 struct SVG {
   Arquivo saida;
-  Ponto2D max;
+  Ponto2D_t max;
 };
 
 
@@ -21,19 +21,19 @@ struct SVG {
 
 static void desenhar_grid(SVG _this) {
   struct SVG *this = (struct SVG *) _this;
-  Ponto2D start, end;
+  Ponto2D_t start, end;
 
   escreve_comentario(this, "GRID");
 
   for (float x = 0; x < this->max.x; x += OFFSET_GRID) {
-    start = Ponto2D_t.new(x, 0);
-    end   = Ponto2D_t.new(x, this->max.y);
+    start = p2d_new(x, 0);
+    end   = p2d_new(x, this->max.y);
     desenha_linha(this, start, end, 0.4, 1, "black", false);
   }
 
   for (float y = 0; y < this->max.y; y += OFFSET_GRID) {
-    start = Ponto2D_t.new(0, y);
-    end   = Ponto2D_t.new(this->max.x, y);
+    start = p2d_new(0, y);
+    end   = p2d_new(this->max.x, y);
     desenha_linha(this, start, end, 0.4, 1, "black", false);
   }
 }
@@ -51,7 +51,7 @@ SVG cria_SVG(char *path, double max_width, double max_height) {
   this = (struct SVG *) malloc(sizeof(struct SVG));
 
   this->saida = abrir_arquivo(path, ESCRITA);
-  this->max   = Ponto2D_t.new(max_width + GARANTIA_TAMANHO, max_height + GARANTIA_TAMANHO);
+  this->max   = p2d_new(max_width + GARANTIA_TAMANHO, max_height + GARANTIA_TAMANHO);
 
   escrever_linha(
     this->saida,
@@ -93,7 +93,7 @@ void desenha_elemento(SVG this, Elemento e) {
 
   // Se for quadra, desenhar o CEP no meio
   if (get_tipo_elemento(e) == QUADRA) {
-    Ponto2D pos;
+    Ponto2D_t pos;
     char *cep;
 
     pos = get_pos(e);
@@ -108,7 +108,7 @@ void desenha_elemento(SVG this, Elemento e) {
   destruir_figura(figura);
 }
 
-void desenha_asset(SVG _this, Ponto2D pos, Ponto2D size, char *nome) {
+void desenha_asset(SVG _this, Ponto2D_t pos, Ponto2D_t size, char *nome) {
   struct SVG *this = (struct SVG *) _this;
 
   char *fullpath = format_string("%s%s", ASSETS_FOLDER, nome);
@@ -131,7 +131,7 @@ void desenha_asset(SVG _this, Ponto2D pos, Ponto2D size, char *nome) {
   free(asset_string);
 }
 
-void escreve_texto(SVG s, char *texto, Ponto2D pos, float tamanho, char *cor) {
+void escreve_texto(SVG s, char *texto, Ponto2D_t pos, float tamanho, char *cor) {
   struct SVG *this;
 
   this = (struct SVG *) s;
@@ -164,7 +164,7 @@ void escreve_comentario(SVG _this, char *_texto, ...) {
   #endif
 }
 
-void desenha_linha(SVG s, Ponto2D a, Ponto2D b, float opacity, double tamanho, char *cor, bool seta) {
+void desenha_linha(SVG s, Ponto2D_t a, Ponto2D_t b, float opacity, double tamanho, char *cor, bool seta) {
   struct SVG *this;
 
   this = (struct SVG *) s;

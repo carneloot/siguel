@@ -18,14 +18,14 @@ void desenha_figura(SVG this, Figura f, float opacity, int is_dashed);
 
 void desenha_elemento(SVG this, Elemento e);
 
-void desenha_asset(SVG this, Ponto2D pos, Ponto2D size, char *nome);
+void desenha_asset(SVG this, Ponto2D_t pos, Ponto2D_t size, char *nome);
 
 void escreve_texto(
-  SVG this, char *texto, Ponto2D pos, float tamanho, char *cor);
+  SVG this, char *texto, Ponto2D_t pos, float tamanho, char *cor);
 
 void escreve_comentario(SVG this, char *texto, ...);
 
-void desenha_linha(SVG this, Ponto2D a, Ponto2D b, float opacity, double tamanho, char *cor, bool seta);
+void desenha_linha(SVG this, Ponto2D_t a, Ponto2D_t b, float opacity, double tamanho, char *cor, bool seta);
 
 void desenha_desenhavel(SVG this, Desenhavel desenhavel);
 

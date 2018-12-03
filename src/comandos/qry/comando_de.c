@@ -48,7 +48,7 @@ int comando_qry_de(void *_this, void *_controlador) {
 
   Lista_t.insert(controlador->saida, info_comercio);
 
-  Ponto2D posicao = endereco_get_coordenada(
+  Ponto2D_t posicao = endereco_get_coordenada(
     comercio_get_endereco(comercio), controlador);
 
   Figura figura = cria_circulo(

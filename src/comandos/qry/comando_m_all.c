@@ -53,9 +53,9 @@ static void __reportar_pessoas(Lista pessoas, struct Controlador *controlador) {
 
 static Lista __quadras_dentro(KDTree arvore, Figura figura) {
 
-  Ponto2D pA = get_pos(figura);
+  Ponto2D_t pA = get_pos(figura);
 
-  Ponto2D pB = pA;
+  Ponto2D_t pB = pA;
   pB.y += get_h(figura);
   pB.x += get_w(figura);
 
@@ -135,8 +135,8 @@ int comando_qry_mr(void *_this, void *_controlador) {
 
   char **params = this->params;
 
-  Ponto2D pos  = Ponto2D_t.new(strtod(params[0], NULL), strtod(params[1], NULL));
-  Ponto2D size = Ponto2D_t.new(strtod(params[2], NULL), strtod(params[3], NULL));
+  Ponto2D_t pos  = p2d_new(strtod(params[0], NULL), strtod(params[1], NULL));
+  Ponto2D_t size = p2d_new(strtod(params[2], NULL), strtod(params[3], NULL));
   
   Figura figura = cria_retangulo(pos.x, pos.y, size.x, size.y, "pink", "pink");
 
