@@ -19,10 +19,11 @@ struct Pessoa {
 Pessoa cria_pessoa(char *cpf, char *nome, char *sobrenome, int sexo, char *nasc) {
   struct Pessoa *this = malloc(sizeof(*this));
 
-  this->cpf       = malloc(strlen(cpf) + 1);
-  this->nome      = malloc(strlen(nome) + 1);
-  this->sobrenome = malloc(strlen(sobrenome) + 1);
-  this->nasc      = malloc(strlen(nasc) + 1);
+  this->cpf         = malloc(strlen(cpf) + 1);
+  this->nome        = malloc(strlen(nome) + 1);
+  this->sobrenome   = malloc(strlen(sobrenome) + 1);
+  this->nasc        = malloc(strlen(nasc) + 1);
+  this->complemento = NULL;
   strcpy(this->cpf, cpf);
   strcpy(this->nome, nome);
   strcpy(this->sobrenome, sobrenome);
@@ -59,6 +60,8 @@ void pessoa_destruir(Pessoa _this) {
   free(this->nome);
   free(this->sobrenome);
   free(this->nasc);
+  if (this->complemento)
+    free(this->complemento);
 
   free(this);
 }
