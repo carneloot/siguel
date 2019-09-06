@@ -22,6 +22,7 @@ enum Tabelas {
   TIPO_X_DESCRICAO,
   CEP_X_QUADRA,
   CPF_X_PESSOA,
+  CPF_X_CEP,
   TABELAS_TOTAL
 };
 

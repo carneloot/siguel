@@ -25,8 +25,17 @@ int __comando_pm_m(void *_this, void *_controlador) {
 
   int face   = char_to_face(params[2][0]);
   int numero = strtol(params[3], NULL, 10);
+  char *cep  = params[1];
+  char *complemento = params[4];
 
-  pessoa_set_endereco(pessoa, params[1], face, numero, params[4]);
+  pessoa_set_endereco(pessoa, cep, face, numero, complemento);
+
+  // Adicionar na tabela CPF_X_CEP
+  HashInfo info_cpf_cep;
+  info_cpf_cep.chave = pessoa_get_cpf(pessoa);
+  info_cpf_cep.valor = pessoa_get_cep(pessoa);
+
+  HashTable_t.insert(controlador->tabelas[CPF_X_CEP], info_cpf_cep);
 
   return 1;
 }

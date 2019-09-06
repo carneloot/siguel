@@ -9,9 +9,11 @@ struct Endereco {
   int numero;
 };
 
-typedef struct Endereco Endereco;
+typedef struct Endereco *Endereco;
 
 Endereco cria_endereco(char *cep, enum Face face, int numero);
+
+void endereco_destruir(Endereco this);
 
 int char_to_face(char indicador);
 

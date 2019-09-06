@@ -14,6 +14,8 @@ void pessoa_set_endereco(Pessoa this, char *cep, int face, int num, char *comple
 
 char *pessoa_get_cpf(Pessoa this);
 
+char *pessoa_get_cep(Pessoa this);
+
 char *pessoa_get_nome(Pessoa this);
 
 void pessoa_destruir(Pessoa this);

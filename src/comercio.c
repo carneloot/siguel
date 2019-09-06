@@ -9,7 +9,7 @@ struct Comercio {
   char *tipo;
   char *nome;
 
-  struct Endereco endereco;
+  Endereco endereco;
 };
 
 Comercio cria_comercio(char *cnpj, char *tipo, char *cep, int face, int num, char *nome) {
@@ -33,6 +33,7 @@ void comercio_destruir(Comercio _this) {
   free(this->tipo);
   free(this->cnpj);
   free(this->nome);
+  endereco_destruir(this->endereco);
 
   free(this);
 }
